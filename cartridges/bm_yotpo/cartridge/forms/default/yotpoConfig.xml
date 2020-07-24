@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<form xmlns="http://www.demandware.com/xml/form/2008-04-19">
+	
+	<field formid="locale" label="label.locale" type="string" mandatory="true" binding="localeID" missing-error="locale.missing" value-error="locale.missing">
+		<options>
+			<option optionid="" 	label="label.locale.select" 		value=""/>
+        </options>
+    </field>
+
+	<field formid="appkey" label="label.appkey" binding="appkey" type="string" mandatory="true" max-length="50" parse-error=""/>
+	<field formid="clientsecret" label="label.clientsecret" binding="clientsecret" type="string" mandatory="true" max-length="50" parse-error=""/>
+	<field formid="utokenauth" label="label.utokenauth" binding="utokenauth" type="string" max-length="50" parse-error=""/>
+
+    <field formid="ratingsenabled" label="label.enableratings" binding="enableratings" type="boolean" checked="false" default-value="false" mandatory="false" />
+    <field formid="reviewsenabled" label="label.enablereviews" binding="enablereviews" type="boolean" checked="false" default-value="false" mandatory="false" />
+    <field formid="purchasefeedenabled" label="label.enablefeed" binding="purchasefeedenabled" type="boolean" checked="false" default-value="false" mandatory="false" />
+
+	<action formid="update" valid-form="false"/>
+	<action formid="add" valid-form="false"/>
+	<action formid="remove" valid-form="false"/>
+	
+</form>

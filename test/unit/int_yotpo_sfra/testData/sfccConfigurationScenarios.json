@@ -1,0 +1,61 @@
+{
+    "enabledConfig": {
+        "custom": {
+            "clientSecretKey": "clientSecretKey",
+            "appKey": "appKey",
+            "utokenAuthCode": "utokenAuthCode",
+            "enablePurchaseFeed": true,
+            "productInformationFromMaster": true,
+            "exportGroupIdInOrder": true
+        }
+    },
+    "noTokenConfig": {
+        "custom": {
+            "clientSecretKey": "clientSecretKey",
+            "appKey": "appKey",
+            "utokenAuthCode": null,
+            "enablePurchaseFeed": true,
+            "productInformationFromMaster": true,
+            "exportGroupIdInOrder": true
+        }
+    },
+    "disabledConfig": {
+        "custom": {
+            "clientSecretKey": null,
+            "appKey": null,
+            "utokenAuthCode": null,
+            "enablePurchaseFeed": false,
+            "productInformationFromMaster": false,
+            "exportGroupIdInOrder": false
+        }
+    },
+    "jobConfig": {
+        "custom": {
+            "orderFeedJobLastExecutionDateTime": "123"
+        }
+    },
+    "configsByLocale": {
+        "default": {
+            "utokenAuthCode": "utokenAuthCode",
+            "appKey": "appKey"
+        },
+        "en_US": {
+            "utokenAuthCode": "utokenAuthCode",
+            "appKey": "appKey"
+        }
+    },
+    "emptyConfigsByLocale": {
+        "default": {},
+        "en_US": {}
+    },
+    "baseYotpoRequestParams": {
+        "validate_data": true,
+        "platform": "general",
+        "utoken": "utokenAuthCode",
+        "orders": []
+    },
+    "lastJobRunInPastDateTimes": {
+        "orderFeedJobLastExecutionTime": "2019-08-14T14:39:14.832Z",
+        "currentDateTime": "2019-08-15T14:39:14.832Z"
+    }
+}

@@ -1,0 +1,17 @@
+table.wide-table { width:100%; }
+table.wide-table tbody tr:first-child td { padding-top: 0.5em; }
+td.label-cell,
+td.input-cell { vertical-align: top; padding-bottom: 1.5em; }
+td.label-cell { width: 13%;  padding-right: 2%; }
+td.input-cell { width: 77%; }
+td.label-cell p,
+td.input-cell p { margin: 0.4em 0 0; }
+td.label-cell p { font-size: 1.2rem; }
+td.input-cell input[type="text"] { min-width: 26em; }
+td.label-cell label { margin: 0; font-weight: bold; font-size: 1.5rem; color: #444; }
+.invalid-feedback { color: red; }
+#get-started { text-align: center;  margin-top: 2em; line-height: 2; }
+#get-started h2 { font-weight: bold; margin-bottom: 0.5em; color: #444; }
+#get-started p { margin-bottom: 1.5em; }
+#get-started a { color: #009edb; font-size: 1.2em; font-weight: bold; text-decoration: none; display: inline-block; position: relative; padding-right: 1em;}
+#get-started a::after { content: "›"; font-size: 1.8em; display: inline-block; height: 1em; position: absolute; top: 0.09em; right: 0; line-height: 0.75; }

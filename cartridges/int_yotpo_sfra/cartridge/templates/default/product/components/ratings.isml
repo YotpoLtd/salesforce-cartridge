@@ -1,0 +1,7 @@
+<isif condition="${pdict.yotpoWidgetData.isRatingEnabled}">
+    <isinclude template="widget/yotpoRatingsWidget" />
+<iselse>
+    <isif condition="${pdict.display && pdict.display.ratings}">
+        <isinclude template="product/components/productRating" />
+    </isif>
+</isif>

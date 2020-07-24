@@ -1,0 +1,9 @@
+<iscomment>
+    Conversion tracking should only be done in the purchase confirmation
+    page once the customer has successfully paid.
+</iscomment>
+<isif condition="${pdict.yotpoConversionTrackingData.isCartridgeEnabled}">
+    <isif condition="${!empty(pdict.yotpoConversionTrackingData.conversionTrackingURL)}">
+        <img id="yotpo-conversion" src="${pdict.yotpoConversionTrackingData.conversionTrackingURL}" width="1" height="1">
+    </isif>
+</isif>

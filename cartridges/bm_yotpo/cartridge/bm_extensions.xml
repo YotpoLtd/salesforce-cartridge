@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<extensions xmlns="http://www.demandware.com/xml/bmmodules/2007-12-11" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.demandware.com/xml/bmmodules/2007-12-11 bmext.xsd">
+
+	<menuaction id="customsubmenu_yotpoadmin_manage" menupath="site-prefs" position="12000" site="true">
+		<name xml:lang="x-default">Manage Yotpo Configurations</name>
+		<short_description xml:lang="x-default">
+      Manage Yotpo configurations.
+		</short_description>
+		<description xml:lang="x-default">
+      Manage Yotpo configurations.
+		</description>
+		<exec pipeline="YotpoAdmin" node="Start"/>
+    <sub-pipelines>
+			<pipeline name="YotpoAdmin-Start" />
+			<pipeline name="YotpoAdmin-JsonStart" />
+			<pipeline name="YotpoAdmin-Save" />
+			<pipeline name="YotpoAdmin-Delete" />
+    </sub-pipelines>
+		<parameters>
+			<parameter name="menuname" value="Manage Yotpo configurations"/>
+			<parameter name="mainmenuname" value="Yotpo Admin"/>
+			<parameter name="menupath" value="customsitemenuextension_yotpoadmin"/>
+		</parameters>
+		<permissions>
+			<!-- no permissions necessary for this extension -->
+		</permissions>
+		<icon>icons/yotpo-logo.png</icon>
+	</menuaction>
+</extensions>

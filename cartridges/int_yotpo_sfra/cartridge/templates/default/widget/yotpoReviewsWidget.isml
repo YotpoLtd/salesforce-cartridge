@@ -1,0 +1,18 @@
+<iscomment>
+    Yotpo Reviews Widget
+</iscomment>
+<isif condition="${pdict.yotpoWidgetData.isReviewEnabled}">
+    <!--- Yotpo Reviews Widget --->
+    <div id="yotpo-reviews-top-div" class="yotpo yotpo-main-widget"
+        data-appkey="${pdict.yotpoWidgetData.yotpoAppKey}"
+        data-domain="${pdict.yotpoWidgetData.domainAddress}"
+        data-product-id="${pdict.yotpoWidgetData.productID}"
+        data-product-models="${pdict.yotpoWidgetData.productModel}"
+        data-name="${pdict.yotpoWidgetData.productName}"
+        data-url="${pdict.yotpoWidgetData.productURL}"
+        data-image-url="${pdict.yotpoWidgetData.imageURL}"
+        data-description="${pdict.yotpoWidgetData.productDesc}"
+        data-bread-crumbs="${pdict.yotpoWidgetData.productCategory}">
+    </div>
+    <!--- //////////////////// --->
+</isif>

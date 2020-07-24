@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://www.demandware.com/xml/impex/metadata/2006-10-31">
+    <custom-type type-id="yotpoConfiguration">
+        <display-name xml:lang="x-default">Yotpo Configuration</display-name>
+        <description xml:lang="x-default">The configuration object that holds mandatory parameters for Yotpo.</description>
+        <staging-mode>no-staging</staging-mode>
+        <storage-scope>site</storage-scope>
+        <key-definition attribute-id="localeID">
+            <display-name xml:lang="x-default">Locale ID</display-name>
+            <description xml:lang="x-default">The locale ID which represents the specific language, which maps with a specific account on Yotpo.</description>
+            <type>string</type>
+            <min-length>0</min-length>
+        </key-definition>
+        <attribute-definitions>
+            <attribute-definition attribute-id="appKey">
+                <display-name xml:lang="x-default">App Key</display-name>
+                <description xml:lang="x-default">This is the App Key for a specific account on Yotpo</description>
+                <type>string</type>
+                <localizable-flag>false</localizable-flag>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="clientSecretKey">
+                <display-name xml:lang="x-default">Client Secret Key</display-name>
+                <description xml:lang="x-default">This is the Client Secret Key for a specific account on Yotpo</description>
+                <type>string</type>
+                <localizable-flag>false</localizable-flag>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="enableRatings">
+                <display-name xml:lang="x-default">Enable Ratings</display-name>
+                <description xml:lang="x-default">This flag indicates whether the ratings are enabled for the specific Locale.</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+            <attribute-definition attribute-id="enablePurchaseFeed">
+                <display-name xml:lang="x-default">Enable Purchase Feed</display-name>
+                <description xml:lang="x-default">This flag indicates whether the purchase feed is enabled for the specific Locale.</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+            <attribute-definition attribute-id="enableReviews">
+                <display-name xml:lang="x-default">Enable Reviews</display-name>
+                <description xml:lang="x-default">This flag indicates whether the reviews are enabled for the specific Locale.</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+            <attribute-definition attribute-id="utokenAuthCode">
+                <display-name xml:lang="x-default">utoken Authentication Code</display-name>
+                <description xml:lang="x-default">This token is retrieved from Yotpo Authentication call response. It remains valid for few hours before it expires. It is updated by the Yotpo authentication process once it expires.</description>
+                <type>string</type>
+                <localizable-flag>false</localizable-flag>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+        </attribute-definitions>
+        <group-definitions>
+            <attribute-group group-id="yotpoConfigurationAttributes">
+                <display-name xml:lang="x-default">Yotpo Configuration Attributes</display-name>
+                <description xml:lang="x-default">This is default group to combine Yotpo Configuration attributes</description>
+                <attribute attribute-id="localeID"/>
+                <attribute attribute-id="appKey"/>
+                <attribute attribute-id="clientSecretKey"/>
+                <attribute attribute-id="utokenAuthCode"/>
+                <attribute attribute-id="enableReviews"/>
+                <attribute attribute-id="enableRatings"/>
+                <attribute attribute-id="enablePurchaseFeed"/>
+            </attribute-group>
+        </group-definitions>
+    </custom-type>
+
+    <custom-type type-id="yotpoJobsConfiguration">
+        <display-name xml:lang="x-default">Yotpo Jobs Configuration</display-name>
+        <description xml:lang="x-default">This saves configuration related to Yotpo Jobs</description>
+        <staging-mode>no-staging</staging-mode>
+        <storage-scope>site</storage-scope>
+        <key-definition attribute-id="id">
+            <display-name xml:lang="x-default">ID</display-name>
+            <description xml:lang="x-default">The unique ID for Yotpo Configuration Job</description>
+            <type>string</type>
+            <min-length>0</min-length>
+        </key-definition>
+        <attribute-definitions>
+            <attribute-definition attribute-id="orderFeedJobLastExecutionDateTime">
+                <display-name xml:lang="x-default">Order Feed Job Last Execution Date Time</display-name>
+                <description xml:lang="x-default">This attribute stores the order feed job last execution date time.</description>
+                <type>datetime</type>
+                <localizable-flag>false</localizable-flag>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+        </attribute-definitions>
+        <group-definitions>
+            <attribute-group group-id="jobsConfiguraiton">
+                <display-name xml:lang="x-default">Jobs Configuration</display-name>
+                <description xml:lang="x-default">This is default group to combine Yotpo Jobs Configuration attributes</description>
+                <attribute attribute-id="orderFeedJobLastExecutionDateTime"/>
+                <attribute attribute-id="id"/>
+            </attribute-group>
+        </group-definitions>
+    </custom-type>
+
+</metadata>

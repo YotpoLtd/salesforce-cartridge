@@ -1,0 +1,61 @@
+{
+    "orderExportEnabled": {
+        "productInformationFromMaster": true,
+        "exportGroupIdInOrder": true
+    },
+    "orderExportDisabled": {
+        "productInformationFromMaster": false,
+        "exportGroupIdInOrder": false
+    },
+    "productData": {
+        "PRODUCT_ID__productID": {
+            "name": "Product Name",
+            "imageURL": "imageUrl",
+            "description": "Product Short Description",
+            "price": "100.11",
+            "productGroupId": "productID",
+            "specs": {
+                "upc": "UPC"
+            },
+            "url": "productUrl",
+            "vendor": "brand"
+        }
+    },
+    "optionalProductData": {
+        "description": "Product Short Description",
+        "imageURL": "imageUrl",
+        "price": "100.11",
+        "vendor": "brand"
+    },
+    "orderData": {
+        "order_id": "0000001",
+        "order_date": {},
+        "currency_iso": "currencyCode",
+        "customer_name": "firstName lastName",
+        "email": "profile@email.com"
+    },
+    "okServiceStatus": {
+        "success": true,
+        "authenticationError": false,
+        "serviceError": false,
+        "unknownError": false
+    },
+    "authErrorServiceStatus": {
+        "success": false,
+        "authenticationError": true,
+        "serviceError": false,
+        "unknownError": false
+    },
+    "serviceErrorServiceStatus": {
+        "success": false,
+        "authenticationError": false,
+        "serviceError": true,
+        "unknownError": false
+    },
+    "unknownErrorServiceStatus": {
+        "success": false,
+        "authenticationError": false,
+        "serviceError": false,
+        "unknownError": true
+    }
+}

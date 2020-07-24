@@ -1,0 +1,39 @@
+{
+    "base": {
+        "error": 0,
+        "errorMessage": {
+            "error": ""
+        },
+        "mockResult": true,
+        "msg": "",
+        "object": "",
+        "ok": true,
+        "status": "OK",
+        "unavailableReason": ""
+    },
+    "baseError": {
+        "status": "SERVICE_UNAVAILABLE",
+        "unavailableReason": "SERVICE_UNAVAILABLE_REASON",
+        "ok": false,
+        "error": 500
+    },
+    "ok": {
+        "code": 200,
+        "message": "OK",
+        "uuid": "22e03d7c-aba557-467d-55-a60a7c28ad73"
+    },
+    "unknownError": {
+        "message": "Failure",
+        "error_type": "YotpoApiUnknownException",
+        "code": 500,
+        "uuid": "04c0290c-6c28-4e1a-ab0b-3cc58e80147f",
+        "s": 4
+    },
+    "unauthorized": {
+        "message": "You are not authorized to access this page.",
+        "code": 401,
+        "error_type": "Exceptions::AccessDenied",
+        "uuid": "98e633ac-147b-41c1-aaba-ff2b4413d5fb",
+        "s": 4
+    }
+}

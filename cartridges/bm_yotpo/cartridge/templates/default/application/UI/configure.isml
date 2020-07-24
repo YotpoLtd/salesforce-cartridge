@@ -1,0 +1,138 @@
+<!--- TEMPLATENAME: configure.isml --->
+<isdecorate template = "application/MenuFrame.isml">
+<isinclude template="custom/modules" />
+
+<isbreadcrumbs bcurl1="${URLUtils.url('SiteNavigationBar-ShowMenuitemOverview','CurrentMenuItemId','site-prefs','itemType','Site', 'SelectedMenuItem', '')}" bctext1="Site Preferences" currentpage="${URLUtils.url('YotpoAdmin-Start')}" currenttext="Manage Yotpo Configurations" />
+
+<link rel="stylesheet" type="text/css" href="${URLUtils.staticURL('/css/yotpoConfig.css')}">
+
+    <div>
+        <form action="${URLUtils.url('YotpoAdmin-Edit')}" method="post" name="yotpoconfigform" id="yotpoconfigform">
+
+            <div id="locales-container">
+                <table class="infobox w e s wide-table" cellspacing="0" cellpadding="4" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="infobox_title_search">
+                                ${Resource.msg('yotpoform.title','forms',null)}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table_title_description">
+                                <label class="form-control-label hidden-label" for="locale">Locale</label>
+                                <select id="locale" name="locale" class="form-control locale custom-select" data-action="${URLUtils.url('YotpoAdmin-JsonStart')}">
+                                    <isloop items=${pdict.allowedLocales} var="locale" status="localeIndex">
+                                        <option id="${locale.localeID}" value="${locale.localeID}" <isif condition="${locale.selected}">selected="selected"</isif>>
+                                            ${locale.localeID}
+                                        </option>
+                                    </isloop>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="cre-menu-div">
+                <table class="w e s cre-table wide-table" cellspacing="0" cellpadding="4" border="0">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <table class="wide-table" cellspacing="0" cellpadding="4">
+                                    <tr>
+                                        <td class="label-cell">
+                                            <label for="appkey">${pdict.yotpoConfig.appkey.label} &#09;</label>
+                                        </td>
+                                        <td class="input-cell">
+                                            <input value="${pdict.yotpoConfig.appkey.value}" name="appkey" id="appkey" type="text" size="50">
+                                            <p>
+                                                ${Resource.msg('fieldDesc.appkey.desc1','forms',null)}
+                                                <br />
+                                                <a href="${Resource.msg('link.storesettings.href','forms',null)}" target="_blank">${Resource.msg('link.storesettings','forms',null)}</a>
+                                                ${Resource.msg('fieldDesc.appkey.desc2','forms',null)}
+                                                <strong>${Resource.msg('label.apply','forms',null)}</strong>.
+                                                <a href="${Resource.msg('link.help.href','forms',null)}" target="_blank">${Resource.msg('link.help','forms',null)}</a>
+                                            </p>
+                                            <div id="appkey-invalid-feedback" class="invalid-feedback"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-cell">
+                                            <label for="clientsecret">${pdict.yotpoConfig.clientsecret.label} &#09;</label>
+                                        </td>
+                                        <td class="input-cell"><input value="${pdict.yotpoConfig.clientsecret.value}" name="clientsecret" id="clientsecret" type="text" size="50"><div id="clientsecret-invalid-feedback" class="invalid-feedback"></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-cell">
+                                            <label for="ratingsenabled">${pdict.yotpoConfig.ratingsenabled.label} &#09;</label>
+                                            <p>${Resource.msg('label.enableratings.desc','forms',null)}</p>
+                                        </td>
+                                        <td class="input-cell"><input type="checkbox" name="ratingsenabled" id="ratingsenabled" value="true" <isif condition="${pdict.yotpoConfig.ratingsenabled.value}">checked="checked"</isif>></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-cell">
+                                            <label for="reviewsenabled">${pdict.yotpoConfig.reviewsenabled.label} &#09;</label>
+                                            <p>${Resource.msg('label.enablereviews.desc','forms',null)}</p>
+                                        </td>
+                                        <td class="input-cell"><input type="checkbox" name="reviewsenabled" id="reviewsenabled" value="true" <isif condition="${pdict.yotpoConfig.reviewsenabled.value}">checked="checked"</isif>></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-cell">
+                                            <label for="purchasefeedenabled">${pdict.yotpoConfig.purchasefeedenabled.label} &#09;</label>
+                                            <p>${Resource.msg('label.enablefeed.desc','forms',null)}</p>
+                                        </td>
+                                        <td class="input-cell"><input type="checkbox" name="purchasefeedenabled" id="purchasefeedenabled" value="true" <isif condition="${pdict.yotpoConfig.purchasefeedenabled.value}">checked="checked"</isif>></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <table class="w e s wide-table" cellspacing="0" cellpadding="0" border="0">
+                <tbody>
+                    <tr>
+                        <td>
+                            <table border="0" cellspacing="4" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <button class="button" type="submit" id="update-btn" value="${Resource.msg('label.apply','forms',null)}" data-action="${URLUtils.url('YotpoAdmin-Save')}" name="yotpoconfigform_submit">
+                                            <span>${Resource.msg('label.apply','forms',null)}</span>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="button" type="submit" id="remove-btn" value="${Resource.msg('label.delete','forms',null)}" data-action="${URLUtils.url('YotpoAdmin-Delete')}" name="yotpoconfigform_submit" <isif condition="${pdict.isAddEnabled}">disabled</isif>>
+                                            <span>${Resource.msg('label.delete','forms',null)}</span>
+                                        </button>
+                                    </td>
+                                    <td align="right">
+                                        <div id="yotpoconfig-progress-div">
+                                            <span id="yotpoconfig-progress-text"></span>
+                                            <div id="yotpoconfig-progress-meter">
+                                                <div id="yotpoconfig-progress-complete"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </form>
+
+        <div id="get-started">
+            <h2>${Resource.msg('footer.title','forms',null)}</h2>
+            <p>
+                ${Resource.msg('footer.message1','forms',null)}
+                <br />
+                ${Resource.msg('footer.message2','forms',null)}
+            </p>
+            <a href="${Resource.msg('link.getstarted.href','forms',null)}" target="_blank">${Resource.msg('link.getstarted','forms',null)}</a>
+        </div>
+
+    </div>
+<script src="${URLUtils.staticURL('js/yotpoConfig.js')}"></script>
+</isdecorate>
