@@ -11,7 +11,7 @@ function htmlHead(params) {
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var templateParams = params || {};
-    templateParams.yotpoUtils = yotpoUtils;
+    templateParams.yotpoAppKey = yotpoUtils.getAppKeyForCurrentLocaleFromRequest(request);
 
     var templateFile = 'common/yotpoHeader';
 
