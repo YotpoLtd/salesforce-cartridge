@@ -14,8 +14,8 @@
 function getExportOrderConfig() {
     var Site = require('dw/system/Site');
     return {
-        productInformationFromMaster: Site.getCurrent().getPreferences().custom.productInformationFromMaster,
-        exportGroupIdInOrder: Site.getCurrent().getPreferences().custom.exportGroupIdInOrder
+        productInformationFromMaster: Site.getCurrent().getPreferences().custom.yotpoProductInformationFromMaster,
+        exportGroupIdInOrder: Site.getCurrent().getPreferences().custom.yotpoExportGroupIdInOrder
     };
 }
 
