@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns="http://www.demandware.com/xml/impex/services/2014-09-26">
+
+    <service-credential service-credential-id="int_yotpo_sfra.https.post.auth.api.cred">
+        <url>https://api.yotpo.com/oauth/token</url>
+        <user-id/>
+        <password/>
+    </service-credential>
+
+    <service-credential service-credential-id="int_yotpo_sfra.https.post.export.purchase.api.cred">
+        <url>https://api.yotpo.com/apps/:app_key/purchases/mass_create.json</url>
+        <user-id/>
+        <password/>
+    </service-credential>
+    
+    <service-credential service-credential-id="int_yotpo_sfra.https.post.loyalty.api.cred">
+        <url>https://loyalty.yotpo.com/commerce-cloud/</url>
+        <user-id/>
+        <password/>
+    </service-credential>
+
+	<service-profile service-profile-id="int_yotpo_sfra.rest.api.profile">
+        <timeout-millis>120000</timeout-millis>
+        <rate-limit-enabled>false</rate-limit-enabled>
+        <rate-limit-calls>0</rate-limit-calls>
+        <rate-limit-millis>0</rate-limit-millis>
+        <cb-enabled>false</cb-enabled>
+        <cb-calls>0</cb-calls>
+        <cb-millis>0</cb-millis>
+    </service-profile>
+    
+    <service service-id="int_yotpo_sfra.https.post.auth.api">
+        <service-type>HTTP</service-type>
+        <enabled>true</enabled>
+        <log-prefix>YotpoRESTAPIEndpoints</log-prefix>
+        <comm-log-enabled>false</comm-log-enabled>
+        <mock-mode-enabled>false</mock-mode-enabled>
+        <profile-id>int_yotpo_sfra.rest.api.profile</profile-id>
+        <credential-id>int_yotpo_sfra.https.post.auth.api.cred</credential-id>
+    </service>
+
+    <service service-id="int_yotpo_sfra.https.post.export.purchase.api">
+        <service-type>HTTP</service-type>
+        <enabled>true</enabled>
+        <log-prefix>YotpoRESTAPIEndpoints</log-prefix>
+        <comm-log-enabled>false</comm-log-enabled>
+        <mock-mode-enabled>false</mock-mode-enabled>
+        <profile-id>int_yotpo_sfra.rest.api.profile</profile-id>
+        <credential-id>int_yotpo_sfra.https.post.export.purchase.api.cred</credential-id>
+    </service>
+
+     <service service-id="int_yotpo_sfra.https.post.loyalty.api">
+        <service-type>HTTP</service-type>
+        <enabled>true</enabled>
+        <log-prefix>YotpoRESTAPIEndpoints</log-prefix>
+        <comm-log-enabled>false</comm-log-enabled>
+        <force-prd-enabled>false</force-prd-enabled>
+        <mock-mode-enabled>false</mock-mode-enabled>
+        <profile-id>int_yotpo_sfra.rest.api.profile</profile-id>
+        <credential-id>int_yotpo_sfra.https.post.loyalty.api.cred</credential-id>
+    </service>
+     
+</services>

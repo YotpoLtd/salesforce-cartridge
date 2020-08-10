@@ -86,9 +86,9 @@ describe('authenticationModel', () => {
             OK: 'OK',
             ERROR: 'ERROR'
         },
-        '~/cartridge/scripts/utils/constants': constants,
-        '~/cartridge/scripts/utils/yotpoLogger': yotpoLogger,
-        '~/cartridge/scripts/serviceregistry/authenticationServiceRegistry': authenticationServiceRegistry
+        '*/cartridge/scripts/utils/constants': constants,
+        '*/cartridge/scripts/utils/yotpoLogger': yotpoLogger,
+        '*/cartridge/scripts/serviceregistry/authenticationServiceRegistry': authenticationServiceRegistry
     });
 
     describe('authenticate', function () {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coupons xmlns="http://www.demandware.com/xml/impex/coupon/2008-06-17">
+    <coupon coupon-id="yotpoLoyaltyS2FCoupon">
+        <description>Coupons sent via Yotpo Loyalty when a user opts to send to friend</description>
+        <enabled-flag>true</enabled-flag>
+        <case-insensitive>false</case-insensitive>
+        <redemption-limits>
+            <limit-per-code>1</limit-per-code>
+            <limit-per-customer>1</limit-per-customer>
+            <allow-multiple-codes-per-order>false</allow-multiple-codes-per-order>
+        </redemption-limits>
+        <system-codes>
+            <max-number-of-codes>10000</max-number-of-codes>
+            <code-length>16</code-length>
+            <include-vowels>true</include-vowels>
+            <include-dashes>true</include-dashes>
+            <algorithm>F2</algorithm>
+        </system-codes>
+    </coupon>
+
+</coupons>

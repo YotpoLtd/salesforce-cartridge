@@ -1,7 +1,7 @@
 <iscomment>
     Yotpo Reviews Widget
 </iscomment>
-<isif condition="${pdict.yotpoWidgetData.isReviewEnabled}">
+<isif condition="${pdict.yotpoWidgetData.isReviewsEnabled}">
     <!--- Yotpo Reviews Widget --->
     <div id="yotpo-reviews-top-div" class="yotpo yotpo-main-widget"
         data-appkey="${pdict.yotpoWidgetData.yotpoAppKey}"

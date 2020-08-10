@@ -4,40 +4,66 @@ const assert = require('chai').assert;
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 
-let yotpoUtils = require('../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/utils/yotpoUtils');
+require.extensions['.ds'] = require.extensions['.js'];
+require('dw-api-mock/demandware-globals');
+
+const constants = require('../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/utils/constants');
+
+const yotpoUtils = proxyquire('../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/utils/yotpoUtils', {
+    '*/cartridge/scripts/utils/constants': constants,
+    '*/cartridge/scripts/utils/yotpoLogger': {
+        logMessage: () => { }
+    }
+});
+
+const stubSystemPrefs = {
+    yotpoCartridgeEnabled: true
+};
+
+const subCustomObject = {
+    yotpoAppKey: '1234',
+    isReviewsEnabled: true
+};
+const mockConfigModel = {
+    isCartridgeEnabled: sinon.stub().returns(true),
+    getYotpoConfig: sinon.stub().returns(subCustomObject)
+};
+const yotpoConfigurationModel = proxyquire('../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/common/yotpoConfigurationModel', {
+    '*/cartridge/scripts/utils/yotpoUtils.js': yotpoUtils,
+    '*/cartridge/scripts/utils/constants': constants,
+    '*/cartridge/scripts/utils/yotpoUtils': yotpoUtils,
+    '*/cartridge/scripts/utils/yotpoLogger': {
+        logMessage: () => { }
+    },
+    'dw/system/Site': {
+        getCurrent: () => {
+            return {
+                getCustomPreferenceValue: (pref) => {
+                    return stubSystemPrefs[pref];
+                }
+            };
+        }
+    }
+});
+
+const integrationHelper = proxyquire('../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/common/integrationHelper', {
+    '*/cartridge/scripts/utils/yotpoUtils.js': yotpoUtils,
+    '*/cartridge/scripts/model/common/yotpoConfigurationModel': mockConfigModel,
+    '*/cartridge/scripts/utils/yotpoLogger': {},
+    'dw/system/Site': {
+        getCurrent: () => {
+            return {
+                preferences: {
+                    custom: {
+                        yotpoConversionTrackingPixelURL: 'conversionUrl'
+                    }
+                }
+            };
+        }
+    }
+});
 
 describe('integrationHelper', () => {
-    const session = {
-        custom: {
-            yotpoConfig: {
-                isCartridgeEnabled: true,
-                isReviewEnabled: true,
-                isRatingEnabled: true,
-                yotpoAppKey: '1234',
-                domainAddress: 'aUrl',
-                productInformationFromMaster: ''
-            }
-        }
-    };
-
-    global.empty = (value) => !(value || false);
-    global.session = sinon.mock(session);
-
-    const integrationHelper = proxyquire('../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/common/integrationHelper', {
-        '../utils/yotpoUtils.js': yotpoUtils,
-        'dw/system/Site': {
-            getCurrent: () => {
-                return {
-                    preferences: {
-                        custom: {
-                            yotpoConversionTrackingPixelURL: 'conversionUrl'
-                        }
-                    }
-                };
-            }
-        }
-    });
-
     describe('getConversionTrackingData', () => {
         const order = {
             totalGrossPrice: {
@@ -50,28 +76,26 @@ describe('integrationHelper', () => {
         const locale = 'default';
 
         sinon.stub(yotpoUtils, 'getCurrentLocaleSFRA').returns('locale');
-        sinon.stub(yotpoUtils, 'getAppKeyForCurrentLocale').returns('appKey');
 
         it('should return conversion tracking url with parameters', () => {
-            let stub = sinon.stub(yotpoUtils, 'isCartridgeEnabled').returns(true);
+            // Remove cached config from previoius test.
+            let stub = sinon.stub(yotpoConfigurationModel, 'isCartridgeEnabled').returns(true);
 
             const trackingUrl = integrationHelper.getConversionTrackingData(order, locale).conversionTrackingURL;
 
-            assert.equal(trackingUrl, 'conversionUrl?order_amount=123.1&order_id=0001234&order_currency=USD&app_key=appKey');
+            assert.equal(trackingUrl, 'conversionUrl?order_amount=123.1&order_id=0001234&order_currency=USD&app_key=1234');
 
             stub.restore();
         });
 
         it('should return empty conversion tracking url if cartridge disabled', () => {
-            let stub = sinon.stub(yotpoUtils, 'isCartridgeEnabled').returns(false);
-
+            // jsubCustomObject.isCartridgeEnabled = false;
+            mockConfigModel.isCartridgeEnabled = sinon.stub().returns(false);
             const trackingUrl = integrationHelper.getConversionTrackingData(order, locale).conversionTrackingURL;
 
             assert.equal(trackingUrl, '');
-
-            stub.restore();
+            mockConfigModel.isCartridgeEnabled = sinon.stub().returns(true);
+            // subCustomObject.isCartridgeEnabled = true;
         });
     });
-
-    delete global.session;
 });

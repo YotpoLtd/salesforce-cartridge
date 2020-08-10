@@ -14,8 +14,8 @@
 function getExportOrderConfig() {
     var Site = require('dw/system/Site');
     return {
-        productInformationFromMaster: Site.getCurrent().getPreferences().custom.productInformationFromMaster,
-        exportGroupIdInOrder: Site.getCurrent().getPreferences().custom.exportGroupIdInOrder
+        productInformationFromMaster: Site.getCurrent().getPreferences().custom.yotpoProductInformationFromMaster,
+        exportGroupIdInOrder: Site.getCurrent().getPreferences().custom.yotpoExportGroupIdInOrder
     };
 }
 
@@ -30,7 +30,7 @@ function getExportOrderConfig() {
  * @returns {boolean} - The flag to indicate if the orders export should be skipped for current locale.
  */
 function validateOrderFeedConfigData(yotpoConfiguration, orderFeedJobLastExecutionTime) {
-    var yotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils');
+    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportOrderModel~validateOrderFeedConfigData';
     var currentLocaleID = yotpoConfiguration.custom.localeID;
@@ -43,8 +43,8 @@ function validateOrderFeedConfigData(yotpoConfiguration, orderFeedJobLastExecuti
         yotpoLogger.logMessage('Skipping orders for current Locale ID - ' + currentLocaleID + ' Purchase Feed Flag - ' + yotpoConfiguration.custom.enablePurchaseFeed, 'debug', logLocation);
     } else {
         // Check if data in Custom Objects for locale and job is valid and contains required data
-        var configValidationResult = yotpoUtils.validateMandatoryConfigData(yotpoConfiguration);
-        var jobValidationResult = yotpoUtils.validateOrderFeedJobConfiguration(orderFeedJobLastExecutionTime);
+        var configValidationResult = YotpoConfigurationModel.validateMandatoryConfigData(yotpoConfiguration);
+        var jobValidationResult = YotpoConfigurationModel.validateOrderFeedJobConfiguration(orderFeedJobLastExecutionTime);
         if (!configValidationResult || !jobValidationResult) {
             if (!configValidationResult) {
                 yotpoLogger.logMessage('The current locale missing mandatory data therefore aborting the process.', 'error', logLocation);
@@ -269,8 +269,8 @@ function getConfigAndRequestsByLocale(yotpoConfigurations, orderFeedJobLastExecu
  * @returns {dw.util.List} - List of all loaded configuration Custom Objects
  */
 function loadAllYotpoConfigurations() {
-    var commonModel = require('*/cartridge/scripts/model/common/commonModel');
-    return commonModel.loadAllYotpoConfigurations();
+    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    return YotpoConfigurationModel.loadAllYotpoConfigurations();
 }
 
 /**
@@ -279,8 +279,8 @@ function loadAllYotpoConfigurations() {
  * @returns {Object} - Contains the last execution and current date time.
  */
 function loadYotpoJobConfigurations() {
-    var commonModel = require('*/cartridge/scripts/model/common/commonModel');
-    return commonModel.loadYotpoJobConfigurations();
+    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    return YotpoConfigurationModel.loadYotpoJobConfigurations();
 }
 
 /**
@@ -749,7 +749,7 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
     var makeRequestForNewToken = shouldGetNewToken || false;
 
     var constants = require('*/cartridge/scripts/utils/constants');
-    var commonModel = require('*/cartridge/scripts/model/common/commonModel');
+    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var exportOrderServiceRegistry = require('*/cartridge/scripts/serviceregistry/exportOrderServiceRegistry');
     var logLocation = 'exportOrderModel~sendOrdersToYotpo';
@@ -794,7 +794,7 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
                 }
             } else if (responseStatus.authenticationError && makeRequestForNewToken) {
                 yotpoLogger.logMessage('Retrying Order Feed submission due to service authentication error', 'error', logLocation);
-                var yotpoConfiguration = commonModel.loadYotpoConfigurationsByLocale(locale);
+                var yotpoConfiguration = YotpoConfigurationModel.loadYotpoConfigurationsByLocale(locale);
                 var utokenAuthCode = this.getServiceAuthToken(yotpoConfiguration);
                 var retryAuthenticationError = true;
                 if (!empty(utokenAuthCode)) {
@@ -890,6 +890,7 @@ function updateJobExecutionTime(currentDateTime) {
 
     return true;
 }
+
 
 /**
  * Exports

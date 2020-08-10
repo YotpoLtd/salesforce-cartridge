@@ -1,11 +1,11 @@
 <iscomment>This template should be included in the main header of the site. This loads the javascript
 from Yotpo which is mandatory for the Yotpo functionality to work</iscomment>
-<isif condition="${dw.system.Site.getCurrent().preferences.custom.yotpoCartridgeEnabled}">
+<isif condition="${pdict.isCartridgeEnabled}">
     <!-- Yotpo Head Scripts -->
     <script type="text/javascript">
-        var yotpoAppKey = '${pdict.yotpoUtils.getAppKeyForCurrentLocaleFromRequest(request)}';
-        var yotpoStaticContentURL = "${dw.system.Site.getCurrent().preferences.custom.yotpoStaticContentURL}";
-        var yotpoURL = yotpoStaticContentURL + yotpoAppKey + "/widget.js";
+        var yotpoAppKey = '${pdict.yotpoAppKey}';
+        var yotpoStaticContentURL = '${pdict.yotpoStaticContentURL}';
+        var yotpoURL = yotpoStaticContentURL + yotpoAppKey + '/widget.js';
         (function e() {
             var e = document.createElement("script");
                     e.type = "text/javascript",
@@ -16,4 +16,30 @@ from Yotpo which is mandatory for the Yotpo functionality to work</iscomment>
         })();
     </script>
     <!-- /////////////////// -->
+	<isif condition = "${pdict.isLoyaltyEnabled && !empty(pdict.yotpoLoyaltyStaticContentURL)}">
+		<script type="text/javascript">
+			var yotpoLoyaltyStaticContentURL = "${pdict.yotpoLoyaltyStaticContentURL}";
+			(function e() {
+				var e = document.createElement("script");
+						e.type = "text/javascript",
+						e.async = true,
+						e.src = yotpoLoyaltyStaticContentURL;
+				var t = document.getElementsByTagName("script")[1];
+				t.parentNode.insertBefore(e, t)
+			})();
+	    </script>
+	</isif>
+	<isif condition = "${pdict.isLoyaltyEnabled && !empty(pdict.yotpoLoyaltySDKURL)}">
+		<script type="text/javascript">
+			var yotpoLoyaltySDKURL = "${pdict.yotpoLoyaltySDKURL}";
+			(function e() {
+				var e = document.createElement("script");
+						e.type = "text/javascript",
+						e.async = true,
+						e.src = yotpoLoyaltySDKURL;
+				var t = document.getElementsByTagName("script")[1];
+				t.parentNode.insertBefore(e, t)
+			})();
+	    </script>
+	</isif>
 </isif>

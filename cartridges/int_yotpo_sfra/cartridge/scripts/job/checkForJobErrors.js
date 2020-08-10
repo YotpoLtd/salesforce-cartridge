@@ -1,4 +1,5 @@
 'use strict';
+
 const Status = require('dw/system/Status');
 
 /**

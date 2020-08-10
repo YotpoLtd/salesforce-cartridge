@@ -8,66 +8,57 @@
  */
 
 /**
- * Validates the mandatory configs in yotpoConfiguration, it returns false required fields are missing.
- * @param {Object} yotpoConfiguration - yotpo configuration object
- * @returns {boolean} True if required configuration keys are present in the config object
+ * This function escapes specific characters from the text based on the regular expression.
+ * @param {string} text - string to be escaped
+ * @param {string} regex - regular expression
+ * @param {string} replacement - replacement character
+ * @returns {string} escapedText
  */
-function validateMandatoryConfigData(yotpoConfiguration) {
-    var appKey = yotpoConfiguration.custom.appKey;
-    var clientSecretKey = yotpoConfiguration.custom.clientSecretKey;
-
-    if (empty(appKey) || empty(clientSecretKey)) {
-        return false;
+function escape(text, regex, replacement) {
+    if (!text) {
+        return text;
     }
 
-    return true;
+    var regExp = new RegExp(regex, 'gi');
+    var escapedText = text.replace(regExp, replacement);
+    return escapedText;
 }
 
 /**
- * Validates the mandatory data related to order feed job configuration
- * @param {Object} orderFeedJobLastExecutionDateTime - last job execution time
- * @returns {boolean} boolean true if required job configurations are present
- */
-function validateOrderFeedJobConfiguration(orderFeedJobLastExecutionDateTime) {
-    if (empty(orderFeedJobLastExecutionDateTime)) {
-        return false;
-    }
-    return true;
-}
+* This functions return the primary category path of a product.
+* @param {Object} product - product object to get category path from.
+* @param {string} separator - category path separator or null
+* @returns {string} categoryPath
+*/
+function getCategoryPath(product, separator) {
+    var categoryPath = '';
+    var topProduct = product;
 
-/**
- * Retrieves the appKey based on the current locale
- * @param {string} currentLocaleID - current locale id
- * @returns {string} yotpo appKey
- */
-function getAppKeyForCurrentLocale(currentLocaleID) {
-    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
-    var constants = require('./constants');
-    var yotpoLogger = require('./yotpoLogger');
-
-    var logLocation = 'yotpoUtils~getAppKeyForCurrentLocale';
-
-    if (empty(currentLocaleID)) {
-        yotpoLogger.logMessage('The current LocaleID is missing, therefore cannot proceed.', 'error', logLocation);
-        return '';
+    if (topProduct.isVariant()) {
+        topProduct = product.getVariationModel().master;
     }
 
-    yotpoLogger.logMessage('The current LocaleID is : ' + currentLocaleID, 'debug', logLocation);
+    var theCategory = topProduct.getPrimaryCategory();
 
-    var yotpoConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_CONFIGURATION_OBJECT, currentLocaleID);
-
-    if (yotpoConfiguration == null) {
-        yotpoLogger.logMessage('The yotpo configuration does not exist for ' + currentLocaleID + ', cannot proceed.', 'error', logLocation);
-        return '';
+    if (empty(theCategory)) {
+        var categories = topProduct.categories;
+        if (!empty(categories)) {
+            theCategory = categories[0];
+        }
     }
 
-    var appKey = yotpoConfiguration.custom.appKey;
+    var cat = theCategory;
+    var path = [];
 
-    if (empty(appKey)) {
-        yotpoLogger.logMessage('The app key couldnt found for current locale.', 'error', logLocation);
+    while (cat.parent != null) {
+        if (cat.online) {
+            path[0] = cat.getDisplayName();
+        }
+        cat = cat.parent;
     }
 
-    return appKey;
+    categoryPath = separator ? path.join(separator) : path.join();
+    return categoryPath;
 }
 
 /**
@@ -75,7 +66,7 @@ function getAppKeyForCurrentLocale(currentLocaleID) {
  * @param {Object} request - request object
  * @returns {string} current locale id
  */
-function getCurrentLocale(request) {
+function getCurrentLocaleFromRequest(request) {
     var currentLocaleID = request.getLocale();
 
     if (empty(currentLocaleID)) {
@@ -87,19 +78,6 @@ function getCurrentLocale(request) {
     }
 
     return currentLocaleID;
-}
-
-/**
- * Gets locale from current request and retrieves app key from config object
- *
- * @param {dw.system.Request} request - current request object
- *
- * @returns {string} appKey - App key from locale configuration
- */
-function getAppKeyForCurrentLocaleFromRequest(request) {
-    var currentLocaleID = getCurrentLocale(request);
-    var appKey = getAppKeyForCurrentLocale(currentLocaleID);
-    return appKey;
 }
 
 /**
@@ -118,88 +96,12 @@ function getCurrentLocaleSFRA(currentLocaleID) {
 }
 
 /**
- * Retrieves if the reviews are enabled for current locale.
- * @param {string} currentLocaleID - current locale id
- * @returns {boolean} true if reviews are enabled for the locale
- */
-function isReviewsEnabledForCurrentLocale(currentLocaleID) {
-    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
-    var constants = require('./constants');
-    var yotpoLogger = require('./yotpoLogger');
-
-    var logLocation = 'yotpoUtils~isReviewsEnabledForCurrentLocale';
-
-    if (empty(currentLocaleID)) {
-        yotpoLogger.logMessage('The current LocaleID is missing, therefore cannot proceed.', 'error', logLocation);
-        return false;
-    }
-
-    yotpoLogger.logMessage('The current LocaleID is : ' + currentLocaleID, 'debug', logLocation);
-
-    var yotpoConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_CONFIGURATION_OBJECT, currentLocaleID);
-
-    if (yotpoConfiguration == null) {
-        yotpoLogger.logMessage('The yotpo configuration does not exist for ' + currentLocaleID + ', cannot proceed.', 'error', logLocation);
-        return false;
-    }
-
-    var reviewsEnabled = yotpoConfiguration.custom.enableReviews;
-    return reviewsEnabled;
-}
-
-/**
- * Retrieves if the ratings are enabled for current locale.
- * @param {string} currentLocaleID - current locale id
- * @returns {boolean} true if ratings are enabled for the locale
- */
-function isRatingEnabledForCurrentLocale(currentLocaleID) {
-    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
-    var constants = require('./constants');
-    var yotpoLogger = require('./yotpoLogger');
-
-    var logLocation = 'yotpoUtils~isRatingsEnabledForCurrentLocale';
-
-    if (empty(currentLocaleID)) {
-        yotpoLogger.logMessage('The current LocaleID is missing, therefore cannot proceed.', 'error', logLocation);
-        return false;
-    }
-
-    yotpoLogger.logMessage('The current LocaleID is : ' + currentLocaleID, 'debug', logLocation);
-
-    var yotpoConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_CONFIGURATION_OBJECT, currentLocaleID);
-
-    if (yotpoConfiguration == null) {
-        yotpoLogger.logMessage('The yotpo configuration does not exist for ' + currentLocaleID + ', cannot proceed.', 'error', logLocation);
-        return false;
-    }
-
-    return yotpoConfiguration.custom.enableRatings;
-}
-
-/**
- * This function escapes specific characters from the text based on the regular expression.
- * @param {string} text - string to be escaped
- * @param {string} regex - regular expression
- * @param {string} replacement - replacement character
- * @returns {string} escapedText
- */
-function escape(text, regex, replacement) {
-    if (!text) {
-        return text;
-    }
-
-    var regExp = new RegExp(regex, 'gi');
-    var escapedText = text.replace(regExp, replacement);
-    return escapedText;
-}
-
-/**
  * Validates given email address based on RFC 5322 Official Standard regex
  * @param {string} emailAddress email address to validate
  * @returns {boolean} true if email is valid based on regex
  */
 function validateEmailAddress(emailAddress) {
-    return require('./constants').EMAIL_VALIDATION_REGEX_FOR_YOTPO_DATA.test(emailAddress);
+    return require('*/cartridge/scripts/utils/constants').EMAIL_VALIDATION_REGEX_FOR_YOTPO_DATA.test(emailAddress);
 }
 
 /**
@@ -243,7 +145,7 @@ function getProductImageUrl(product) {
  * @returns {string} input test after cleaning
  */
 function cleanDataForExport(text, type, replacement, safeChars) {
-    var constants = require('./constants');
+    var constants = require('*/cartridge/scripts/utils/constants');
 
     var defaultedReplacement = replacement || '';
     var defaultedSafeChars = safeChars || '';
@@ -286,7 +188,7 @@ function cleanDataForExport(text, type, replacement, safeChars) {
  * @returns {string} formatted date/time
  */
 function formatDateTime(dateTime) {
-    var constants = require('./constants');
+    var constants = require('*/cartridge/scripts/utils/constants');
     var Calendar = require('dw/util/Calendar');
     var StringUtils = require('dw/util/StringUtils');
 
@@ -313,74 +215,68 @@ function extendObject(obj, src) {
 }
 
 /**
-* This functions return the primary category path of a product.
-* @param {Object} product - product object to get category path from.
-* @param {string} separator - category path separator or null
-* @returns {string} categoryPath
-*/
-function getCategoryPath(product, separator) {
-    var categoryPath = '';
-    var topProduct = product;
+ * This function is used to get date of past number of days
+ * For example 30 days old date is required then method will
+ * subtract 30 days form current date and will return past date
+ *
+ * @param {Integer} numberOfDays : The number of days from current date
+ *
+ * @return {Object} pastDate :  The Date object date which is subtracted form current date
+ */
+function getPastDateFromDays(numberOfDays) {
+    var Calendar = require('dw/util/Calendar');
 
-    if (topProduct.isVariant()) {
-        topProduct = product.getVariationModel().master;
-    }
-
-    var theCategory = topProduct.getPrimaryCategory();
-
-    if (empty(theCategory)) {
-        var categories = topProduct.categories;
-        if (!empty(categories)) {
-            theCategory = categories[0];
-        }
-    }
-
-    var cat = theCategory;
-    var path = [];
-
-    while (cat.parent != null) {
-        if (cat.online) {
-            path[0] = cat.getDisplayName();
-        }
-        cat = cat.parent;
-    }
-
-    categoryPath = separator ? path.join(separator) : path.join();
-    return categoryPath;
+    var calendar = new Calendar();
+    var currentTimeMilis = calendar.getTime();
+    var numberOfDaysMillis = numberOfDays * 24 * 60 * 60 * 1000;
+    var pastDate = new Date(currentTimeMilis - numberOfDaysMillis);
+    return pastDate;
 }
 
 /**
- * This is a common function to check whether the Yotpo cartridge is enabled.
- * @returns {boolean} boolean
+ * @description appends the parameters to the given url and returns the changed url
+ * @param {string} url - the URL
+ * @param {Object} params - the parameters to append with URL
+ *
+ * @returns {string} The URL with appended parameters
  */
-function isCartridgeEnabled() {
-    var Site = require('dw/system/Site');
-    var yotpoLogger = require('./yotpoLogger');
+function appendParamsToUrl(url, params) {
+    var ArrayList = require('dw/util/ArrayList');
 
-    var logLocation = 'yotpoUtils~isCartridgeEnabled';
-    var yotpoCartridgeEnabled = Site.getCurrent().getPreferences().custom.yotpoCartridgeEnabled;
+    var _params = new ArrayList();
+    Object.keys(params).forEach(function (key) {
+        _params.push(key + '=' + encodeURIComponent(params[key]));
+    });
+    var _url = url + '?' + _params.join('&');
+    return _url;
+}
 
-    if (!yotpoCartridgeEnabled) {
-        yotpoLogger.logMessage('The Yotpo cartridge is disabled, please check custom preference (yotpoCartridgeEnabled).', 'info', logLocation);
+/**
+ * This function is used to convert the price into cents
+ *
+ * @param {number} price : The price which needs to be convert.
+ *
+ * @return {number} priceCents : The converted price into cents.
+ */
+function convertPriceIntoCents(price) {
+    var priceCents = 0;
+    if (price !== null) {
+        priceCents = price * 100;
     }
-
-    return yotpoCartridgeEnabled;
+    return priceCents;
 }
 
 exports.escape = escape;
-exports.getAppKeyForCurrentLocale = getAppKeyForCurrentLocale;
 exports.getCategoryPath = getCategoryPath;
-exports.getCurrentLocale = getCurrentLocale;
+exports.getCurrentLocaleFromRequest = getCurrentLocaleFromRequest;
 exports.getCurrentLocaleSFRA = getCurrentLocaleSFRA;
-exports.getAppKeyForCurrentLocaleFromRequest = getAppKeyForCurrentLocaleFromRequest;
 exports.getImageLink = getImageLink;
-exports.isCartridgeEnabled = isCartridgeEnabled;
-exports.isReviewsEnabledForCurrentLocale = isReviewsEnabledForCurrentLocale;
-exports.isRatingEnabledForCurrentLocale = isRatingEnabledForCurrentLocale;
-exports.validateMandatoryConfigData = validateMandatoryConfigData;
-exports.validateOrderFeedJobConfiguration = validateOrderFeedJobConfiguration;
 exports.getProductImageUrl = getProductImageUrl;
 exports.formatDateTime = formatDateTime;
 exports.validateEmailAddress = validateEmailAddress;
 exports.cleanDataForExport = cleanDataForExport;
 exports.extendObject = extendObject;
+exports.getPastDateFromDays = getPastDateFromDays;
+exports.appendParamsToUrl = appendParamsToUrl;
+exports.convertPriceIntoCents = convertPriceIntoCents;
+

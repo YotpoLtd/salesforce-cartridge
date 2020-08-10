@@ -30,4 +30,6 @@
             </div>
         </div>
     </div>
+    <iscomment>Logged in Customer tracking for Yotpo Loyalty</iscomment>
+    <isinclude template="loyalty/yotpoFooter"/>
 </footer>
