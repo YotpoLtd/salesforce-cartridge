@@ -3,7 +3,7 @@ from Yotpo which is mandatory for the Yotpo functionality to work</iscomment>
 <isif condition="${dw.system.Site.getCurrent().preferences.custom.yotpoCartridgeEnabled}">
     <!-- Yotpo Head Scripts -->
     <script type="text/javascript">
-        var yotpoAppKey = '${pdict.yotpoUtils.getAppKeyForCurrentLocaleFromRequest(request)}';
+        var yotpoAppKey = '${pdict.yotpoAppKey}';
         var yotpoStaticContentURL = "${dw.system.Site.getCurrent().preferences.custom.yotpoStaticContentURL}";
         var yotpoURL = yotpoStaticContentURL + yotpoAppKey + "/widget.js";
         (function e() {
