@@ -73,7 +73,7 @@ var yotpoAuthenticationSvc = LocalServiceRegistry.createService('int_yotpo_sfra.
      * @returns {string} - Log message, or null to create and use the default message
      */
     getResponseLogMessage: function (response) {
-        var responseJSON = JSON.parse(response);
+        var responseJSON = JSON.parse(response.text);
         responseJSON.access_token = '****';
         return JSON.stringify(responseJSON);
     }
