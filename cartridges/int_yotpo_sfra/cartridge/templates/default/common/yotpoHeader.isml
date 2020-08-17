@@ -1,8 +1,7 @@
 <iscomment>This template should be included in the main header of the site. This loads the javascript
 from Yotpo which is mandatory for the Yotpo functionality to work</iscomment>
 <isif condition="${pdict.isCartridgeEnabled}">
-    <!-- Yotpo Head Scripts -->
-    <script type="text/javascript">
+    <script>
         var yotpoAppKey = '${pdict.yotpoAppKey}';
         var yotpoStaticContentURL = '${pdict.yotpoStaticContentURL}';
         var yotpoURL = yotpoStaticContentURL + yotpoAppKey + '/widget.js';
@@ -15,9 +14,8 @@ from Yotpo which is mandatory for the Yotpo functionality to work</iscomment>
             t.parentNode.insertBefore(e, t)
         })();
     </script>
-    <!-- /////////////////// -->
-	<isif condition = "${pdict.isLoyaltyEnabled && !empty(pdict.yotpoLoyaltyStaticContentURL)}">
-		<script type="text/javascript">
+    <isif condition = "${pdict.isLoyaltyEnabled && !empty(pdict.yotpoLoyaltyStaticContentURL)}">
+        <script>
 			var yotpoLoyaltyStaticContentURL = "${pdict.yotpoLoyaltyStaticContentURL}";
 			(function e() {
 				var e = document.createElement("script");
@@ -28,9 +26,9 @@ from Yotpo which is mandatory for the Yotpo functionality to work</iscomment>
 				t.parentNode.insertBefore(e, t)
 			})();
 	    </script>
-	</isif>
-	<isif condition = "${pdict.isLoyaltyEnabled && !empty(pdict.yotpoLoyaltySDKURL)}">
-		<script type="text/javascript">
+    </isif>
+    <isif condition = "${pdict.isLoyaltyEnabled && !empty(pdict.yotpoLoyaltySDKURL)}">
+        <script>
 			var yotpoLoyaltySDKURL = "${pdict.yotpoLoyaltySDKURL}";
 			(function e() {
 				var e = document.createElement("script");
@@ -41,5 +39,5 @@ from Yotpo which is mandatory for the Yotpo functionality to work</iscomment>
 				t.parentNode.insertBefore(e, t)
 			})();
 	    </script>
-	</isif>
+    </isif>
 </isif>
