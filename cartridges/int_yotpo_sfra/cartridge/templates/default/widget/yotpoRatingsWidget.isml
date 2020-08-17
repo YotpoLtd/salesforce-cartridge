@@ -2,7 +2,7 @@
     It displays the product ratings for product on product details,
     category and search pages.
 </iscomment>
-<isif condition="${pdict.yotpoWidgetData.isRatingEnabled}">
+<isif condition="${pdict.yotpoWidgetData.isRatingsEnabled}">
     <!--- Yotpo Ratings Widget --->
     <div id="yotpo-bottomline-top-div" class="yotpo bottomLine"
         data-appkey="${pdict.yotpoWidgetData.yotpoAppKey}"

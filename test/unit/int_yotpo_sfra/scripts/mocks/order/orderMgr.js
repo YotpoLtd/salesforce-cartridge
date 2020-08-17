@@ -3,5 +3,6 @@ const sinon = require('sinon');
 const searchOrdersSpy = sinon.spy();
 
 module.exports = {
-    searchOrders: searchOrdersSpy
+    searchOrders: searchOrdersSpy,
+    ORDER_STATUS_CREATED: 0
 };

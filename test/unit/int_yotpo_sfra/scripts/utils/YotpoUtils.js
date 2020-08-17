@@ -29,20 +29,6 @@ describe('yotpoUtils', () => {
         }
     };
 
-    const disabledYotpoConfig = {
-        custom: {
-            clientSecretKey: null,
-            appKey: null,
-            enableReviews: false,
-            enableRatings: false,
-            yotpoCartridgeEnabled: false,
-            yotpoDebugLogEnabled: false,
-            yotpoInfoLogEnabled: false
-        }
-    };
-
-    const nullYotpoConfig = null;
-
     // Mock Objects and Getters
     const CustomObjectMgr = {
         getCustomObject: sinonYotpoConfig
@@ -143,65 +129,15 @@ describe('yotpoUtils', () => {
         'dw/system/Logger': Logger,
         'dw/util/Calendar': sinonCalendar,
         'dw/util/StringUtils': StringUtils,
-        './yotpoLogger': yotpoLogger
+        '*/cartridge/scripts/utils/constants': constants,
+        '*/cartridge/scripts/utils/yotpoLogger': yotpoLogger
     });
 
     const getCategoryMock = () => categoryMockDefault;
 
     const getCategoryAndSetData = (data) => yotpoUtils.extendObject(Object.assign({}, getCategoryMock()), data);
 
-    describe('validateMandatoryConfigData', () => {
-        it('should return true with clientSecretKey & appKey in config', () => {
-            let yotpoConfiguration = sinonYotpoConfig.returns(enabledYotpoConfig)();
-            const result = yotpoUtils.validateMandatoryConfigData(yotpoConfiguration);
-            assert.equal(result, true);
-        });
-
-        it('should return false without clientSecretKey & appKey in config', () => {
-            let yotpoConfiguration = sinonYotpoConfig.returns(disabledYotpoConfig)();
-            const result = yotpoUtils.validateMandatoryConfigData(yotpoConfiguration);
-            assert.equal(result, false);
-        });
-    });
-
-    describe('validateOrderFeedJobConfiguration', () => {
-        it('should return true with orderFeedJobLastExecutionDateTime being passed', () => {
-            const orderFeedJobLastExecutionDateTime = new Date();
-            const result = yotpoUtils.validateOrderFeedJobConfiguration(orderFeedJobLastExecutionDateTime);
-            assert.equal(result, true);
-        });
-
-        it('should return false with orderFeedJobLastExecutionDateTime being passed', () => {
-            const orderFeedJobLastExecutionDateTime = null;
-            const result = yotpoUtils.validateOrderFeedJobConfiguration(orderFeedJobLastExecutionDateTime);
-            assert.equal(result, false);
-        });
-    });
-
-    describe('getAppKeyForCurrentLocale', () => {
-        it('should return appKey', () => {
-            const yotpoConfiguration = sinonYotpoConfig.returns(enabledYotpoConfig)();
-            const currentLocaleID = 'default';
-            const result = yotpoUtils.getAppKeyForCurrentLocale(currentLocaleID);
-            assert.equal(result, yotpoConfiguration.custom.appKey);
-        });
-
-        it('should return empty string when currentLocaleID is missing', () => {
-            sinonYotpoConfig.returns(enabledYotpoConfig);
-            const currentLocaleID = null;
-            const result = yotpoUtils.getAppKeyForCurrentLocale(currentLocaleID);
-            assert.equal(result, '');
-        });
-
-        it('should return empty string when yotpoConfiguration is empty', () => {
-            sinonYotpoConfig.returns(nullYotpoConfig);
-            const currentLocaleID = 'badLocale';
-            const result = yotpoUtils.getAppKeyForCurrentLocale(currentLocaleID);
-            assert.equal(result, '');
-        });
-    });
-
-    describe('getCurrentLocale', () => {
+    describe('getCurrentLocaleFromRequest', () => {
         let request = {
             getLocale: () => 'locale',
             getHttpLocale: () => 'httpLocale'
@@ -209,14 +145,14 @@ describe('yotpoUtils', () => {
 
         it('should return locale', () => {
             sinonYotpoConfig.returns(enabledYotpoConfig);
-            const result = yotpoUtils.getCurrentLocale(request);
+            const result = yotpoUtils.getCurrentLocaleFromRequest(request);
             assert.equal(result, 'locale');
         });
 
         it('should return httpLocale', () => {
             sinonYotpoConfig.returns(enabledYotpoConfig);
             request.getLocale = () => null;
-            const result = yotpoUtils.getCurrentLocale(request);
+            const result = yotpoUtils.getCurrentLocaleFromRequest(request);
             assert.equal(result, 'httpLocale');
         });
 
@@ -224,7 +160,7 @@ describe('yotpoUtils', () => {
             sinonYotpoConfig.returns(enabledYotpoConfig);
             request.getLocale = () => null;
             request.getHttpLocale = () => null;
-            const result = yotpoUtils.getCurrentLocale(request);
+            const result = yotpoUtils.getCurrentLocaleFromRequest(request);
             assert.equal(result, 'default');
         });
     });
@@ -246,64 +182,6 @@ describe('yotpoUtils', () => {
             let currentLocaleID;
             const result = yotpoUtils.getCurrentLocaleSFRA(currentLocaleID);
             assert.equal(result, 'default');
-        });
-    });
-
-    describe('isReviewsEnabledForCurrentLocale', () => {
-        it('should return false when currentLocaleID is empty', () => {
-            const currentLocaleID = null;
-            const result = yotpoUtils.isReviewsEnabledForCurrentLocale(currentLocaleID);
-            assert.equal(result, false);
-        });
-
-        it('should return false when yotpoConfiguration is null', () => {
-            sinonYotpoConfig.returns(nullYotpoConfig);
-            const currentLocaleID = 'default';
-            const result = yotpoUtils.isReviewsEnabledForCurrentLocale(currentLocaleID);
-            assert.equal(result, false);
-        });
-
-        it('should return false because reviews are disabled', () => {
-            sinonYotpoConfig.returns(disabledYotpoConfig);
-            const currentLocaleID = 'default';
-            const result = yotpoUtils.isReviewsEnabledForCurrentLocale(currentLocaleID);
-            assert.equal(result, false);
-        });
-
-        it('should return true because reviews are enabled', () => {
-            sinonYotpoConfig.returns(enabledYotpoConfig);
-            const currentLocaleID = 'default';
-            const result = yotpoUtils.isReviewsEnabledForCurrentLocale(currentLocaleID);
-            assert.equal(result, true);
-        });
-    });
-
-    describe('isRatingEnabledForCurrentLocale', () => {
-        it('should return false when currentLocaleID is empty', () => {
-            const currentLocaleID = null;
-            const result = yotpoUtils.isRatingEnabledForCurrentLocale(currentLocaleID);
-            assert.equal(result, false);
-        });
-
-        it('should return false when yotpoConfiguration is null', () => {
-            sinonYotpoConfig.returns(nullYotpoConfig);
-            const currentLocaleID = 'default';
-            const result = yotpoUtils.isRatingEnabledForCurrentLocale(currentLocaleID);
-            assert.equal(result, false);
-        });
-
-        it('should return false because ratings are disabled', () => {
-            sinonYotpoConfig.returns(disabledYotpoConfig);
-            const currentLocaleID = 'default';
-            const result = yotpoUtils.isRatingEnabledForCurrentLocale(currentLocaleID);
-            assert.equal(result, false);
-        });
-
-        it('should return true because ratings are enabled', () => {
-            sinonYotpoConfig.returns(enabledYotpoConfig);
-            const currentLocaleID = 'default';
-            const result = yotpoUtils.isRatingEnabledForCurrentLocale(currentLocaleID);
-            assert.equal(result, true);
         });
     });
 
@@ -492,22 +370,6 @@ describe('yotpoUtils', () => {
 
             const result = yotpoUtils.getCategoryPath(product);
             assert.equal(result, 'Parent Product Primary Category Name');
-        });
-    });
-
-    describe('isCartridgeEnabled', () => {
-        it('should return true because cartridge is enabled', () => {
-            sinonYotpoConfig.returns(enabledYotpoConfig);
-
-            const result = yotpoUtils.isCartridgeEnabled();
-            assert.equal(result, true);
-        });
-
-        it('should return false because cartridge is disabled', () => {
-            sinonYotpoConfig.returns(disabledYotpoConfig);
-
-            const result = yotpoUtils.isCartridgeEnabled();
-            assert.equal(result, false);
         });
     });
 });

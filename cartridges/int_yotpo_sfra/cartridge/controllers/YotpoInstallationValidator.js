@@ -47,7 +47,9 @@ server.get('ConfirmationTemplate', function (req, res, next) {
 });
 
 /**
- * Extends Order-ConfirmationTemplate controller to send data to yotpo conversion tracking,
+ * Extends Order-ConfirmationTemplate controller to send data to yotpo conversion tracking.
+ * Note that the conversion tracking information is only included on order confirmation page
+ * if the yotpo cartridge is enabled and either ratings or reviews is also enabled
  */
 server.append('ConfirmationTemplate', function (req, res, next) {
     var OrderMgr = require('dw/order/OrderMgr');

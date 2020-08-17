@@ -25,7 +25,7 @@ exports.REGEX_BASE_FOR_YOTPO_DATA = '^0-9a-zA-Z';
 exports.REGEX_FOR_YOTPO_DATA_SAFE_SPECIAL_CHARS = ':,\\.\\?\\!\\|\\+\\_\\-=\\$\\*#%& ';
 exports.REGEX_FOR_YOTPO_PRODUCT_ID_DATA_SAFE_SPECIAL_CHARS = '\\_\\- ';
 // RFC 5322 Official Standard regex
-exports.EMAIL_VALIDATION_REGEX_FOR_YOTPO_DATA = /(?:[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i;
+exports.EMAIL_VALIDATION_REGEX_FOR_YOTPO_DATA = /(?:[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i;  // eslint-disable-line
 exports.EMAIL_REGEX_FOR_YOTPO_DATA = ' ';
 exports.SERVICE_MAX_TIMEOUTS = 5;
 exports.PRODUCT_ID_TOKEN = 'PRODUCT_ID__';
@@ -53,6 +53,12 @@ exports.EXPORT_ORDER_CUSTOMER_DATA_ERROR = 'EXPORT_ORDER_CUSTOMER_DATA_ERROR';
 exports.EXPORT_ORDER_MISSING_MANDATORY_FIELDS_ERROR = 'EXPORT_ORDER_MISSING_MANDATORY_FIELDS_ERROR';
 exports.EXPORT_CUSTOMER_MISSING_MANDATORY_FIELDS_ERROR = 'EXPORT_CUSTOMER_MISSING_MANDATORY_FIELDS_ERROR';
 
+exports.EXPORT_LOYALTY_ORDER_ERROR = 'EXPORT_LOYALTY_ORDER_ERROR';
+exports.EXPORT_LOYALTY_CUSTOMER_ERROR = 'EXPORT_LOYALTY_CUSTOMER_ERROR';
+exports.YOTPO_CUSTOMER_MISSING_ERROR = 'YOTPO_CUSTOMER_MISSING_ERROR';
+exports.EXPORT_LOYALTY_SERVICE_ERROR = 'EXPORT_LOYALTY_SERVICE_ERROR';
+exports.LOYALTY_API_SERVICE_ERROR = 'LOYALTY_API_SERVICE_ERROR';
+
 // API HTTP STATUS CODES
 exports.STATUS_200 = '200';
 exports.STATUS_401 = '401';
@@ -62,3 +68,7 @@ exports.STATUS_500 = '500';
 
 // Order Volume by days
 exports.ORDER_VOLUME_DAYS = 30;
+
+// Loyalty Module Constants
+exports.YOTPO_LOYALTY_CUSTOMER_EXPORT_OBJECT = 'yotpoLoyaltyCustomer';
+exports.YOTPO_LOYALTY_ORDER_EXPORT_OBJECT = 'yotpoLoyaltyOrder';

@@ -3,19 +3,37 @@
 /**
  * Renders yotpo scripts inline using ISML.renderTemplate
  *
- * @param {Object} params - parameters required by yotpoheader isml temmplate
+ * @param {Object} params - parameters required by yotpoHeader isml template
  */
 function htmlHead(params) {
     var ISML = require('dw/template/ISML');
-    var yotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils.js');
+    var Site = require('dw/system/Site');
+    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+    var currLocale = request.locale;
+    var isCartridgeEnabled = YotpoConfigurationModel.isCartridgeEnabled();
+    var isLoyaltyEnabled = YotpoConfigurationModel.getYotpoPref('yotpoLoyaltyEnabled', currLocale);
 
     var templateParams = params || {};
-    templateParams.yotpoAppKey = yotpoUtils.getAppKeyForCurrentLocaleFromRequest(request);
+    templateParams.yotpoAppKey = YotpoConfigurationModel.getAppKeyForCurrentLocaleFromRequest(request);
+    templateParams.yotpoStaticContentURL = Site.getCurrent().preferences.custom.yotpoStaticContentURL;
+    templateParams.isCartridgeEnabled = isCartridgeEnabled;
+    templateParams.isLoyaltyEnabled = isLoyaltyEnabled;
+    templateParams.yotpoLoyaltyStaticContentURL = '';
+    templateParams.yotpoLoyaltySDKURL = '';
 
     var templateFile = 'common/yotpoHeader';
 
-    if (yotpoUtils.isCartridgeEnabled()) {
+    if (isCartridgeEnabled) {
+        if (isLoyaltyEnabled) {
+            var loyaltyAPIKeys = YotpoConfigurationModel.getLoyaltyAPIKeys(currLocale);
+            var yotpoLoyaltyStaticContentURL = YotpoConfigurationModel.getYotpoPref('yotpoLoyaltyStaticContentURL', currLocale);
+            var yotpoLoyaltySDKURL = YotpoConfigurationModel.getYotpoPref('yotpoLoyaltySDKURL', currLocale);
+            yotpoLoyaltyStaticContentURL = !empty(yotpoLoyaltyStaticContentURL) && !empty(loyaltyAPIKeys) && !empty(loyaltyAPIKeys.guid) ? yotpoLoyaltyStaticContentURL.replace('<GUID>', loyaltyAPIKeys.guid) : '';
+            yotpoLoyaltySDKURL = !empty(yotpoLoyaltySDKURL) && !empty(loyaltyAPIKeys) && !empty(loyaltyAPIKeys.guid) ? yotpoLoyaltySDKURL.replace('<GUID>', loyaltyAPIKeys.guid) : '';
+            templateParams.yotpoLoyaltyStaticContentURL = yotpoLoyaltyStaticContentURL;
+            templateParams.yotpoLoyaltySDKURL = yotpoLoyaltySDKURL;
+        }
         try {
             ISML.renderTemplate(templateFile, templateParams);
         } catch (ex) {

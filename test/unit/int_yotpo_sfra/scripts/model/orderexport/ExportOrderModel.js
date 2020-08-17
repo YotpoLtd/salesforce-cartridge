@@ -59,30 +59,34 @@ describe('ExportOrderModel', () => {
         'dw/util/Calendar': function () {},
         'dw/util/StringUtils': {
             formatCalendar: () => { return {}; }
+        },
+        '*/cartridge/scripts/utils/constants': constants,
+        '*/cartridge/scripts/utils/yotpoLogger': {
+            logMessage: () => { }
         }
     });
 
     yotpoUtils.getProductImageUrl = () => {};
 
-    const yotpoLogger = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/utils/yotpoLogger', {
-        'dw/system/Site': siteMock,
-        'dw/system/Logger': loggerMock
-    });
-
-    const commonModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/common/commonModel', {
+    const yotpoConfigurationModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/common/yotpoConfigurationModel', {
         ...ApiStubs,
-        '~/cartridge/scripts/utils/yotpoLogger': yotpoLogger,
-        '~/cartridge/scripts/utils/constants': constants
+        '*/cartridge/scripts/utils/yotpoUtils.js': yotpoUtils,
+        '*/cartridge/scripts/utils/constants': constants,
+        '*/cartridge/scripts/utils/yotpoLogger': {
+            logMessage: () => { }
+        }
     });
 
     const ExportOrderModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/orderexport/exportOrderModel', {
         ...ApiStubs,
-        '~/cartridge/scripts/utils/constants': constants,
-        '~/cartridge/scripts/utils/yotpoUtils': yotpoUtils,
-        '~/cartridge/scripts/utils/yotpoLogger': yotpoLogger,
-        '../common/commonModel': commonModel,
-        '~/cartridge/scripts/serviceregistry/exportOrderServiceRegistry': exportOrderServiceRegistry,
-        '../authentication/authenticationModel': {
+        '*/cartridge/scripts/utils/constants': constants,
+        '*/cartridge/scripts/utils/yotpoUtils': yotpoUtils,
+        '*/cartridge/scripts/model/common/yotpoConfigurationModel': yotpoConfigurationModel,
+        '*/cartridge/scripts/utils/yotpoLogger': {
+            logMessage: () => { }
+        },
+        '*/cartridge/scripts/serviceregistry/exportOrderServiceRegistry': exportOrderServiceRegistry,
+        '*/cartridge/scripts/model/authentication/authenticationModel': {
             authenticate: (appKey, clientSecretKey) => {
                 if (appKey && clientSecretKey) {
                     return {
@@ -392,8 +396,8 @@ describe('ExportOrderModel', () => {
     });
 
     describe('loadAllYotpoConfigurations', () => {
-        it('Should return true because commonModel.loadAllYotpoConfigurations is called', () => {
-            const sinonLoadAllYotpoConfigurationsSpy = sinon.spy(commonModel, 'loadAllYotpoConfigurations');
+        it('Should return true because yotpoConfigurationModel.loadAllYotpoConfigurations is called', () => {
+            const sinonLoadAllYotpoConfigurationsSpy = sinon.spy(yotpoConfigurationModel, 'loadAllYotpoConfigurations');
 
             exportOrderModelInstance.loadAllYotpoConfigurations();
 
@@ -404,8 +408,8 @@ describe('ExportOrderModel', () => {
     });
 
     describe('loadYotpoJobConfigurations', () => {
-        it('Should return true because commonModel.loadYotpoJobConfigurations is called', () => {
-            const loadYotpoJobConfigurationsSpy = sinon.spy(commonModel, 'loadYotpoJobConfigurations');
+        it('Should return true because yotpoConfigurationModel.loadYotpoJobConfigurations is called', () => {
+            const loadYotpoJobConfigurationsSpy = sinon.spy(yotpoConfigurationModel, 'loadYotpoJobConfigurations');
             customObjectMgrMock.getCustomObject.returns(sfccConfigurationScenarios.jobConfig);
 
             exportOrderModelInstance.loadYotpoJobConfigurations();
@@ -778,9 +782,12 @@ describe('ExportOrderModel', () => {
                 requestsDataByLocale: requestDataByLocale
             };
 
+            // There has to be at least 1 order for the api to be called
+            requestDataByLocale.default.orders.push({});
             exportOrderModelInstance.exportOrdersByLocale(inputConfigAndRequestsByLocale);
 
             assert.isTrue(sinonSendOrdersToYotpoStub.calledWith(requestDataByLocale.default, 'appKey', 'default', true));
+            requestDataByLocale.default.orders.pop({});
 
             sinonSendOrdersToYotpoStub.restore();
         });

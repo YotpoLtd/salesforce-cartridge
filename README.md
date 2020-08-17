@@ -1,6 +1,6 @@
-# YOTPO Reviews for SFRA
+# YOTPO Reviews and Loyalty for SFRA
 
-Yotpo reviews integration for use with the Storefront Reference Architecture
+Yotpo reviews and loyalty integration for use with the Storefront Reference Architecture
 
 # Getting Started
 
@@ -14,7 +14,9 @@ Yotpo reviews integration for use with the Storefront Reference Architecture
     "hostname": "your-sandbox-hostname.demandware.net",
     "username": "yourlogin",
     "password": "yourpwd",
-    "code-version": "version_to_upload_to"
+    "code-version": "version_to_upload_to",
+    "storefront-username": "storefrontUsername",
+    "storefront-password": "storefrontPassword"
 }
 ```
 
@@ -31,8 +33,21 @@ Yotpo reviews integration for use with the Storefront Reference Architecture
 
 You can run `npm test` to execute all unit tests in the cartridge.
 
+You can run `npm run lint` to verify code quality compliance
+
+You can run `npm run test:integration` to execute all integration tests in the cartridge.  These tests require a connection to the sandbox and expect the sample data to have been loaded
+The integration tests use your credentials from the dw.json file to connect to your sandbox.
+
+## Git pre-commit hooks for testing 
+
+Git can run the unit, initegration and lint tests for you before each commit.  To enable this hook run
+```
+ln -s ../../test/preCommitHook.sh .git/hooks/pre-commit
+```
+
 ## Running acceptance tests
 Running acceptance tests requires that the SFRA base cartridge and and metadata have been installed on your sandbox, and you have a working RefArch site.
+These tests expect that at least 1 order exists.
 
 Acceptance tests are located in the `yotpo-link/test/acceptance` directory.
 

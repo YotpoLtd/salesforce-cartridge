@@ -1,13 +1,15 @@
 {
     "name": "link_yotpo",
     "packageName": "int_yotpo_sfra",
-    "version": "0.0.1",
+    "version": "20.1.0",
     "description": "Yotpo ratings and reviews integration for SFCC Storefront Reference Architecture",
     "author": "CQL Inc.",
     "main": "index.js",
     "scripts": {
         "lint": "sgmf-scripts --lint js",
         "test": "sgmf-scripts --test test/unit/**/*.js",
+        "test:cover": "sgmf-scripts --cover test/unit/**/*.js",
+        "test:integration": "sgmf-scripts --test test/integration/controllers/*.js",
         "test:acceptance": "./node_modules/.bin/codeceptjs run --verbose",
         "upload": "sgmf-scripts --upload -- ",
         "uploadCartridge": "sgmf-scripts --uploadCartridge int_yotpo_sfra && sgmf-scripts --uploadCartridge bm_yotpo"
@@ -17,6 +19,8 @@
         "babel-eslint": "^10.0.2",
         "chai": "^3.5.0",
         "codeceptjs": "^2.1.0",
+        "dw-api-mock": "file:.github/buildDependencies/dw-api-mock",
+        "app-module-path": "^1.0.4",
         "eslint": "^4.17.0",
         "eslint-config-airbnb-base": "^5.0.1",
         "eslint-plugin-codeceptjs": "^1.0.0",
@@ -36,7 +40,14 @@
         "last 2 versions",
         "ie >= 10"
     ],
+    "mocha": {
+        "spec": "test/unit/**/*.js"
+    },
     "paths": {
         "base": "../storefront-reference-architecture/cartridges/app_storefront_base/"
+    },
+    "dependencies": {
+        "cheerio": "^1.0.0-rc.3",
+        "request-promise": "^4.2.5"
     }
 }

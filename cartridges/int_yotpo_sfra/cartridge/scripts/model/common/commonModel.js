@@ -7,90 +7,98 @@
  */
 
 /**
- * Reads the Yotpo configurations from Custom Objects.
- * @returns {dw.util.List} YotpoConfigurationList - The list of CustomObject holding Yotpo configurations.
+ * This function is used to get customer by its customer number
+ *
+ * @param {string} customerNo: The customer number to retrieve customer information
+ *
+ * @return {boolean} result.customerExists : The flag to indicate if customer exists
+ * @return {string} result.customerEmail : The customer email address
+ * @return {string} result.customerNo : current customer no
+ * @return {string} result.customerGroups : The customer Groups associate with customer
  */
-function loadAllYotpoConfigurations() {
-    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
-    var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var constants = require('*/cartridge/scripts/utils/constants');
+function getLoggedInCustomerDetails(customerNo) {
+    var CustomerMgr = require('dw/customer/CustomerMgr');
 
-    var logLocation = 'commonModel~loadAllYotpoConfigurations';
-
-    var yotpoConfigurations = CustomObjectMgr.getAllCustomObjects(constants.YOTPO_CONFIGURATION_OBJECT);
-
-    if (yotpoConfigurations == null || !yotpoConfigurations.hasNext()) {
-        yotpoLogger.logMessage('The Yotpo configuration does not exist, therefore cannot proceed further.', 'error', logLocation);
-        throw constants.YOTPO_CONFIGURATION_LOAD_ERROR;
-    }
-
-    yotpoLogger.logMessage('Yotpo Configurations count - ' + yotpoConfigurations.count, 'debug', logLocation);
-
-    var yotpoConfigurationList = yotpoConfigurations.asList();
-    yotpoConfigurations.close();// closing list...
-
-    return yotpoConfigurationList;
-}
-
-/**
- * Loads the Yotpo configuration by locale ID from Custom Objects.
- * @param {string} localeID - current locale id
- * @returns {Object} Yotpo configuration object for the locale
- */
-function loadYotpoConfigurationsByLocale(localeID) {
-    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
-    var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var constants = require('*/cartridge/scripts/utils/constants');
-
-    var logLocation = 'commonModel~loadYotpoConfigurationsByLocale';
-    var yotpoConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_CONFIGURATION_OBJECT, localeID);
-
-    if (yotpoConfiguration == null) {
-        yotpoLogger.logMessage('The Yotpo configuration does not exist for Locale, cannot proceed further. Locale ID is: ' + localeID, 'error', logLocation);
-        throw constants.YOTPO_CONFIGURATION_LOAD_ERROR;
-    }
-
-    return yotpoConfiguration;
-}
-
-/**
- * Reads the Yotpo job configurations custom object to retrieve last execution time
- * @returns {Object} - Contains the last execution and current date time.
- */
-function loadYotpoJobConfigurations() {
-    var Calendar = require('dw/util/Calendar');
-    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
-    var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var constants = require('*/cartridge/scripts/utils/constants');
-
-    var logLocation = 'commonModel~loadYotpoJobConfigurations';
-
-    var yotpoJobConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_JOBS_CONFIGURATION_OBJECT, constants.YOTPO_JOB_CONFIG_ID);
-
-    if (yotpoJobConfiguration == null) {
-        try {
-            require('dw/system/Transaction').wrap(function () {
-                yotpoJobConfiguration = CustomObjectMgr.createCustomObject(constants.YOTPO_JOBS_CONFIGURATION_OBJECT, constants.YOTPO_JOB_CONFIG_ID);
-                yotpoJobConfiguration.custom.orderFeedJobLastExecutionDateTime = new Date(0);
-            });
-        } catch (e) {
-            var errorMessage = 'Could not create job configuration custom object. Please check that custom object meta data has been imported.';
-            yotpoLogger.logMessage(errorMessage + ' Error: ' + e, 'error', logLocation);
-            // The job can't continue if this fails, so throw an error that will be shown in the job log.
-            throw new Error(errorMessage);
-        }
-    }
-
-    var orderFeedJobLastExecutionTime = yotpoJobConfiguration.custom.orderFeedJobLastExecutionDateTime;
-    var helperCalendar = new Calendar();
-    var currentDateTime = helperCalendar.getTime();
-
-    return {
-        orderFeedJobLastExecutionTime: orderFeedJobLastExecutionTime,
-        currentDateTime: currentDateTime
+    var result = {
+        customerExists: false
     };
+
+    var customerObj = CustomerMgr.getCustomerByCustomerNumber(customerNo);
+
+    if (!customerObj) {
+        return result;
+    }
+
+    var customerGroupArray = new Array();
+    var customerGroupIterator = customerObj.getCustomerGroups().iterator();
+
+    while (customerGroupIterator.hasNext()) {
+        var customerGroup = customerGroupIterator.next();
+        customerGroupArray.push('\"' + customerGroup.ID + '\"');
+    }
+
+    result.customerExists = true;
+    result.customerEmail = customerObj.profile.email;
+    result.customerNo = customerNo;
+    result.customerGroups = '[' + customerGroupArray.join(',') + ']';
+
+    return result;
 }
 
-exports.loadAllYotpoConfigurations = loadAllYotpoConfigurations;
-exports.loadYotpoJobConfigurations = loadYotpoJobConfigurations;
-exports.loadYotpoConfigurationsByLocale = loadYotpoConfigurationsByLocale;
+/**
+ * This method is used to get current basket details for logged in customer.
+ *
+ * @param {string} currentLocaleID : The current locale id for current request used to get loyalty API key.
+ *
+ * @return {boolean} result.basketExists : The flag to indicate if basket exists.
+ * @return {string} result.basketTokken : The SHA1 Base64 encrypted basket token which will create with the concatenated
+ * value of basketID and loyalty API Key.
+ * @return {string} result.basketID : The UUID of current basket.
+ */
+function getCurrentBasketDetails(currentLocaleID) {
+    var BasketMgr = require('dw/order/BasketMgr');
+    var Bytes = require('dw/util/Bytes');
+    var Encoding = require('dw/crypto/Encoding');
+    var MessageDigest = require('dw/crypto/MessageDigest');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+
+    var logLocation = 'CommonModel~getCurrentBasketDetails';
+
+    var result = {
+        basketExists: false
+    };
+
+    var currentBasket = BasketMgr.getCurrentOrNewBasket();
+
+    if (!currentBasket) {
+        return result;
+    }
+
+    var yotpoConfiguration = YotpoConfigurationModel.getYotpoConfig(currentLocaleID);
+    var encryptedBasketToken;
+
+    if (!yotpoConfiguration) {
+        return result;
+    }
+
+    try {
+        var loyaltyAPIKey = yotpoConfiguration.yotpoLoyaltyAPIKey;
+
+        var loyaltyCartToken = loyaltyAPIKey + currentBasket.UUID;
+        var messageDigest = new MessageDigest(MessageDigest.DIGEST_SHA_256);
+        encryptedBasketToken = Encoding.toBase64(messageDigest.digestBytes(new Bytes(loyaltyCartToken, 'UTF-8')));
+    } catch (ex) {
+        YotpoLogger.logMessage('Exception occurred while encrypting cart tokken for Locale: ' + currentLocaleID + ' exception is:' + ex, 'error', logLocation);
+        return result;
+    }
+
+    result.basketExists = true;
+    result.basketTokken = encryptedBasketToken;
+    result.basketID = currentBasket.UUID;
+
+    return result;
+}
+
+exports.getLoggedInCustomerDetails = getLoggedInCustomerDetails;
+exports.getCurrentBasketDetails = getCurrentBasketDetails;
