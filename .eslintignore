@@ -1,7 +1,9 @@
 codecept.conf.js
+cartridges/bm_yotpo/cartridge/static
 cartridges/app_storefront_base/cartridge/static/
 bm_yotpo/cartridge/static/
 coverage/
 doc/
 bin/
+test/
 test/acceptance
