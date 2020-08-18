@@ -68,7 +68,7 @@ describe('ExportOrderModel', () => {
 
     yotpoUtils.getProductImageUrl = () => {};
 
-    const yotpoConfigurationModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/common/yotpoConfigurationModel', {
+    const yotpoConfigurationModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/models/common/yotpoConfigurationModel', {
         ...ApiStubs,
         '*/cartridge/scripts/utils/yotpoUtils.js': yotpoUtils,
         '*/cartridge/scripts/utils/constants': constants,
@@ -77,16 +77,16 @@ describe('ExportOrderModel', () => {
         }
     });
 
-    const ExportOrderModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/orderexport/exportOrderModel', {
+    const ExportOrderModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/models/orderexport/exportOrderModel', {
         ...ApiStubs,
         '*/cartridge/scripts/utils/constants': constants,
         '*/cartridge/scripts/utils/yotpoUtils': yotpoUtils,
-        '*/cartridge/scripts/model/common/yotpoConfigurationModel': yotpoConfigurationModel,
+        '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
         '*/cartridge/scripts/utils/yotpoLogger': {
             logMessage: () => { }
         },
         '*/cartridge/scripts/serviceregistry/exportOrderServiceRegistry': exportOrderServiceRegistry,
-        '*/cartridge/scripts/model/authentication/authenticationModel': {
+        '*/cartridge/models/authentication/authenticationModel': {
             authenticate: (appKey, clientSecretKey) => {
                 if (appKey && clientSecretKey) {
                     return {

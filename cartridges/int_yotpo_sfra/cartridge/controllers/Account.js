@@ -29,7 +29,7 @@ server.append('Login', function (req, res, next) {
                 // Successfully exported to Yotpo. Update profile
                 var CustomerMgr = require('dw/customer/CustomerMgr');
                 var registeredCustomer = CustomerMgr.getCustomerByCustomerNumber(viewData.authenticatedCustomer.profile.customerNo);
-                var LoyaltyCustomerModel = require('*/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel');
+                var LoyaltyCustomerModel = require('*/cartridge/models/loyalty/common/loyaltyCustomerModel');
                 LoyaltyCustomerModel.updateLoyaltyInitializedFlag(registeredCustomer);
             }
         }
@@ -73,7 +73,7 @@ server.append('SubmitRegistration', function (req, res, next) {
                         }
                     } else {
                         // Successfully exported to Yotpo. Update profile
-                        var LoyaltyCustomerModel = require('*/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel');
+                        var LoyaltyCustomerModel = require('*/cartridge/models/loyalty/common/loyaltyCustomerModel');
                         LoyaltyCustomerModel.updateLoyaltyInitializedFlag(registeredCustomer);
                     }
                 }
@@ -111,7 +111,7 @@ server.append('SaveProfile', function (req, res, next) {
                 // Successfully exported to Yotpo. Update profile
                 var CustomerMgr = require('dw/customer/CustomerMgr');
                 var registeredCustomer = CustomerMgr.getCustomerByCustomerNumber(req.currentCustomer.profile.customerNo);
-                var LoyaltyCustomerModel = require('*/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel');
+                var LoyaltyCustomerModel = require('*/cartridge/models/loyalty/common/loyaltyCustomerModel');
                 LoyaltyCustomerModel.updateLoyaltyInitializedFlag(registeredCustomer);
             }
         }

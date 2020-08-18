@@ -37,7 +37,7 @@ describe('loyaltyOrderModel', () => {
         '*/cartridge/scripts/utils/yotpoLogger': loggerSpy
     });
 
-    const loyaltyOrderModel = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/loyalty/common/loyaltyOrderModel.js', {
+    const loyaltyOrderModel = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/models/loyalty/common/loyaltyOrderModel.js', {
         'dw/order/Order': {
             ORDER_STATUS_CREATED: 0,
             ORDER_STATUS_NEW: 3,

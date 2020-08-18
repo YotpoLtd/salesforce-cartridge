@@ -66,7 +66,7 @@ yotpoHelper.removeSelectedLocaleConfig = function (selectedLocale) {
 };
 
 yotpoHelper.getUTokenAuthCode = function (appKey, clientSecretKey) {
-    var authenticationModel = require('~/../int_yotpo_sfra/cartridge/scripts/model/authentication/authenticationModel');
+    var authenticationModel = require('~/../int_yotpo_sfra/cartridge/models/authentication/authenticationModel');
     var status;
 
     try {

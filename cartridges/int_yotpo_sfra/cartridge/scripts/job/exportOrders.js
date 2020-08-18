@@ -31,7 +31,7 @@ var chunkSkippedOrders = [];
  * @param {dw.job.JobStepExecution} stepExecution - execution of a job step
  */
 function beforeStep(parameters, stepExecution) {
-    var ExportOrderModel = require('*/cartridge/scripts/model/orderexport/exportOrderModel');
+    var ExportOrderModel = require('*/cartridge/models/orderexport/exportOrderModel');
     var exportOrderModelInstance = new ExportOrderModel();
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportOrders~beforeStep';
@@ -111,7 +111,7 @@ function read() {
  * @return {Object} - orderData to be sent to List for 'write' returns null if order was skipped due to data errors
  */
 function process(order) {
-    var ExportOrderModel = require('*/cartridge/scripts/model/orderexport/exportOrderModel');
+    var ExportOrderModel = require('*/cartridge/models/orderexport/exportOrderModel');
     var exportOrderModelInstance = new ExportOrderModel();
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportOrders~process';
@@ -154,7 +154,7 @@ function process(order) {
  * @param {dw.util.List} ordersData - List of orderData objects returned from "process"
  */
 function write(ordersData) {
-    var ExportOrderModel = require('*/cartridge/scripts/model/orderexport/exportOrderModel');
+    var ExportOrderModel = require('*/cartridge/models/orderexport/exportOrderModel');
     var exportOrderModelInstance = new ExportOrderModel();
 
     // Get objects to build requests separated by locale
@@ -180,7 +180,7 @@ function afterChunk(success) {
 
     if (success) {
         yotpoLogger.logMessage('Yotpo Order Export chunk completed successfully. \n ' + logMsg, 'debug', logLocation);
-        var ExportOrderModel = require('*/cartridge/scripts/model/orderexport/exportOrderModel');
+        var ExportOrderModel = require('*/cartridge/models/orderexport/exportOrderModel');
         var exportOrderModelInstance = new ExportOrderModel();
         exportOrderModelInstance.updateJobExecutionTime(yotpoJobConfiguration.currentDateTime);
     } else {

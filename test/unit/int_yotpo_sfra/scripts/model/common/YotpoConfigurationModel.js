@@ -123,7 +123,7 @@ describe('yotpoConfigurationModel', () => {
         sinonCalendar.reset();
     });
 
-    const yotpoConfigurationModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/common/yotpoConfigurationModel', {
+    const yotpoConfigurationModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/models/common/yotpoConfigurationModel', {
         'dw/object/CustomObjectMgr': CustomObjectMgr,
         'dw/system/Site': Site,
         'dw/system/Logger': Logger,

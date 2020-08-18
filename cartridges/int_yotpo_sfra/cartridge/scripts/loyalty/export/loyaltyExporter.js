@@ -17,7 +17,7 @@
  */
 function exportLoyaltyOrder(params) {
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var logLocation = 'loyaltyExporter~exportLoyaltyOrder';
     var localeID = params.locale || 'default';
 
@@ -45,11 +45,11 @@ function exportLoyaltyOrder(params) {
         if (empty(payload)) {
             var OrderMgr = require('dw/order/OrderMgr');
             var order = OrderMgr.getOrder(params.orderNo);
-            var LoyaltyOrderModel = require('*/cartridge/scripts/model/loyalty/common/loyaltyOrderModel');
+            var LoyaltyOrderModel = require('*/cartridge/models/loyalty/common/loyaltyOrderModel');
             payload = LoyaltyOrderModel.prepareOrderJSON(order);
         }
 
-        var ExportLoyaltyOrderModel = require('*/cartridge/scripts/model/loyalty/export/exportLoyaltyOrderModel');
+        var ExportLoyaltyOrderModel = require('*/cartridge/models/loyalty/export/exportLoyaltyOrderModel');
         ExportLoyaltyOrderModel.exportOrder(payload, params);
     } catch (ex) {
         YotpoLogger.logMessage('Something went wrong while exporting order number: ' + params.orderNo +
@@ -71,7 +71,7 @@ function exportLoyaltyOrder(params) {
  */
 function exportLoyaltyCustomer(params) {
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var logLocation = 'loyaltyExporter~exportLoyaltyCustomer';
     var localeID = params.locale || 'default';
 
@@ -101,7 +101,7 @@ function exportLoyaltyCustomer(params) {
             return exported;
         }
 
-        var exportLoyaltyCustomerModel = require('*/cartridge/scripts/model/loyalty/export/exportLoyaltyCustomerModel');
+        var exportLoyaltyCustomerModel = require('*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel');
         var payload = exportLoyaltyCustomerModel.generateCustomerExportPayload(params.customerNo);
         exportLoyaltyCustomerModel.exportCustomerByLocale(payload, params.locale);
     } catch (ex) {

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module scripts/model/loyalty/export/exportLoyaltyOrderModel
+ * @module models/loyalty/export/exportLoyaltyOrderModel
  *
  * The model is used to export order to Yotpo.
  */
@@ -19,8 +19,8 @@ function exportOrder(payload, params) {
     var Site = require('dw/system/Site');
 
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
-    var LoyaltyService = require('*/cartridge/scripts/model/loyalty/export/loyaltyService');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
+    var LoyaltyService = require('*/cartridge/models/loyalty/export/loyaltyService');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var localeID = request.locale;
@@ -62,7 +62,7 @@ function generateOrderExportPayload(OrderNo) {
     var OrderMgr = require('dw/order/OrderMgr');
     var Site = require('dw/system/Site');
 
-    var LoyaltyOrderModel = require('~/cartridge/scripts/model/loyalty/common/loyaltyOrderModel');
+    var LoyaltyOrderModel = require('~/cartridge/models/loyalty/common/loyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var logLocation = 'ExportLoyaltyOrderModel~generateOrderExportPayload';
@@ -83,8 +83,8 @@ function generateOrderExportPayload(OrderNo) {
  * @throws {Constants.EXPORT_LOYALTY_SERVICE_ERROR} If the post to the loyalty service was unsuccessful.
  */
 function exportOrderByLocale(payload, locale) {
-    var LoyaltyService = require('*/cartridge/scripts/model/loyalty/export/loyaltyService');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var LoyaltyService = require('*/cartridge/models/loyalty/export/loyaltyService');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var logLocation = 'ExportLoyaltyOrderModel~exportOrderByLocale';

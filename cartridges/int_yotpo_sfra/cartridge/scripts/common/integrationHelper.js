@@ -8,7 +8,7 @@
  * @returns {Object} a JSON object of the yotpo ratings and reviews.
  */
 function getRatingsOrReviewsData(currentLocale, productId) {
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var isCartridgeEnabled = YotpoConfigurationModel.isCartridgeEnabled();
     var yotpoConfig = YotpoConfigurationModel.getYotpoConfig(currentLocale);
 
@@ -59,7 +59,7 @@ function getRatingsOrReviewsData(currentLocale, productId) {
  * @returns {Object} a JSON object containing basic tracking info
  */
 function getConversionTrackingData(order, currentLocale) {
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var yotpoConfig = YotpoConfigurationModel.getYotpoConfig(currentLocale);
     var isCartridgeEnabled = YotpoConfigurationModel.isCartridgeEnabled();
     var conversionTrkURL = '';

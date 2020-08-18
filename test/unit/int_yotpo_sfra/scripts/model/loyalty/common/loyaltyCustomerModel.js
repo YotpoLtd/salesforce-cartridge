@@ -11,7 +11,7 @@ describe('loyaltyCustomerModel', () => {
         logMessage: sinon.spy()
     };
 
-    const loyaltyCustomerModel = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel.js', {
+    const loyaltyCustomerModel = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/models/loyalty/common/loyaltyCustomerModel.js', {
         '*/cartridge/scripts/utils/constants': constants,
         '~/cartridge/scripts/utils/yotpoLogger': loggerSpy,
         'dw/customer/CustomerMgr': {

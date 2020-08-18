@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module scripts/model/authentication/authenticationModel
+ * @module models/authentication/authenticationModel
  *
  * This model is used for authentication purpose in Yotpo, It reads the site preferences to get the Yotpo connection
  * details and authentication parameters and sends the HTTP request. It reads the response and returns the

@@ -9,7 +9,7 @@ server.append('Begin', function (req, res, next) { // adds additional middleware
     var viewData = res.getViewData();
     var BasketMgr = require('dw/order/BasketMgr');
     var YotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var currentLocaleID = YotpoUtils.getCurrentLocaleSFRA(viewData.locale);
     var isCartridgeEnabled = YotpoConfigurationModel.isCartridgeEnabled();
     var isLoyaltyEnabled = isCartridgeEnabled && YotpoConfigurationModel.getYotpoPref('yotpoLoyaltyEnabled', currentLocaleID);

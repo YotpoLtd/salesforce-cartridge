@@ -71,15 +71,15 @@ describe('loyaltyExporter', () => {
         'dw/system/Transaction': transactionMock,
         '*/cartridge/scripts/utils/constants': constants,
         '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
-        '*/cartridge/scripts/model/common/yotpoConfigurationModel': yotpoConfigurationModel,
-        '*/cartridge/scripts/model/loyalty/export/exportLoyaltyOrderModel': {
+        '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
+        '*/cartridge/models/loyalty/export/exportLoyaltyOrderModel': {
             exportOrder: exportStub
         },
-        '*/cartridge/scripts/model/loyalty/export/exportLoyaltyCustomerModel': {
+        '*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel': {
             generateCustomerExportPayload: () => {},
             exportCustomerByLocale: exportStub
         },
-        '*/cartridge/scripts/model/loyalty/common/loyaltyOrderModel': {
+        '*/cartridge/models/loyalty/common/loyaltyOrderModel': {
             saveUserInfoInOrder: (order) => {
                 return order;
             },

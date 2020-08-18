@@ -77,9 +77,9 @@ describe('exportLoyaltyOrders job', () => {
     beforeEach(function () {
         // The exporter has a bunch of private variables that need to reset between tests.
         exportLoyaltyOrders = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/job/loyalty/exportLoyaltyOrders.js', {
-            '*/cartridge/scripts/model/loyalty/export/exportLoyaltyOrderModel': exportLoyaltyOrderModel,
+            '*/cartridge/models/loyalty/export/exportLoyaltyOrderModel': exportLoyaltyOrderModel,
             '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
-            '*/cartridge/scripts/model/common/yotpoConfigurationModel': yotpoConfigurationModel,
+            '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
             '*/cartridge/scripts/utils/constants': constants
         });
         sitePrefs = Object.assign({}, sitePrefDefaults);

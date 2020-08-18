@@ -61,7 +61,7 @@ function getCurrentBasketDetails(currentLocaleID) {
     var Encoding = require('dw/crypto/Encoding');
     var MessageDigest = require('dw/crypto/MessageDigest');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
 
     var logLocation = 'CommonModel~getCurrentBasketDetails';
 

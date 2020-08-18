@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module scripts/model/loyalty/export/loyaltyOrderCO
+ * @module models/loyalty/export/loyaltyOrderCO
  *
  * The script is used to prepare and update export data to Yotpo for Loyalty.
  */
@@ -20,8 +20,8 @@ function createLoyaltyOrderCO(params) {
     var Transaction = require('dw/system/Transaction');
 
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
-    var LoyaltyOrderModel = require('*/cartridge/scripts/model/loyalty/common/loyaltyOrderModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
+    var LoyaltyOrderModel = require('*/cartridge/models/loyalty/common/loyaltyOrderModel');
     var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
 
     var localeID = params.locale;
@@ -74,7 +74,7 @@ function createLoyaltyOrderCO(params) {
 function updateLoyaltyOrderCO(co, params) {
     var Transaction = require('dw/system/Transaction');
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
 
     var localeID = request.locale;

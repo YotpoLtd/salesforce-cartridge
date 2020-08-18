@@ -25,8 +25,8 @@
  */
 function fetchCustomers(params) {
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var LoyaltyCustomerModel = require('*/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var LoyaltyCustomerModel = require('*/cartridge/models/loyalty/common/loyaltyCustomerModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var logLocation = 'loyaltyAPI~fetchCustomers';
@@ -103,8 +103,8 @@ function fetchCustomers(params) {
  */
 function getOrdersCount(params) {
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
-    var LoyaltyOrderModel = require('~/cartridge/scripts/model/loyalty/common/loyaltyOrderModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
+    var LoyaltyOrderModel = require('~/cartridge/models/loyalty/common/loyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var logLocation = 'loyaltyAPI~getOrdersCount';
@@ -181,8 +181,8 @@ function fetchOrders(params) {
     var OrderMgr = require('dw/order/OrderMgr');
 
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var LoyaltyOrderModel = require('~/cartridge/scripts/model/loyalty/common/loyaltyOrderModel');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var LoyaltyOrderModel = require('~/cartridge/models/loyalty/common/loyaltyOrderModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var logLocation = 'loyaltyAPI~fetchOrders';
@@ -274,7 +274,7 @@ function createGiftCertificate(params) {
     var Transaction = require('dw/system/Transaction');
 
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var logLocation = 'loyaltyAPI~createGiftCertificate';
@@ -371,7 +371,7 @@ function createGiftCertificate(params) {
  */
 function getNextCouponCode(params) {
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var couponID = params.couponID ? params.couponID : ''; // i.e. yotpoLoyaltyS2FCoupon
     var nextCouponCode = '';

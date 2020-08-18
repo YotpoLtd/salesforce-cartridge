@@ -29,9 +29,9 @@ var chunkSkippedCustomers = [];
  * @param {dw.job.JobStepExecution} stepExecution - execution of a job step
  */
 function beforeStep(parameters, stepExecution) {
-    var ExportLoyaltyCustomerModel = require('*/cartridge/scripts/model/loyalty/export/exportLoyaltyCustomerModel');
+    var ExportLoyaltyCustomerModel = require('*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var logLocation = 'exportLoyaltyCustomers~beforeStep';
 
     // reset error flagging in job context
@@ -107,7 +107,7 @@ function read() {
  * @return {Object} - customerData to be sent to List for 'write' returns null if customer was skipped due to data errors
  */
 function process(customerEventObject) {
-    var ExportLoyaltyCustomerModel = require('*/cartridge/scripts/model/loyalty/export/exportLoyaltyCustomerModel');
+    var ExportLoyaltyCustomerModel = require('*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportCustomers~process';
 
@@ -158,7 +158,7 @@ function process(customerEventObject) {
  * @param {dw.util.List} events - List of customerData events objects returned from "process"
  */
 function write(events) {
-    var ExportLoyaltyCustomerModel = require('*/cartridge/scripts/model/loyalty/export/exportLoyaltyCustomerModel');
+    var ExportLoyaltyCustomerModel = require('*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportCustomers~write';
     for (var i = 0; i < events.length; i++) {
@@ -173,7 +173,7 @@ function write(events) {
                 // Successfully exported to Yotpo. Update profile
                 var CustomerMgr = require('dw/customer/CustomerMgr');
                 var registeredCustomer = CustomerMgr.getCustomerByCustomerNumber(events[i].customerId);
-                var LoyaltyCustomerModel = require('*/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel');
+                var LoyaltyCustomerModel = require('*/cartridge/models/loyalty/common/loyaltyCustomerModel');
                 LoyaltyCustomerModel.updateLoyaltyInitializedFlag(registeredCustomer);
                 // Blank out the status Details in case this export had previously failed.
                 events[i].customerEventObject.custom.StatusDetails = ''; // eslint-disable-line

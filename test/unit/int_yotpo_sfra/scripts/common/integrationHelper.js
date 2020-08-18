@@ -28,7 +28,7 @@ const mockConfigModel = {
     isCartridgeEnabled: sinon.stub().returns(true),
     getYotpoConfig: sinon.stub().returns(subCustomObject)
 };
-const yotpoConfigurationModel = proxyquire('../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/common/yotpoConfigurationModel', {
+const yotpoConfigurationModel = proxyquire('../../../../../cartridges/int_yotpo_sfra/cartridge/models/common/yotpoConfigurationModel', {
     '*/cartridge/scripts/utils/yotpoUtils.js': yotpoUtils,
     '*/cartridge/scripts/utils/constants': constants,
     '*/cartridge/scripts/utils/yotpoUtils': yotpoUtils,
@@ -48,7 +48,7 @@ const yotpoConfigurationModel = proxyquire('../../../../../cartridges/int_yotpo_
 
 const integrationHelper = proxyquire('../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/common/integrationHelper', {
     '*/cartridge/scripts/utils/yotpoUtils.js': yotpoUtils,
-    '*/cartridge/scripts/model/common/yotpoConfigurationModel': mockConfigModel,
+    '*/cartridge/models/common/yotpoConfigurationModel': mockConfigModel,
     '*/cartridge/scripts/utils/yotpoLogger': {},
     'dw/system/Site': {
         getCurrent: () => {

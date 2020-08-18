@@ -13,9 +13,9 @@ var server = require('server');
  * This controller is invoked to track logged in customer and basket for Yotpo loyalty
  */
 server.get('IncludeLoyaltyTracking', function (req, res, next) {
-    var CommonModel = require('*/cartridge/scripts/model/common/commonModel');
+    var CommonModel = require('*/cartridge/models/common/commonModel');
     var YotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
 
     var viewData = res.getViewData();
     var currentLocaleID = YotpoUtils.getCurrentLocaleSFRA(viewData.locale);

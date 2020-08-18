@@ -63,8 +63,8 @@ describe('loyaltyCustomerCO', () => {
         'dw/system/Transaction': transactionMock,
         '*/cartridge/scripts/utils/constants': constants,
         '~/cartridge/scripts/utils/yotpoLogger': loggerSpy,
-        '*/cartridge/scripts/model/common/yotpoConfigurationModel': yotpoConfigurationModel,
-        '*/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel': {
+        '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
+        '*/cartridge/models/loyalty/common/loyaltyCustomerModel': {
             prepareCustomerJSON: (customer) => {
                 return customer;
             }

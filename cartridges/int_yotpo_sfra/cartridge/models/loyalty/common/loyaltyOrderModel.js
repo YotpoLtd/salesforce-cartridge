@@ -341,7 +341,7 @@ function prepareOrderJSON(order) {
 
         if (empty(customerProfile)) {
             // is this a registered user checking out as a guest user? If so, send their registered user customer number
-            var LoyaltyCustomerModel = require('*/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel');
+            var LoyaltyCustomerModel = require('*/cartridge/models/loyalty/common/loyaltyCustomerModel');
             var params = {
                 email: customerEmail,
                 singleCustomer: true

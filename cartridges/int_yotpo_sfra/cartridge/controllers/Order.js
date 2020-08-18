@@ -10,7 +10,7 @@ server.append('Confirm', function (req, res, next) {
     var OrderMgr = require('dw/order/OrderMgr');
     var CustomObjectMgr = require('dw/object/CustomObjectMgr');
     var order = OrderMgr.getOrder(req.querystring.ID);
-    var LoyaltyOrderModel = require('*/cartridge/scripts/model/loyalty/common/loyaltyOrderModel');
+    var LoyaltyOrderModel = require('*/cartridge/models/loyalty/common/loyaltyOrderModel');
     var YotpoIntegrationHelper = require('*/cartridge/scripts/common/integrationHelper.js');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'Order~Confirm';

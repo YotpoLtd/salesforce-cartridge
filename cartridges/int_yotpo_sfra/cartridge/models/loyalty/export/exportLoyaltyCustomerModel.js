@@ -16,7 +16,7 @@ function generateCustomerExportPayload(customerNo) {
     var CustomerMgr = require('dw/customer/CustomerMgr');
     var Site = require('dw/system/Site');
 
-    var LoyaltyCustomerModel = require('~/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel');
+    var LoyaltyCustomerModel = require('~/cartridge/models/loyalty/common/loyaltyCustomerModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var logLocation = 'ExportLoyaltyCustomerModel~generateCustomerExportPayload';
@@ -39,7 +39,7 @@ function generateCustomerExportPayload(customerNo) {
  */
 function exportCustomerByLocale(payload, locale) {
     var LoyaltyService = require('./loyaltyService');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var logLocation = 'ExportLoyaltyCustomerModel~exportCustomerByLocale';

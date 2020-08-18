@@ -1,6 +1,6 @@
 <isset name="currLocale" value="${request.locale}" scope="page" />
 <isscript>
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
 </isscript>
 <isif condition="${YotpoConfigurationModel.isCartridgeEnabled() && YotpoConfigurationModel.getYotpoPref('yotpoLoyaltyEnabled', currLocale)}">
     <isinclude url="${URLUtils.url('Yotpo-IncludeLoyaltyTracking')}"/>

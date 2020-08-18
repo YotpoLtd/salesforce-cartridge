@@ -14,8 +14,8 @@ describe('loyaltyService', () => {
         getYotpoConfig: () => { return { yotpoLoyaltyGUID: 'guid', yotpoLoyaltyAPIKey: 'apikey' }; }
     };
 
-    const loyaltyService = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/loyalty/export/loyaltyService.js', {
-        '*/cartridge/scripts/model/common/yotpoConfigurationModel': yotpoConfigurationModel,
+    const loyaltyService = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/models/loyalty/export/loyaltyService.js', {
+        '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
         'dw/svc/LocalServiceRegistry': {
             createService: () => true
         },

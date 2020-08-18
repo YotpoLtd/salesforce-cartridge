@@ -76,9 +76,9 @@ describe('loyaltyAPI', () => {
     const loyaltyAPI = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/loyalty/api/loyaltyAPI.js', {
         '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
         '*/cartridge/scripts/utils/constants': constants,
-        '*/cartridge/scripts/model/common/yotpoConfigurationModel': yotpoConfigurationModel,
-        '*/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel': loyaltyCustomerModel,
-        '~/cartridge/scripts/model/loyalty/common/loyaltyOrderModel': loyaltyOrderModel,
+        '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
+        '*/cartridge/models/loyalty/common/loyaltyCustomerModel': loyaltyCustomerModel,
+        '~/cartridge/models/loyalty/common/loyaltyOrderModel': loyaltyOrderModel,
         'dw/order/GiftCertificateMgr': giftCertMgr,
         'dw/campaign/CouponMgr': CouponMgr
     });

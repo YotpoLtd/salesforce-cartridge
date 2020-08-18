@@ -27,17 +27,17 @@ describe('exportLoyaltyCustomerModel', () => {
         serviceSpy.exportData.reset();
     });
 
-    const exportLoyaltyCustomerModel = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/loyalty/export/exportLoyaltyCustomerModel.js', {
+    const exportLoyaltyCustomerModel = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/models/loyalty/export/exportLoyaltyCustomerModel.js', {
         'dw/customer/CustomerMgr': {
             getCustomerByCustomerNumber: () => { return { profile: { status: true } }; }
         },
         'dw/system/Site': SiteForLogger,
         '*/cartridge/scripts/utils/constants': constants,
         'dw/object/CustomObjectMgr': { queryCustomObjects: () => true },
-        '~/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel': LoyaltyCustomerModelStub,
+        '~/cartridge/models/loyalty/common/loyaltyCustomerModel': LoyaltyCustomerModelStub,
         '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
         './loyaltyService': serviceSpy,
-        '*/cartridge/scripts/model/common/yotpoConfigurationModel': {
+        '*/cartridge/models/common/yotpoConfigurationModel': {
             getLoyaltyAPIKeys: () => { return { guid: 'guid', key: 'apikey' }; }
         }
     });

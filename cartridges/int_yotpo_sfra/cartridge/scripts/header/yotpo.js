@@ -8,7 +8,7 @@
 function htmlHead(params) {
     var ISML = require('dw/template/ISML');
     var Site = require('dw/system/Site');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var currLocale = request.locale;
     var isCartridgeEnabled = YotpoConfigurationModel.isCartridgeEnabled();

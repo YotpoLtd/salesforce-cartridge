@@ -29,9 +29,9 @@ var chunkSkippedOrders = [];
  * @param {dw.job.JobStepExecution} stepExecution - execution of a job step
  */
 function beforeStep(parameters, stepExecution) {
-    var ExportLoyaltyOrderModel = require('*/cartridge/scripts/model/loyalty/export/exportLoyaltyOrderModel');
+    var ExportLoyaltyOrderModel = require('*/cartridge/models/loyalty/export/exportLoyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var YotpoConfigurationModel = require('*/cartridge/scripts/model/common/yotpoConfigurationModel');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var logLocation = 'exportLoyaltyOrders~beforeStep';
 
     // reset error flagging in job context
@@ -111,7 +111,7 @@ function read() {
  * @return {Object} - OrderData to be sent to List for 'write' returns null if Order was skipped due to data errors
  */
 function process(OrderEventObject) {
-    var ExportLoyaltyOrderModel = require('*/cartridge/scripts/model/loyalty/export/exportLoyaltyOrderModel');
+    var ExportLoyaltyOrderModel = require('*/cartridge/models/loyalty/export/exportLoyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportOrders~process';
 
@@ -164,7 +164,7 @@ function process(OrderEventObject) {
  * @param {dw.util.List} events - List of OrderData events objects returned from "process"
  */
 function write(events) {
-    var ExportLoyaltyOrderModel = require('*/cartridge/scripts/model/loyalty/export/exportLoyaltyOrderModel');
+    var ExportLoyaltyOrderModel = require('*/cartridge/models/loyalty/export/exportLoyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportOrders~write';
     for (var i = 0; i < events.length; i++) {

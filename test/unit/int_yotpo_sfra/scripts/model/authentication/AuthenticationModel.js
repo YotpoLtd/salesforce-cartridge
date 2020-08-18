@@ -81,7 +81,7 @@ describe('authenticationModel', () => {
     });
     var constants = require('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/utils/constants');
 
-    const authenticationModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/authentication/authenticationModel', {
+    const authenticationModel = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/models/authentication/authenticationModel', {
         'dw/svc/Result': {
             OK: 'OK',
             ERROR: 'ERROR'

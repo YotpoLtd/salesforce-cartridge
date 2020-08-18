@@ -94,12 +94,12 @@ describe('exportLoyaltyCustomers job', () => {
     beforeEach(function () {
         // The exporter has a bunch of private variables that need to reset between tests.
         exportLoyaltyCustomers = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/job/loyalty/exportLoyaltyCustomers.js', {
-            '*/cartridge/scripts/model/loyalty/export/exportLoyaltyCustomerModel': exportLoyaltyCustomerModel,
-            '*/cartridge/scripts/model/loyalty/common/loyaltyCustomerModel': {
+            '*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel': exportLoyaltyCustomerModel,
+            '*/cartridge/models/loyalty/common/loyaltyCustomerModel': {
                 updateLoyaltyInitializedFlag: () => {}
             },
             '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
-            '*/cartridge/scripts/model/common/yotpoConfigurationModel': yotpoConfigurationModel,
+            '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
             '*/cartridge/scripts/utils/constants': constants
         });
         sitePrefs = Object.assign({}, sitePrefDefaults);

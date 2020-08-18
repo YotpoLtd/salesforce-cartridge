@@ -71,12 +71,12 @@ describe('exportLoyaltyOrderModel', () => {
         exportData: exportSpy
     };
 
-    const exportLoyaltyOrderModel = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/model/loyalty/export/exportLoyaltyOrderModel.js', {
+    const exportLoyaltyOrderModel = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/models/loyalty/export/exportLoyaltyOrderModel.js', {
         '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
-        '*/cartridge/scripts/model/common/yotpoConfigurationModel': yotpoConfigurationModel,
+        '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
         '*/cartridge/scripts/utils/constants': constants,
         'dw/object/CustomObjectMgr': { queryCustomObjects: () => true },
-        '*/cartridge/scripts/model/loyalty/export/loyaltyService': loyaltyService
+        '*/cartridge/models/loyalty/export/loyaltyService': loyaltyService
     });
 
     describe('exportOrder', () => {
