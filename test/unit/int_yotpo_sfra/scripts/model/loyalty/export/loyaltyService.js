@@ -19,7 +19,7 @@ describe('loyaltyService', () => {
         'dw/svc/LocalServiceRegistry': {
             createService: () => true
         },
-        '~/cartridge/scripts/serviceregistry/loyalty/loyaltyAPIServiceRegistry': {
+        '*/cartridge/scripts/serviceregistry/loyalty/loyaltyAPIServiceRegistry': {
             loyaltyAPIService: {
                 call: serviceSpy,
                 addHeader: () => {},
@@ -38,7 +38,7 @@ describe('loyaltyService', () => {
                 }
             }
         },
-        '~/cartridge/scripts/serviceregistry/loyalty/loyaltyExportServiceRegistry': {
+        '*/cartridge/scripts/serviceregistry/loyalty/loyaltyExportServiceRegistry': {
             loyaltyService: {
                 call: serviceSpy,
                 addHeader: () => {},
@@ -58,9 +58,9 @@ describe('loyaltyService', () => {
             OK: 'OK',
             ERROR: 'ERROR'
         },
-        '~/cartridge/scripts/utils/constants': constants,
-        '~/cartridge/scripts/utils/yotpoLogger': loggerSpy,
-        '~/cartridge/scripts/utils/yotpoUtils': {
+        '*/cartridge/scripts/utils/constants': constants,
+        '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
+        '*/cartridge/scripts/utils/yotpoUtils': {
             appendParamsToUrl: () => { return 'http://unittesting'; }
         }
     });

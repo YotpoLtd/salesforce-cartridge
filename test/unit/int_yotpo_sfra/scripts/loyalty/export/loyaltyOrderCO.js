@@ -68,7 +68,7 @@ describe('loyaltyOrderCO', () => {
         },
         'dw/system/Transaction': transactionMock,
         '*/cartridge/scripts/utils/constants': constants,
-        '~/cartridge/scripts/utils/yotpoLogger': loggerSpy,
+        '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
         '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
         '*/cartridge/models/loyalty/common/loyaltyOrderModel': {
             saveUserInfoInOrder: (order) => {

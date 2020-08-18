@@ -78,7 +78,7 @@ describe('loyaltyAPI', () => {
         '*/cartridge/scripts/utils/constants': constants,
         '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
         '*/cartridge/models/loyalty/common/loyaltyCustomerModel': loyaltyCustomerModel,
-        '~/cartridge/models/loyalty/common/loyaltyOrderModel': loyaltyOrderModel,
+        '*/cartridge/models/loyalty/common/loyaltyOrderModel': loyaltyOrderModel,
         'dw/order/GiftCertificateMgr': giftCertMgr,
         'dw/campaign/CouponMgr': CouponMgr
     });

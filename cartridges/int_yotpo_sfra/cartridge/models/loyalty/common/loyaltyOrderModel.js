@@ -51,7 +51,7 @@ function getOrderState(orderState) {
  */
 function getOrderCountByState(orderState) {
     var OrderMgr = require('dw/order/OrderMgr');
-    var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var Constants = require('*/cartridge/scripts/utils/constants');
 
     var logLocation = 'LoyaltyOrderModel~orderCountByState';
@@ -84,7 +84,7 @@ function getOrderCountByState(orderState) {
  */
 function getOrderCountByVolume(numberOfDays) {
     var OrderMgr = require('dw/order/OrderMgr');
-    var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var YotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils');
     var Constants = require('*/cartridge/scripts/utils/constants');
 
@@ -274,7 +274,7 @@ function prepareOrderLineItemsJSON(order) {
  */
 function prepareOrderJSON(order) {
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var YotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils');
     var logLocation = 'loyaltyOrderModel~prepareOrderJSON';
 
@@ -435,7 +435,7 @@ function prepareOrderJSON(order) {
  * @return {Object} payload : The payload for response
  */
 function prepareOrdersJSON(orderIterator) {
-    var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'loyaltyOrderModel~prepareOrdersJSON';
 
     var orderList = new Array();

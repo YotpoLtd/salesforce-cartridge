@@ -62,7 +62,7 @@ function generateOrderExportPayload(OrderNo) {
     var OrderMgr = require('dw/order/OrderMgr');
     var Site = require('dw/system/Site');
 
-    var LoyaltyOrderModel = require('~/cartridge/models/loyalty/common/loyaltyOrderModel');
+    var LoyaltyOrderModel = require('*/cartridge/models/loyalty/common/loyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var logLocation = 'ExportLoyaltyOrderModel~generateOrderExportPayload';

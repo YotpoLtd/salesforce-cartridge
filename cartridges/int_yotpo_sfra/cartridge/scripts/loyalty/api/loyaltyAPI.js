@@ -104,7 +104,7 @@ function fetchCustomers(params) {
 function getOrdersCount(params) {
     var Constants = require('*/cartridge/scripts/utils/constants');
     var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
-    var LoyaltyOrderModel = require('~/cartridge/models/loyalty/common/loyaltyOrderModel');
+    var LoyaltyOrderModel = require('*/cartridge/models/loyalty/common/loyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var logLocation = 'loyaltyAPI~getOrdersCount';
@@ -181,7 +181,7 @@ function fetchOrders(params) {
     var OrderMgr = require('dw/order/OrderMgr');
 
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var LoyaltyOrderModel = require('~/cartridge/models/loyalty/common/loyaltyOrderModel');
+    var LoyaltyOrderModel = require('*/cartridge/models/loyalty/common/loyaltyOrderModel');
     var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 

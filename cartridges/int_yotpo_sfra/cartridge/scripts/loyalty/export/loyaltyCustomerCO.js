@@ -23,7 +23,7 @@ function createLoyaltyCustomerCO(params) {
     var Constants = require('*/cartridge/scripts/utils/constants');
     var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var LoyaltyCustomerModel = require('*/cartridge/models/loyalty/common/loyaltyCustomerModel');
-    var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var localeID = request.locale;
     var logLocation = 'loyaltyCustomerCO~createLoyaltyCustomerCO';

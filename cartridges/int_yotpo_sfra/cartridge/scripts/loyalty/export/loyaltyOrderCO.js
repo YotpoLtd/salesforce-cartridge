@@ -22,7 +22,7 @@ function createLoyaltyOrderCO(params) {
     var Constants = require('*/cartridge/scripts/utils/constants');
     var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var LoyaltyOrderModel = require('*/cartridge/models/loyalty/common/loyaltyOrderModel');
-    var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var localeID = params.locale;
     var logLocation = 'loyaltyOrderCO~createLoyaltyOrderCO';
@@ -75,7 +75,7 @@ function updateLoyaltyOrderCO(co, params) {
     var Transaction = require('dw/system/Transaction');
     var Constants = require('*/cartridge/scripts/utils/constants');
     var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
-    var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var localeID = request.locale;
     var logLocation = 'loyaltyOrderCO~updateLoyaltyOrderCO';

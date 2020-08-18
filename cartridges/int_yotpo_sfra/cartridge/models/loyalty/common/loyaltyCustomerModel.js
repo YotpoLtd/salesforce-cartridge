@@ -7,8 +7,8 @@
  */
 function prepareCustomerJSON(profile) {
     var Constants = require('*/cartridge/scripts/utils/constants');
-    var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
-    var YotpoUtils = require('~/cartridge/scripts/utils/yotpoUtils');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+    var YotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils');
     var logLocation = 'LoyaltyCustomerModel~prepareCustomerJSON';
     var customerJSON;
 
@@ -54,7 +54,7 @@ function prepareCustomerJSON(profile) {
  * @returns {Object} payload : The customers JSON
  */
 function prepareCustomersJSON(profileIterator) {
-    var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'LoyaltyCustomerModel~prepareCustomersJSON';
 
     var profileList = new Array();

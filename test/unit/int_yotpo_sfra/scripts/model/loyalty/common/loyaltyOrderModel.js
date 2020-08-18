@@ -48,9 +48,8 @@ describe('loyaltyOrderModel', () => {
             ORDER_STATUS_FAILED: 8
         },
         'dw/order/OrderMgr': orderMgr,
-        '~/cartridge/scripts/utils/yotpoLogger': loggerSpy,
+        '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
         '*/cartridge/scripts/utils/constants': constants,
-        // '*/cartridge/scripts/utils/yotpoUtils': { getPastDateFromDays: () => {} }
         '*/cartridge/scripts/utils/yotpoUtils': yotpoUtils,
         'dw/catalog/ProductMgr': { getProduct: () => { return fakeProduct; } }
     });

@@ -13,7 +13,7 @@ describe('loyaltyCustomerModel', () => {
 
     const loyaltyCustomerModel = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/models/loyalty/common/loyaltyCustomerModel.js', {
         '*/cartridge/scripts/utils/constants': constants,
-        '~/cartridge/scripts/utils/yotpoLogger': loggerSpy,
+        '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
         'dw/customer/CustomerMgr': {
             getCustomerByCustomerNumber: () => {
                 return { profile: 'byNumber' };
@@ -25,7 +25,7 @@ describe('loyaltyCustomerModel', () => {
                 return { status: true, forward: () => {} };
             }
         },
-        '~/cartridge/scripts/utils/yotpoUtils': {
+        '*/cartridge/scripts/utils/yotpoUtils': {
             escape: (param) => {
                 return param;
             }

@@ -18,10 +18,10 @@
  */
 function exportData(payload, queryParams, endpoint) {
     var Result = require('dw/svc/Result');
-    var LoyaltyExportServiceRegistry = require('~/cartridge/scripts/serviceregistry/loyalty/loyaltyExportServiceRegistry');
-    var Constants = require('~/cartridge/scripts/utils/constants');
-    var YotpoLogger = require('~/cartridge/scripts/utils/yotpoLogger');
-    var YotpoUtils = require('~/cartridge/scripts/utils/yotpoUtils');
+    var LoyaltyExportServiceRegistry = require('*/cartridge/scripts/serviceregistry/loyalty/loyaltyExportServiceRegistry');
+    var Constants = require('*/cartridge/scripts/utils/constants');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+    var YotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils');
 
     var logLocation = 'loyaltyService~exportData';
     var result;

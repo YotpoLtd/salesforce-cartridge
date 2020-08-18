@@ -34,7 +34,7 @@ describe('exportLoyaltyCustomerModel', () => {
         'dw/system/Site': SiteForLogger,
         '*/cartridge/scripts/utils/constants': constants,
         'dw/object/CustomObjectMgr': { queryCustomObjects: () => true },
-        '~/cartridge/models/loyalty/common/loyaltyCustomerModel': LoyaltyCustomerModelStub,
+        '*/cartridge/models/loyalty/common/loyaltyCustomerModel': LoyaltyCustomerModelStub,
         '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
         './loyaltyService': serviceSpy,
         '*/cartridge/models/common/yotpoConfigurationModel': {
