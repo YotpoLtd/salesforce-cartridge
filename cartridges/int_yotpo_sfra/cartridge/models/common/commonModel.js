@@ -34,7 +34,7 @@ function getLoggedInCustomerDetails(customerNo) {
 
     while (customerGroupIterator.hasNext()) {
         var customerGroup = customerGroupIterator.next();
-        customerGroupArray.push('\"' + customerGroup.ID + '\"');
+        customerGroupArray.push('\"' + customerGroup.ID + '\"'); // eslint-disable-line no-useless-escape
     }
 
     result.customerExists = true;
