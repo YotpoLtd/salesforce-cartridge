@@ -31,8 +31,8 @@ server.get('IncludeLoyaltyTracking', function (req, res, next) {
 
     if (req.currentCustomer.profile) {
         customerDetails = CommonModel.getLoggedInCustomerDetails(req.currentCustomer.profile.customerNo);
-        basketDetails = CommonModel.getCurrentBasketDetails(currentLocaleID);
     }
+    basketDetails = CommonModel.getCurrentBasketDetails(currentLocaleID);
 
     res.render('/tracking/yotpoLoyaltyTracking', {
         isLoyaltyEnabled: isLoyaltyEnabled,
