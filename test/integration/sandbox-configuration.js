@@ -24,7 +24,7 @@ function generateConfig() {
     /* eslint-enable no-prototype-builtins */
 
     return {
-        baseURL: `https://${dwJSONConfig.hostname}/on/demandware.store/Sites-MAI-Site/default/`,
+        baseURL: `https://${dwJSONConfig.hostname}/on/demandware.store/Sites-RefArch-Site/default/`,
         hostname: dwJSONConfig.hostname,
         user: dwJSONConfig['storefront-username'],
         pass: dwJSONConfig['storefront-password'],
