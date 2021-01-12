@@ -386,7 +386,7 @@ function prepareOrderProductsOptionalData(product, productLineItem) {
 
         // The large image for the product
         if (!empty(imageURL)) {
-            productData.imageURL = imageURL;
+            productData.image = imageURL;
         }
         // The description of the product
         if (!empty(description)) {
@@ -507,7 +507,7 @@ function prepareOrderProductsData(order) {
             }
 
             // Required product data
-            var productID = constants.PRODUCT_ID_TOKEN + yotpoUtils.cleanDataForExport(currentProduct.ID, 'product', '-');
+            var productID = yotpoUtils.cleanDataForExport(currentProduct.ID, 'product', '-');
             var productName = yotpoUtils.cleanDataForExport(currentProduct.name, 'product');
             var productURL = URLUtils.abs('Product-Show', 'pid', currentProduct.ID).toString();
 
@@ -558,7 +558,8 @@ function prepareOrderProductsData(order) {
                 productData.specs = specs;
             }
 
-            productsData[productID] = productData;
+            // SFCC does not allow object keys to start with '0,' so adding a prefix to the key.
+            productsData[constants.PRODUCT_ID_TOKEN + productID] = productData;
         }
     }
 
@@ -771,6 +772,7 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
 
         exportOrderServiceRegistry.yotpoExportOrdersSvc.setURL(yotpoURL);
 
+        // Removing the prefix that was added earlier to workaround SFCC not allowing object keys to start with '0.'
         var requestJson = JSON.stringify(requestData).replace(constants.PRODUCT_ID_TOKEN, '', 'g');
         var result = exportOrderServiceRegistry.yotpoExportOrdersSvc.call(requestJson);
         var responseStatus = this.parseYotpoResponse(result);
