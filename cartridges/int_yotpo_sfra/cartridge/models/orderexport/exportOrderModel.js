@@ -176,6 +176,7 @@ function prepareRequestParamsData(utokenAuthCode) {
     return {
         validate_data: true,
         platform: constants.PLATFORM_FOR_YOTPO_DATA,
+        plugin_version: constants.YOTPO_CARTRIDGE_VERSION,
         utoken: utokenAuthCode,
         orders: []
     };
