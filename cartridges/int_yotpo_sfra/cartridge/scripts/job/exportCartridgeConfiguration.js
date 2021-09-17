@@ -28,7 +28,8 @@ function exportCartridgeConfiguration(parameters, stepExecution) {
         var yotpoConfigurations = exportOrderModelInstance.loadAllYotpoConfigurations();
         localesToProcess = ExportCartridgeConfigurationModelInstance.validateLocaleConfigData(yotpoConfigurations);
 
-        var cartridgeConfig = {
+        var cartridgeConfig = {};
+        cartridgeConfig.metadata = {
             platform: constants.PLATFORM_FOR_YOTPO_DATA,
             plugin_version: constants.YOTPO_CARTRIDGE_VERSION
         };
@@ -38,8 +39,9 @@ function exportCartridgeConfiguration(parameters, stepExecution) {
         for (var i = 0; i < 1; i++) {
             var currLocale = localesToProcess[i];
             var yotpoConfig = YotpoConfigurationModel.getYotpoConfig(currLocale);
-            var yotpoAppKey = yotpoConfig.appKey;
-            var isErrorReported = ExportCartridgeConfigurationModelInstance.sendConfigDataToYotpo(cartridgeConfig, yotpoAppKey, currLocale, false);
+            cartridgeConfig.app_key = yotpoConfig.appKey;
+            cartridgeConfig.utoken = yotpoConfig.utokenAuthCode;
+            var isErrorReported = ExportCartridgeConfigurationModelInstance.sendConfigDataToYotpo(cartridgeConfig, currLocale, true);
             isAnyErrorOccured = isAnyErrorOccured || isErrorReported;
         }
         if (isAnyErrorOccured) {
