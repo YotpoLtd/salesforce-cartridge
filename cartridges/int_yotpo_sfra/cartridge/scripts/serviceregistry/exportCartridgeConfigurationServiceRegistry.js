@@ -48,13 +48,6 @@ var yotpoExportCartridgeConfigSvc = LocalServiceRegistry.createService('int_yotp
      */
     getRequestLogMessage: function (request) {
         var requestJSON = JSON.parse(request);
-        var orders = requestJSON.orders;
-
-        for (var i = 0; i < orders.length; i++) {
-            orders[i].email = '';
-            orders[i].customer_name = '';
-        }
-
         return JSON.stringify(requestJSON);
     },
 
