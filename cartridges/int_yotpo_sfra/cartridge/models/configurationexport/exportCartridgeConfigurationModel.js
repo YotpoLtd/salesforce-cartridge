@@ -101,16 +101,12 @@ function validateLocaleConfigData(yotpoConfigurations) {
  * It returns an error in case of some problem in submission.
  *
  * @param {Object} requestData - Object structure for config export request. Gets converted to JSON
- * @param {string} yotpoAppKey - The appKey to connect to Yotpo.
  * @param {string} locale - Locale ID
  * @param {boolean} shouldGetNewToken - Optional flag to retry auth request and save new token in Custom Object
  *
  * @returns {boolean} authenticationError : The flag to indicate if the error was due to Authentication failure.
  */
-function sendConfigDataToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) {
-    var ExportOrderModel = require('*/cartridge/models/orderexport/exportOrderModel');
-    var exportOrderModelInstance = new ExportOrderModel();
-
+function sendConfigDataToYotpo(requestData, locale, shouldGetNewToken) {
     var makeRequestForNewToken = shouldGetNewToken || false;
 
     var constants = require('*/cartridge/scripts/utils/constants');
@@ -140,6 +136,7 @@ function sendConfigDataToYotpo(requestData, yotpoAppKey, locale, shouldGetNewTok
         var requestJson = JSON.stringify(requestData);
         var result = exportCartridgeConfigurationServiceRegistry.yotpoExportCartridgeConfigSvc.call(requestJson);
         var responseStatus = exportOrderModelInstance.parseYotpoResponse(result);
+        var responseStatus = this.parseYotpoResponse(result);
         authenticationError = responseStatus.authenticationError;
 
         if (!responseStatus.success) {
@@ -190,6 +187,58 @@ function sendConfigDataToYotpo(requestData, yotpoAppKey, locale, shouldGetNewTok
     return authenticationError;
 }
 
+/**
+ * Parses service response and sets appropriate log entries
+ *
+ * @param {dw.svc.Result} result - Service request response
+ *
+ * @returns {Object} - Contains success, authenticationError, serviceError, & unknownError flags
+ */
+ function parseYotpoResponse(result) {
+    var constants = require('*/cartridge/scripts/utils/constants');
+    var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+    var logLocation = 'exportCartridgeConfigurationModel~parseYotpoResponse';
+    var responseStatusCode;
+    try {
+        responseStatusCode = !empty(result.object) ? JSON.parse(result.object).status.code : result.error;
+    } catch (e) {
+        responseStatusCode = result.error;
+    }    
+
+    var status = {
+        success: false,
+        authenticationError: false,
+        serviceError: false,
+        unknownError: false
+    };
+
+    switch (String(responseStatusCode)) {
+        case constants.STATUS_200 :
+            yotpoLogger.logMessage('Config info submitted successfully.', 'debug', logLocation);
+            status.success = true;
+            break;
+        case constants.STATUS_401 :
+            yotpoLogger.logMessage('The request to relay config info failed authentication. ' +
+            ' Error code: ' + result.error + '\n' +
+            ' Error Text is: ' + result.msg + ': ' + result.errorMessage, 'error', logLocation);
+            status.authenticationError = true;
+            break;
+        case constants.STATUS_500 :
+            yotpoLogger.logMessage('The request to relay config info encountered an Internal Server Error e.g. Timeout. ' +
+            ' Error code: ' + result.error + '\n' +
+            ' Error Text is: ' + result.errorMessage, 'error', logLocation);
+            status.serviceError = true;
+            break;
+        default :
+            yotpoLogger.logMessage('The request to relay config info failed for an unknown reason. Error: ' + result.error + '\n' +
+            ' Error Text is: ' + result.errorMessage, 'error', logLocation);
+            status.unknownError = true;
+    }
+
+    return status;
+}
+
+
 
 /**
  * Exports
@@ -198,6 +247,7 @@ function ExportCartridgeConfigurationModel() {
     this.serviceTimeouts = 0;
     this.sendConfigDataToYotpo = sendConfigDataToYotpo;
     this.validateLocaleConfigData = validateLocaleConfigData;
+    this.parseYotpoResponse = parseYotpoResponse;
 }
 
 module.exports = ExportCartridgeConfigurationModel;
