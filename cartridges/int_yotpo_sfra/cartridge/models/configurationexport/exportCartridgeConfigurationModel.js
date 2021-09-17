@@ -118,21 +118,6 @@ function sendConfigDataToYotpo(requestData, locale, shouldGetNewToken) {
     var authenticationError = false;
 
     try {
-        // Get api url from service definition
-        var yotpoURL = exportCartridgeConfigurationServiceRegistry.yotpoExportCartridgeConfigSvc.getConfiguration().getCredential().getURL();
-        // Replace string token with appkey saved in Custom Object
-        yotpoURL = yotpoURL.replace(':app_key', yotpoAppKey.toString());
-
-        if (empty(yotpoURL)) {
-            yotpoLogger.logMessage('The URL is empty for int_yotpo_sfra.https.post.export.cartridge.config.api service.', 'error', logLocation);
-            throw constants.EXPORT_CARTRIDGE_CONFIG_ERROR;
-        } else {
-            yotpoLogger.logMessage('Yotpo web path to pass cartridge config data: ' + yotpoURL, 'debug', logLocation);
-        }
-
-        exportCartridgeConfigurationServiceRegistry.yotpoExportCartridgeConfigSvc.setURL(yotpoURL);
-
-        // Removing the prefix that was added earlier to workaround SFCC not allowing object keys to start with '0.'
         var requestJson = JSON.stringify(requestData);
         var result = exportCartridgeConfigurationServiceRegistry.yotpoExportCartridgeConfigSvc.call(requestJson);
         var responseStatus = exportOrderModelInstance.parseYotpoResponse(result);
