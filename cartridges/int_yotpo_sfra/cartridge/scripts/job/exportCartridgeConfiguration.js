@@ -11,7 +11,7 @@ const Status = require('dw/system/Status');
  * @returns {dw/system/Status} returnStatus
  */
 function exportCartridgeConfiguration(parameters, stepExecution) {
-    var returnStatus = new Status(Status.OK);
+    var returnStatus = new Status(Status.ERROR);
     var jobExecution = stepExecution.getJobExecution();
     var jobContext = jobExecution.getContext();
     var constants = require('*/cartridge/scripts/utils/constants');
@@ -34,14 +34,21 @@ function exportCartridgeConfiguration(parameters, stepExecution) {
         };
 
         var totalLocales = localesToProcess.length;
+        var isAnyErrorOccured = false;
         for (var i = 0; i < 1; i++) {
             var currLocale = localesToProcess[i];
             var yotpoConfig = YotpoConfigurationModel.getYotpoConfig(currLocale);
             var yotpoAppKey = yotpoConfig.appKey;
-            var response = ExportCartridgeConfigurationModelInstance.sendConfigDataToYotpo(cartridgeConfig, yotpoAppKey, currLocale, false);
+            var isErrorReported = ExportCartridgeConfigurationModelInstance.sendConfigDataToYotpo(cartridgeConfig, yotpoAppKey, currLocale, false);
+            isAnyErrorOccured = isAnyErrorOccured || isErrorReported;
+        }
+        if (isAnyErrorOccured) {
+            returnStatus = Status(Status.ERROR);
+        } else {
+            returnStatus = Status(Status.OK);
         }
     } catch (e) {
-        throw new Error(e);
+        returnStatus = new Status(Status.ERROR, e.message);
     }
 
     return returnStatus;
