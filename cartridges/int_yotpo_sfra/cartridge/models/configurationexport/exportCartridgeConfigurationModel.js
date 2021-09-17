@@ -120,7 +120,6 @@ function sendConfigDataToYotpo(requestData, locale, shouldGetNewToken) {
     try {
         var requestJson = JSON.stringify(requestData);
         var result = exportCartridgeConfigurationServiceRegistry.yotpoExportCartridgeConfigSvc.call(requestJson);
-        var responseStatus = exportOrderModelInstance.parseYotpoResponse(result);
         var responseStatus = this.parseYotpoResponse(result);
         authenticationError = responseStatus.authenticationError;
 
@@ -131,8 +130,8 @@ function sendConfigDataToYotpo(requestData, locale, shouldGetNewToken) {
                 if (this.serviceTimeouts <= constants.SERVICE_MAX_TIMEOUTS) {
                     yotpoLogger.logMessage('Retrying cartridge config submission due to service error \n' +
                     ' Error code: ' + result.error + '\n' +
-                    ' Error Text is: ' + result.errorMessage.error, 'error', logLocation);
-                    this.sendConfigDataToYotpo(requestData, yotpoAppKey, locale, false);
+                    ' Error Text is: ' + result.errorMessage, 'error', logLocation);
+                    this.sendConfigDataToYotpo(requestData, locale, false);
                 } else {
                     var serviceErrorMsg = constants.EXPORT_CARTRIDGE_CONFIG_RETRY_ERROR + ': Cartridge config data submission aborted due to repeated service errors \n' +
                     ' Number of attempts: ' + this.serviceTimeouts;
@@ -143,13 +142,15 @@ function sendConfigDataToYotpo(requestData, locale, shouldGetNewToken) {
             } else if (responseStatus.authenticationError && makeRequestForNewToken) {
                 yotpoLogger.logMessage('Retrying Cartridge Config Data submission due to service authentication error', 'error', logLocation);
                 var yotpoConfiguration = YotpoConfigurationModel.loadYotpoConfigurationsByLocale(locale);
-                var utokenAuthCode = this.getServiceAuthToken(yotpoConfiguration);
+                var ExportOrderModel = require('*/cartridge/models/orderexport/exportOrderModel');
+                var exportOrderModelInstance = new ExportOrderModel();
+                var utokenAuthCode = exportOrderModelInstance.getServiceAuthToken(yotpoConfiguration);
                 var retryAuthenticationError = true;
                 if (!empty(utokenAuthCode)) {
-                    this.saveCustomObjectData(yotpoConfiguration, 'utokenAuthCode', utokenAuthCode);
-                    var updatedRequestData = this.updateUTokenInRequestData(utokenAuthCode, requestData);
+                    exportOrderModelInstance.saveCustomObjectData(yotpoConfiguration, 'utokenAuthCode', utokenAuthCode);
+                    var updatedRequestData = exportOrderModelInstance.updateUTokenInRequestData(utokenAuthCode, requestData);
                     // retry export
-                    retryAuthenticationError = this.sendConfigDataToYotpo(updatedRequestData, yotpoAppKey, locale, false);
+                    retryAuthenticationError = this.sendConfigDataToYotpo(updatedRequestData, locale, false);
                 }
 
                 // If the error persist then we should terminate here
