@@ -2,7 +2,8 @@
 
 /**
 *
-*	 This is the Export Order service to communicate with Yotpo
+*    This is the Export Config service to communicate with Yotpo.
+*	 Relays the rudimentary Cartridge Configuration/Version details to Yotpo.
 *
 */
 var LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
