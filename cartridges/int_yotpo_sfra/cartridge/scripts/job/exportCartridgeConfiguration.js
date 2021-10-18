@@ -36,7 +36,7 @@ function exportCartridgeConfiguration(parameters, stepExecution) {
 
         var totalLocales = localesToProcess.length;
         var isAnyErrorOccured = false;
-        for (var i = 0; i < 1; i++) {
+        for (var i = 0; i < totalLocales; i++) {
             var currLocale = localesToProcess[i];
             var yotpoConfig = YotpoConfigurationModel.getYotpoConfig(currLocale);
             cartridgeConfig.app_key = yotpoConfig.appKey;
