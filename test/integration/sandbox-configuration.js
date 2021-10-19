@@ -17,10 +17,10 @@ function generateConfig() {
 
     /* eslint-disable no-prototype-builtins */
     if (!dwJSONConfig.hasOwnProperty('hostname')) throw new Error('hostname attribute must exist in configuration!');
-    if (!dwJSONConfig.hasOwnProperty('storefront-username')) throw new Error('hostname attribute must exist in configuration!');
-    if (!dwJSONConfig.hasOwnProperty('storefront-password')) throw new Error('hostname attribute must exist in configuration!');
-    if (!dwJSONConfig.hasOwnProperty('username')) throw new Error('hostname attribute must exist in configuration!');
-    if (!dwJSONConfig.hasOwnProperty('password')) throw new Error('hostname attribute must exist in configuration!');
+    if (!dwJSONConfig.hasOwnProperty('storefront-username')) throw new Error('storefront-username attribute must exist in configuration!');
+    if (!dwJSONConfig.hasOwnProperty('storefront-password')) throw new Error('storefront-password attribute must exist in configuration!');
+    if (!dwJSONConfig.hasOwnProperty('username')) throw new Error('username attribute must exist in configuration!');
+    if (!dwJSONConfig.hasOwnProperty('password')) throw new Error('password attribute must exist in configuration!');
     /* eslint-enable no-prototype-builtins */
 
     return {
