@@ -9,10 +9,11 @@ cartridges.zip
 cartridges/*/cartridge/static/default/css/
 cartridges/*/cartridge/static/default/js/
 .idea/
-dw.json
+dw.json*
 sitegenesisdata/
 mobilefirstdata/
 storefrontdata/
+bm_app_storefront_base/
 demo_data_sfra/
 demo_data_sfra.zip
 .DS_Store
