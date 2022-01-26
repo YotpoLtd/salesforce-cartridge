@@ -76,3 +76,5 @@ exports.ORDER_VOLUME_DAYS = 30;
 // Loyalty Module Constants
 exports.YOTPO_LOYALTY_CUSTOMER_EXPORT_OBJECT = 'yotpoLoyaltyCustomer';
 exports.YOTPO_LOYALTY_ORDER_EXPORT_OBJECT = 'yotpoLoyaltyOrder';
+
+exports.YOTPO_CARTRIDGE_VERSION = '21.2.1';
