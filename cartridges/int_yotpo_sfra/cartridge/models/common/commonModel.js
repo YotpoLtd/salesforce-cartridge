@@ -52,7 +52,7 @@ function getLoggedInCustomerDetails(customerNo, currentLocaleID) {
     var MessageDigest = require('dw/crypto/MessageDigest');
     var Bytes = require('dw/util/Bytes');
     var Encoding = require('dw/crypto/Encoding');
-    var loyaltyAPIKey = YotpoConfigurationModel.getYotpoPref('appKey', currentLocaleID);
+    var loyaltyAPIKey = YotpoConfigurationModel.getYotpoPref('yotpoLoyaltyAPIKey', currentLocaleID);
     var cipheredCustomerEmailToken = '';
     try {
         var messageDigest = new MessageDigest(MessageDigest.DIGEST_SHA_256);
