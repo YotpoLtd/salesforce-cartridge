@@ -69,7 +69,7 @@ function getCurrentBasketDetails(currentLocaleID) {
         basketExists: false
     };
 
-    var currentBasket = BasketMgr.getCurrentOrNewBasket();
+    var currentBasket = BasketMgr.getCurrentBasket();
 
     if (!currentBasket) {
         return result;
