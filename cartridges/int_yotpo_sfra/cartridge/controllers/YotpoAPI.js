@@ -1,4 +1,7 @@
+'use strict';
+
 var HTTP_ERROR_STATUS = 422;
+var server = require('server');
 
 /**
  * AddProductToCart : Helps the creation of new cart item via the Yotpo JavaScript toolset. 
@@ -9,17 +12,16 @@ var HTTP_ERROR_STATUS = 422;
  * 
  * @name AddProductToCart
  * @function
- * @param {middleware} - server.middleware.include
- * @param {middleware} - cache.applyDefaultCache
  * @param {category} - non-sensitive
  * @param {renders} - json
  * @param {serverfunction} - get
  */
 server.get('AddProductToCart', server.middleware.https, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
+    var ProductMgr = require('dw/catalog/ProductMgr');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     YotpoLogger.logMessage('Received request to add a free product to the cart',
-        'debug', 'YotpoLoyalty~FreeProduct~AddProductToCart');    
+        'debug', 'YotpoAPI~AddProductToCart');    
     var sku = req.querystring.sku;    
 
     if (empty(sku)) {
@@ -33,13 +35,14 @@ server.get('AddProductToCart', server.middleware.https, function (req, res, next
     if (ProductMgr.getProduct(sku)) {
         var Transaction = require('dw/system/Transaction');
         var ProductMgr = require('dw/catalog/ProductMgr');
-        var calculator = require('app_storefront_base/cartridge/scripts/hooks/cart/calculate');
+        var HookMgr = require('dw/system/HookMgr');
+
         Transaction.wrap(function() {
             try {                                
                 var basket = BasketMgr.getCurrentOrNewBasket();
                 var lineitem = basket.createProductLineItem(sku, basket.shipments[0]);
                 lineitem.setQuantityValue(1);
-                calculator.calculate(basket);
+                HookMgr.callHook('dw.order.calculate', 'calculate', basket);
 
                 res.setStatusCode(200);
                 res.json({basket_id: basket.UUID});
@@ -57,24 +60,49 @@ server.get('AddProductToCart', server.middleware.https, function (req, res, next
     next();
 });
 
+/**
+ * RemoveProductFromCart : Called by the Yotpo JavaScript toolset. Remove all products matching the incoming sku.
+ * 
+ * Expects a querystring parameter "sku" cooresponding to the productID of the product being removed.
+ * Used closely in tandem with the concept of "free" product and its removal if some failure occurs.
+ * Basket must be present.
+ * 
+ * @name AddProductToCart
+ * @function
+ * @param {category} - non-sensitive
+ * @param {renders} - json
+ * @param {serverfunction} - get
+ */
 server.get('RemoveProductFromCart', server.middleware.https, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
-    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    YotpoLogger.logMessage('Received request to fetch single customer',
-        'debug', 'YotpoLoyalty~GetCustomer');
-    var Transaction = require('dw/system/Transaction');
     var ProductMgr = require('dw/catalog/ProductMgr');
-    var basketCalculationHelpers = require('app_storefront_base/cartridge/scripts/helpers/basketCalculationHelpers');
-    var basket = BasketMgr.getCurrentBasket();
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+    YotpoLogger.logMessage('Received request to remove product from basket',
+        'debug', 'YotpoAPI~RemoveProductFromCart');      
     var sku = req.querystring.sku
 
-    if (!basket) {
-        res.setStatusCode(500);
-        res.json({});
-        return next();
+    if (empty(sku)) {
+        // bail out if no sku presnt
+        res.setStatusCode(HTTP_ERROR_STATUS);
+        res.json({error_message: 'expecting "sku" parameter in querystring'});
+        next();
+        return;
     }
+    
+    var basket = BasketMgr.getCurrentBasket();
+    if (empty(basket)) {
+        // bail out if no basket presnt
+        res.setStatusCode(HTTP_ERROR_STATUS);
+        res.json({error_message: 'expecting session contains currentBasket. None present. Aborting.'});
+        next();
+        return;
+    }    
 
     if (ProductMgr.getProduct(sku)) {
+        var Transaction = require('dw/system/Transaction');
+        var ProductMgr = require('dw/catalog/ProductMgr');
+        var HookMgr = require('dw/system/HookMgr');
+        
         Transaction.wrap(function (){
             try {
                 var lineitems = basket.getAllProductLineItems(sku);
@@ -83,18 +111,20 @@ server.get('RemoveProductFromCart', server.middleware.https, function (req, res,
                     basket.removeProductLineItem(lineitems[i]);
                 }
 
-                basketCalculationHelpers.calculateTotals(basket);
+                HookMgr.callHook('dw.order.calculate', 'calculate', basket);
                 res.setStatusCode(200);
                 res.json({});
             } catch (e) {
-                res.setStatusCode(422);
+                res.setStatusCode(HTTP_ERROR_STATUS);
                 res.json({error_message: e.message});
             }
         });
     } else {
-        res.setStatusCode(422);
-        res.json({error_message: 'product does not exist'});
+        res.setStatusCode(HTTP_ERROR_STATUS);
+        res.json({error_message: 'product does not exist in catalog, so it cannot be removed.'});
     }
 
     next();
 });
+
+module.exports = server.exports();
