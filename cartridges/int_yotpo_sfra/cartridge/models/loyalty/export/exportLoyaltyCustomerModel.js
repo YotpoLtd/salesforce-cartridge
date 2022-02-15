@@ -7,42 +7,17 @@
  */
 
 /**
- * This is the main function called by Loyalty Exporter.
- *
- * @param {string} customerNo : The customer number
- * @returns {Object} Json payload to post to Yotpo
- */
-function generateCustomerExportPayload(customerNo) {
-    var CustomerMgr = require('dw/customer/CustomerMgr');
-    var Site = require('dw/system/Site');
-
-    var LoyaltyCustomerModel = require('*/cartridge/models/loyalty/common/loyaltyCustomerModel');
-    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-
-    var logLocation = 'ExportLoyaltyCustomerModel~generateCustomerExportPayload';
-
-    YotpoLogger.logMessage('\n------ Yotpo Export Order To Yotpo Loyalty  --------' +
-            '\n Current Site ID: ' + Site.getCurrent().getName() +
-            '\n Customer Number: ' + customerNo, 'debug', logLocation);
-
-    var customerObj = CustomerMgr.getCustomerByCustomerNumber(customerNo);
-    var profile = customerObj.profile;
-
-    return LoyaltyCustomerModel.prepareCustomerJSON(profile);
-}
-
-/**
  * Post customer data to Yotpo API
- * @param {*} payload Payload data to post to yotpo
+ * @param {*} customerArray Payload data to post to yotpo
  * @param {*} locale locale to lookup api key info
  * @throws {Constants.EXPORT_LOYALTY_SERVICE_ERROR} If the post to the loyalty service was unsuccessful.
  */
-function exportCustomerByLocale(payload, locale) {
+function exportCustomersByLocale(customerArray, locale) {
     var LoyaltyService = require('./loyaltyService');
     var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
-    var logLocation = 'ExportLoyaltyCustomerModel~exportCustomerByLocale';
+    var logLocation = 'ExportLoyaltyCustomerModel~exportCustomersByLocale';
 
     var keys = YotpoConfigurationModel.getLoyaltyAPIKeys(locale);
     if (!keys) {
@@ -55,26 +30,21 @@ function exportCustomerByLocale(payload, locale) {
         guid: keys.guid,
         api_key: keys.key
     };
-    LoyaltyService.exportData(payload, queryParams, 'customers');
+    var payload = { customers: customerArray };
+    LoyaltyService.exportData(payload, queryParams, 'process_customers_batch');
 }
 
 /**
- * Return iterator for loyalty customer export objects
- *
- * @returns {Object} Customer Object iterator
+ * Get a customer object iterator starting from a given customer ID
+ * @param {*} lastCustomerId Str customer ID to start iterator from
+ * @returns {Object} custIterator customer object iterator
  */
-function getQueuedCustomerExportObjects() {
-    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
-    var constants = require('*/cartridge/scripts/utils/constants');
-
-    return CustomObjectMgr.queryCustomObjects(constants.YOTPO_LOYALTY_CUSTOMER_EXPORT_OBJECT,
-        'custom.Status = {0} OR custom.Status = {1}',
-        'creationDate desc',
-        'QUEUED',
-        'FAIL');
+function getCustomerExportObjectIterator(lastCustomerId) {
+    var CustomerMgr = require('dw/customer/CustomerMgr');
+    var custIterator = CustomerMgr.searchProfiles('customerNo >= {0}', 'customerNo ASC', lastCustomerId);
+    return custIterator;
 }
 
 /* Module Exports */
-exports.generateCustomerExportPayload = generateCustomerExportPayload;
-exports.exportCustomerByLocale = exportCustomerByLocale;
-exports.getQueuedCustomerExportObjects = getQueuedCustomerExportObjects;
+exports.exportCustomersByLocale = exportCustomersByLocale;
+exports.getCustomerExportObjectIterator = getCustomerExportObjectIterator;

@@ -35,44 +35,36 @@ describe('exportLoyaltyOrders job', () => {
     };
 
     let orderObjDefaults = {
-        'OrderData': {
-            'fake': 'object'
-        },
-        'OrderEventObject': {
-            'custom': {
-                'ID': 'randomID',
-                'OrderID': '123',
-                'Payload': '{"fake":"object"}',
-                'PayloadDeliveryDate': '1/1/2020',
-                'Status': 'Queued',
-                'StatusDetails': '',
-                'creationDate': '1/1/1900',
-                'lastModified': '1/1/2020'
-            }
-        },
-        'OrderId': '123',
-        'OrderLocale': 'default'
+        'orderNo': 'randomId',
+        'customerLocaleID': 'en_us'
     };
+
+    let orderJson = {
+        orderId: 'randomId'
+    }
 
     const yotpoConfigurationModel = {
         isCartridgeEnabled: () => { return sitePrefs.yotpoCartridgeEnabled; },
         getYotpoPref: (pref) => { return sitePrefs[pref] || null; }
     };
 
+    let hasNextReturn = true;
     const exportLoyaltyOrderModel = {
-        getQueuedOrderExportObjects: () => {
+        getOrderExportObjectIterator: () => {
             return {
                 count: 1,
-                hasNext: () => { return true; },
-                next: () => { return true; }
+                hasNext: () => { return hasNextReturn; },
+                next: () => { return true; },
+                getCount: () => 5
             };
         },
         generateOrderExportPayload: () => {},
-        exportOrderByLocale: () => {}
+        exportOrdersByLocale: () => {}
     };
 
     var jobContext = { getContext: () => { return {}; } };
     var stepExecution = { getJobExecution: () => { return jobContext; } };
+    let jobsConfigObject = { custom: {} };
 
     beforeEach(function () {
         // The exporter has a bunch of private variables that need to reset between tests.
@@ -80,7 +72,13 @@ describe('exportLoyaltyOrders job', () => {
             '*/cartridge/models/loyalty/export/exportLoyaltyOrderModel': exportLoyaltyOrderModel,
             '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
             '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
-            '*/cartridge/scripts/utils/constants': constants
+            '*/cartridge/scripts/utils/constants': constants,
+            '*/cartridge/models/loyalty/common/loyaltyOrderModel': {
+                prepareOrderJSON: () => orderJson
+            },
+            'dw/object/CustomObjectMgr': {
+                getCustomObject: () => jobsConfigObject
+            },
         });
         sitePrefs = Object.assign({}, sitePrefDefaults);
         fakeOrderEvent = Object.assign({}, orderEventDefaults);
@@ -100,18 +98,6 @@ describe('exportLoyaltyOrders job', () => {
             assert.throws(() => exportLoyaltyOrders.beforeStep({}, stepExecution), '');
             sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/.*Yotpo Loyalty Order Export is disabled/), 'warn', 'exportLoyaltyOrders~beforeStep');
         });
-        it('Call getQueuedOrderExportObjects and populate the package scoped Orders object', () => {
-            assert.equal(exportLoyaltyOrders.getTotalCount(), 0);
-            assert.isUndefined(exportLoyaltyOrders.beforeStep({}, stepExecution));
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Starting Yotpo Loyalty Order Export Step Job/), 'debug', 'exportLoyaltyOrders~beforeStep');
-            assert.equal(exportLoyaltyOrders.getTotalCount(), 1);
-        });
-        it('Throws an error if getQueuedOrderExportObjects throws.', () => {
-            let getQueuedOrderExportObjects = sinon.stub(exportLoyaltyOrderModel, 'getQueuedOrderExportObjects');
-            getQueuedOrderExportObjects.throws('fakeException');
-            assert.throws(() => exportLoyaltyOrders.beforeStep({}, stepExecution), 'fakeException');
-            getQueuedOrderExportObjects.restore();
-        });
     });
 
     describe('read', () => {
@@ -120,27 +106,18 @@ describe('exportLoyaltyOrders job', () => {
             assert.isTrue(exportLoyaltyOrders.read());
         });
         it('should return null when has next is not true.', () => {
-            let getQueuedOrderExportObjects = sinon.stub(exportLoyaltyOrderModel, 'getQueuedOrderExportObjects');
-            getQueuedOrderExportObjects.returns({ hasNext: () => { return false; } });
+            let getOrderExportObjectIterator = sinon.stub(exportLoyaltyOrderModel, 'getOrderExportObjectIterator');
+            getOrderExportObjectIterator.returns({ hasNext: () => { return false; } });
             exportLoyaltyOrders.beforeStep({}, stepExecution);
             assert.isNull(exportLoyaltyOrders.read());
-            getQueuedOrderExportObjects.restore();
+            getOrderExportObjectIterator.restore();
         });
     });
 
     describe('process', () => {
-        it('should return return an assembled order Object.', () => {
-            let generateOrderExportPayload = sinon.stub(exportLoyaltyOrderModel, 'generateOrderExportPayload');
-            generateOrderExportPayload.returns({ fake: 'object' });
-            assert.deepEqual(exportLoyaltyOrders.process(fakeOrderEvent), orderObj);
-            generateOrderExportPayload.restore();
-        });
-        it('should use existing payload if present and override the locale if included.', () => {
-            fakeOrderEvent.custom.locale = 'testing';
-            fakeOrderEvent.custom.Payload = '{"fake":"object"}';
-            orderObj.OrderLocale = 'testing';
-            orderObj.OrderEventObject.custom.locale = 'testing';
-            assert.deepEqual(exportLoyaltyOrders.process(fakeOrderEvent), orderObj);
+        it('should return order data.', () => {
+            let res = exportLoyaltyOrders.process(orderObj);
+            assert.equal(res.orderId, 'randomId');
         });
         it('should return null if no order data.', () => {
             let res = exportLoyaltyOrders.process();
@@ -150,28 +127,19 @@ describe('exportLoyaltyOrders job', () => {
 
     describe('write', () => {
         it('Should post the objects to Yotpo.', () => {
-            let exportOrderByLocale = sinon.stub(exportLoyaltyOrderModel, 'exportOrderByLocale');
+            let exportOrderByLocale = sinon.stub(exportLoyaltyOrderModel, 'exportOrdersByLocale');
             exportOrderByLocale.returns(true);
-            let events = [orderObj];
+            let events = {toArray: () => [orderObj]};
             exportLoyaltyOrders.write(events);
-            assert.equal(events[0].OrderEventObject.custom.Status, 'SUCCESS');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Writing Order payload to yotpo for Order/), 'debug', 'exportOrders~write');
             exportOrderByLocale.restore();
         });
         it('Should mark object as failed if it does not post to yotpo.', () => {
-            let exportOrderByLocale = sinon.stub(exportLoyaltyOrderModel, 'exportOrderByLocale');
+            let exportOrderByLocale = sinon.stub(exportLoyaltyOrderModel, 'exportOrdersByLocale');
             exportOrderByLocale.throws('FakeError');
-            let events = [orderObj];
+            let events = {toArray: () => [orderObj]};
             exportLoyaltyOrders.write(events);
-            assert.equal(events[0].OrderEventObject.custom.Status, 'FAIL');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write Order payload to yotpo for Order/), 'error', 'exportOrders~write');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write order payload to yotpo for payload:  Error: FakeError/), 'error', 'exportOrders~write');
             exportOrderByLocale.restore();
-        });
-        it('Should log and fail if event has no order ID.', () => {
-            orderObj.OrderId = null;
-            let events = [orderObj];
-            exportLoyaltyOrders.write(events);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write event, OrderId not found/), 'error', 'exportOrders~write');
         });
     });
     describe('afterChunk', () => {
@@ -194,7 +162,7 @@ describe('exportLoyaltyOrders job', () => {
             // Only care about logging for the afterChunk
             loggerSpy.logMessage.reset();
             exportLoyaltyOrders.afterChunk(false);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/3 Orders skipped out of 3 processed in this chunk/), 'error', 'exportOrders~afterChunk');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 Orders skipped out of 3 processed in this chunk/), 'error', 'exportOrders~afterChunk');
         });
     });
     describe('afterStep', () => {
@@ -209,6 +177,7 @@ describe('exportLoyaltyOrders job', () => {
         });
         it('Should log unsuccessful order counts.', () => {
             // Process an order
+            jobsConfigObject.custom.loyaltyOrderExportComplete = false;
             exportLoyaltyOrders.beforeStep({}, stepExecution);
             let generateOrderExportPayload = sinon.stub(exportLoyaltyOrderModel, 'generateOrderExportPayload');
             generateOrderExportPayload.returns({ fake: 'object' });
@@ -219,21 +188,8 @@ describe('exportLoyaltyOrders job', () => {
             loggerSpy.logMessage.reset();
             constants.EXPORT_ORDER_ERROR_COUNT_THRESHOLD = 100;
             exportLoyaltyOrders.afterStep(false, {}, stepExecution);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/1 Orders skipped out of 2 processed in this step /), 'error', 'exportOrders~afterStep');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/The following Orders where excluded from export in this job execution due to data errors:/), 'error', 'exportOrders~afterStep');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 Orders skipped out of 2 processed in this step /), 'error', 'exportOrders~afterStep');
             constants.EXPORT_ORDER_ERROR_COUNT_THRESHOLD = 0.3;
-        });
-        it('Should throw if failed orders are more than constants.EXPORT_ORDER_ERROR_COUNT_THRESHOLD.', () => {
-            // Process an order
-            exportLoyaltyOrders.beforeStep({}, stepExecution);
-            let generateOrderExportPayload = sinon.stub(exportLoyaltyOrderModel, 'generateOrderExportPayload');
-            generateOrderExportPayload.returns({ fake: 'object' });
-            // Generate 1 successful 1 failed order
-            exportLoyaltyOrders.process(fakeOrderEvent);
-            exportLoyaltyOrders.process();
-            generateOrderExportPayload.restore();
-            loggerSpy.logMessage.reset();
-            assert.throws(() => exportLoyaltyOrders.afterStep(false, {}, stepExecution), /1 Orders skipped out of 2 processed in this step/);
         });
     });
 });

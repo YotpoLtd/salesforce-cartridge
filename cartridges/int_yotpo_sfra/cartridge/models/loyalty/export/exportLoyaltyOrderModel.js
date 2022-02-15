@@ -53,36 +53,12 @@ function exportOrder(payload, params) {
 }
 
 /**
- * This is the main function called by Loyalty Exporter.
- *
- * @param {string} OrderNo : The Order number
- * @returns {Object} Json payload to post to Yotpo
- */
-function generateOrderExportPayload(OrderNo) {
-    var OrderMgr = require('dw/order/OrderMgr');
-    var Site = require('dw/system/Site');
-
-    var LoyaltyOrderModel = require('*/cartridge/models/loyalty/common/loyaltyOrderModel');
-    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-
-    var logLocation = 'ExportLoyaltyOrderModel~generateOrderExportPayload';
-
-    YotpoLogger.logMessage('\n------ Yotpo Export Order To Yotpo Loyalty  --------' +
-            '\n Current Site ID: ' + Site.getCurrent().getName() +
-            '\n Order Number: ' + OrderNo, 'debug', logLocation);
-
-    var orderObj = OrderMgr.getOrder(OrderNo);
-
-    return LoyaltyOrderModel.prepareOrderJSON(orderObj);
-}
-
-/**
  * Post Order data to Yotpo API
- * @param {*} payload Payload data to post to yotpo
+ * @param {*} ordersArray Payload data to post to yotpo
  * @param {*} locale locale to lookup api key info
  * @throws {Constants.EXPORT_LOYALTY_SERVICE_ERROR} If the post to the loyalty service was unsuccessful.
  */
-function exportOrderByLocale(payload, locale) {
+function exportOrdersByLocale(ordersArray, locale) {
     var LoyaltyService = require('*/cartridge/models/loyalty/export/loyaltyService');
     var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
@@ -100,27 +76,23 @@ function exportOrderByLocale(payload, locale) {
         guid: keys.guid,
         api_key: keys.key
     };
-    LoyaltyService.exportData(payload, queryParams, 'orders');
+    var payload = { orders: ordersArray };
+    LoyaltyService.exportData(payload, queryParams, 'process_orders_batch');
 }
 
-/**
- * Return iterator for loyalty Order export objects
- *
- * @returns {Object} Order Object iterator
- */
-function getQueuedOrderExportObjects() {
-    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
-    var constants = require('*/cartridge/scripts/utils/constants');
 
-    return CustomObjectMgr.queryCustomObjects(constants.YOTPO_LOYALTY_ORDER_EXPORT_OBJECT,
-        'custom.Status = {0} OR custom.Status = {1}',
-        'creationDate desc',
-        'QUEUED',
-        'FAIL');
+/**
+ * Get an Order object iterator starting from a given order ID
+ * @param {*} lastOrderId Str Order ID to start iterator from
+ * @returns {Object} orderIterator order object iterator
+ */
+function getOrderExportObjectIterator(lastOrderId) {
+    var OrderMgr = require('dw/order/OrderMgr');
+    var orderIterator = OrderMgr.searchOrders('orderNo >= {0}', 'orderNo ASC', lastOrderId);
+    return orderIterator;
 }
 
 /* Module Exports */
-exports.generateOrderExportPayload = generateOrderExportPayload;
-exports.exportOrderByLocale = exportOrderByLocale;
-exports.getQueuedOrderExportObjects = getQueuedOrderExportObjects;
+exports.exportOrdersByLocale = exportOrdersByLocale;
+exports.getOrderExportObjectIterator = getOrderExportObjectIterator;
 exports.exportOrder = exportOrder;

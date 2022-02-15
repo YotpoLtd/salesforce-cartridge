@@ -1,0 +1,31 @@
+{
+  "_v":"20.4",
+  "clients":
+  [
+    {
+      "client_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "allowed_origins":["https://app.swellrewards.com","https://loyalty.yotpo.com"],
+      "resources":
+      [
+        {
+         "resource_id": "/sites/*/coupons/**",
+         "methods": ["get", "put", "patch", "delete"],
+         "read_attributes": "(**)",
+         "write_attributes": "(**)"
+       },
+        {
+         "resource_id": "/sites/*/gift_certificates",
+         "methods": ["get", "post"],
+         "read_attributes": "(**)",
+         "write_attributes": "(**)"
+       },
+        {
+         "resource_id": "/sites/*/gift_certificates/**",
+         "methods": ["get", "patch", "delete"],
+         "read_attributes": "(**)",
+         "write_attributes": "(**)"
+       }
+      ]
+    }
+  ]
+}

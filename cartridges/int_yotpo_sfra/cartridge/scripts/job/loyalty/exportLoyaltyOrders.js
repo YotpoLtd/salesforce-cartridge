@@ -19,6 +19,7 @@ var stepOrdersProcessed = 0;
 var chunkOrdersProcessed = 0;
 var stepErrorCount = 0;
 var chunkErrorCount = 0;
+var lastOrderId = '0';
 var stepSkippedOrders = [];
 var chunkSkippedOrders = [];
 
@@ -33,6 +34,9 @@ function beforeStep(parameters, stepExecution) {
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
     var logLocation = 'exportLoyaltyOrders~beforeStep';
+    var constants = require('*/cartridge/scripts/utils/constants');
+    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
+    var yotpoJobsConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_JOBS_CONFIGURATION_OBJECT, constants.YOTPO_JOB_CONFIG_ID);
 
     // reset error flagging in job context
     var jobExecution = stepExecution.getJobExecution();
@@ -54,10 +58,26 @@ function beforeStep(parameters, stepExecution) {
         throw new Error();
     }
 
+    if ('loyaltyOrderExportComplete' in yotpoJobsConfiguration.custom) {
+        if (yotpoJobsConfiguration.custom.loyaltyOrderExportComplete) {
+            YotpoLogger.logMessage('Failed to start loyalty Order Export, Yotpo Loyalty Order Export is marked as complete in jobs configuration custom object', 'warn', logLocation);
+            jobContext.displayErrorInBm = true;
+            throw new Error();
+        }
+    }
+
+    if ('loyaltyOrderExportLastId' in yotpoJobsConfiguration.custom) {
+        lastOrderId = '' + yotpoJobsConfiguration.custom.loyaltyOrderExportLastId;
+    } else {
+        require('dw/system/Transaction').wrap(function () {
+            yotpoJobsConfiguration.custom['loyaltyOrderExportLastId'] = lastOrderId;
+        });
+    }
+
     YotpoLogger.logMessage('Starting Yotpo Loyalty Order Export Step Job', 'debug', logLocation);
 
     try {
-        Orders = ExportLoyaltyOrderModel.getQueuedOrderExportObjects();
+        Orders = ExportLoyaltyOrderModel.getOrderExportObjectIterator(lastOrderId);
     } catch (e) {
         // Set error status to job context so it can be checked in the following script step to
         // surface the job error status for the chunk step in the Business Manager.
@@ -86,7 +106,7 @@ function beforeChunk() {
  */
 function getTotalCount() {
     if (Orders) {
-        return Orders.count;
+        return Orders.getCount();
     }
     return 0;
 }
@@ -97,8 +117,20 @@ function getTotalCount() {
  * @return {Object} - Order Object to send to 'process' returns null when there are more objects to read
  */
 function read() {
+    var ExportLoyaltyOrderModel = require('*/cartridge/models/loyalty/export/exportLoyaltyOrderModel');
+    var nextOrder;
     if (Orders.hasNext()) {
-        return Orders.next();
+        nextOrder = Orders.next();
+        lastOrderId = '' + nextOrder.orderNo;
+        return nextOrder;
+    }
+    Orders = ExportLoyaltyOrderModel.getOrderExportObjectIterator(lastOrderId);
+    if (Orders.hasNext()) {
+        nextOrder = Orders.next();
+        if (nextOrder.orderNo > lastOrderId) {
+            lastOrderId = '' + nextOrder.orderNo;
+            return nextOrder;
+        }
     }
 
     return null;
@@ -107,52 +139,45 @@ function read() {
 /**
  * Performs any calculations / formatting required
  *
- * @param {Object} OrderEventObject - Order Object to be processed
+ * @param {Object} orderObject - Order Object to be processed
  * @return {Object} - OrderData to be sent to List for 'write' returns null if Order was skipped due to data errors
  */
-function process(OrderEventObject) {
-    var ExportLoyaltyOrderModel = require('*/cartridge/models/loyalty/export/exportLoyaltyOrderModel');
+function process(orderObject) {
+    var LoyaltyOrderModel = require('*/cartridge/models/loyalty/common/loyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportOrders~process';
 
     stepOrdersProcessed++;
     chunkOrdersProcessed++;
-    var OrderData;
-    var OrderId;
-    var OrderLocale = 'default'; // Overridden if specificed in the object
+    var orderData;
+    var orderLocale = 'default'; // Overridden if specificed in the object
+
+    if (!orderObject) {
+        return null;
+    }
 
     try {
-        if ('OrderID' in OrderEventObject.custom) {
-            OrderId = OrderEventObject.custom.OrderID;
-            if ('Payload' in OrderEventObject.custom && OrderEventObject.custom.Payload) {
-                OrderData = JSON.parse(OrderEventObject.custom.Payload);
-            } else {
-                OrderData = ExportLoyaltyOrderModel.generateOrderExportPayload(OrderId);
-                OrderEventObject.custom.Payload = JSON.stringify(OrderData); // eslint-disable-line
-            }
-        }
-        if ('locale' in OrderEventObject.custom) {
-            OrderLocale = OrderEventObject.custom.locale;
+        orderData = LoyaltyOrderModel.prepareOrderJSON(orderObject);
+        if (orderObject.customerLocaleID) {
+            orderLocale = orderObject.customerLocaleID;
         }
     } catch (e) {
         YotpoLogger.logMessage(e, 'error', logLocation);
     }
 
-    if (!empty(OrderData)) {
+    if (!empty(orderData)) {
         return {
-            OrderLocale: OrderLocale,
-            OrderId: OrderId,
-            OrderData: OrderData,
-            OrderEventObject: OrderEventObject
-
+            orderLocale: orderLocale,
+            orderId: orderObject.orderNo,
+            orderData: orderData
         };
     }
 
     stepErrorCount++;
     chunkErrorCount++;
-    if (!empty(OrderId)) {
-        stepSkippedOrders.push(OrderId);
-        chunkSkippedOrders.push(OrderId);
+    if (!empty(orderObject.orderNo)) {
+        stepSkippedOrders.push(orderObject.orderNo);
+        chunkSkippedOrders.push(orderObject.orderNo);
     }
 
     return null;
@@ -167,27 +192,30 @@ function write(events) {
     var ExportLoyaltyOrderModel = require('*/cartridge/models/loyalty/export/exportLoyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportOrders~write';
-    for (var i = 0; i < events.length; i++) {
-        if (events[i].OrderId) {
-            YotpoLogger.logMessage('Writing Order payload to yotpo for Order: ' + events[i].OrderId, 'debug', logLocation);
 
-            try {
-                // Throws on error rather than returning status.
-                ExportLoyaltyOrderModel.exportOrderByLocale(events[i].OrderData, events[i].OrderLocale);
-                events[i].OrderEventObject.custom.Status = 'SUCCESS'; // eslint-disable-line
-                events[i].OrderEventObject.custom.PayloadDeliveryDate = new Date(); // eslint-disable-line
-                // Blank out the status Details in case this export had previously failed.
-                events[i].OrderEventObject.custom.StatusDetails = ''; // eslint-disable-line
-            } catch (errorDetails) {
-                events[i].OrderEventObject.custom.Status = 'FAIL'; // eslint-disable-line
-                events[i].OrderEventObject.custom.StatusDetails = 'Error Details: ' + errorDetails; // eslint-disable-line
-
-                YotpoLogger.logMessage('Failed to write Order payload to yotpo for Order: ' + events[i].OrderId + ' Error: ' + errorDetails, 'error', logLocation);
-            }
-        } else {
-            YotpoLogger.logMessage('Failed to write event, OrderId not found', 'error', logLocation);
+    var ordersByLocale = events.toArray().reduce(function callback(acc, curval) {
+        var curLocale = curval.orderLocale;
+        if (!acc[curLocale]) {
+            acc[curLocale] = [];
         }
-    }
+        if (curval.orderId) {
+            acc[curLocale].push(curval.orderData);
+            YotpoLogger.logMessage('Writing Order payload to yotpo for Order: ' + curval.orderId, 'debug', logLocation);
+        }
+        return acc;
+    }, {});
+
+    Object.keys(ordersByLocale).forEach(function (locale) {
+        var orderDataArray = ordersByLocale[locale];
+        try {
+            var errorsArray = ExportLoyaltyOrderModel.exportOrdersByLocale(orderDataArray, locale);
+            if (errorsArray) {
+                YotpoLogger.logMessage('Yotpo order import, some orders failed to load: ' + orderDataArray + ' Error: ' + errorsArray, 'error', logLocation);
+            }
+        } catch (errorDetails) {
+            YotpoLogger.logMessage('Failed to write order payload to yotpo for payload: ' + orderDataArray + ' Error: ' + errorDetails, 'error', logLocation);
+        }
+    });
 }
 
 /**
@@ -201,15 +229,28 @@ function afterChunk(success) {
     var logMsg = '\n' + chunkErrorCount + ' Orders skipped out of ' + chunkOrdersProcessed + ' processed in this chunk';
     var orderErrorsMsg = 'The following Orders where excluded from export in this chunk due to data errors: \n' +
     chunkSkippedOrders.join('\n');
+    var Calendar = require('dw/util/Calendar');
+    var constants = require('*/cartridge/scripts/utils/constants');
+    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
+    var yotpoJobsConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_JOBS_CONFIGURATION_OBJECT, constants.YOTPO_JOB_CONFIG_ID);
 
     if (success) {
         yotpoLogger.logMessage('Yotpo Order Export chunk completed successfully. \n ' + logMsg, 'debug', logLocation);
+        var	helperCalendar = new Calendar();
+        var currentDateTime = helperCalendar.getTime();
+        yotpoJobsConfiguration.custom.orderFeedJobLastExecutionDateTime = currentDateTime;
     } else {
         yotpoLogger.logMessage('Yotpo Order Export chunk failed. \n ' + logMsg, 'error', logLocation);
     }
 
     if (chunkErrorCount > 0) {
         yotpoLogger.logMessage(logMsg + '\n' + orderErrorsMsg, 'error', logLocation);
+    }
+
+    if (lastOrderId && lastOrderId != '0') {
+        require('dw/system/Transaction').wrap(function () {
+            yotpoJobsConfiguration.custom['loyaltyOrderExportLastId'] = lastOrderId;
+        });
     }
 }
 
@@ -224,6 +265,9 @@ function afterStep(success, parameters, stepExecution) {
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var constants = require('*/cartridge/scripts/utils/constants');
 
+    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
+    var yotpoJobsConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_JOBS_CONFIGURATION_OBJECT, constants.YOTPO_JOB_CONFIG_ID);
+
     var jobExecution = stepExecution.getJobExecution();
     var jobContext = jobExecution.getContext();
     var logLocation = 'exportOrders~afterStep';
@@ -234,6 +278,9 @@ function afterStep(success, parameters, stepExecution) {
 
     if (success) {
         yotpoLogger.logMessage('Yotpo Order Export step completed successfully. \n ' + logMsg, 'debug', logLocation);
+        require('dw/system/Transaction').wrap(function () {
+            yotpoJobsConfiguration.custom['loyaltyOrderExportComplete'] = true;
+        });
     } else {
         yotpoLogger.logMessage('Yotpo Order Export step failed. \n ' + logMsg, 'error', logLocation);
     }
