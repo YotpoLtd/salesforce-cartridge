@@ -23,35 +23,12 @@ describe('exportLoyaltyCustomers job', () => {
         yotpoLoyaltyEnableCustomerFeed: true
     };
 
-    var customerEventDefaults = {
-        custom: {
-            CustomerID: 'randomID',
-            Payload: '',
-            PayloadDeliveryDate: '1/1/2020',
-            Status: 'Queued',
-            StatusDetails: '',
-            lastModified: '1/1/2020',
-            creationDate: '1/1/1900'
-        }
-    };
+    let customerJson = {
+        'customerNo': 'randomID',
+    }
 
     let customerObjDefaults = {
-        'customerData': {
-            'fake': 'object'
-        },
-        'customerEventObject': {
-            'custom': {
-                'CustomerID': 'randomID',
-                'Payload': '{"fake":"object"}',
-                'PayloadDeliveryDate': '1/1/2020',
-                'Status': 'Queued',
-                'StatusDetails': '',
-                'creationDate': '1/1/1900',
-                'lastModified': '1/1/2020'
-            }
-        },
-        'customerId': 'randomID',
-        'customerLocale': 'testing'
+        'customerNo': 'randomID',
     };
 
     const yotpoConfigurationModel = {
@@ -63,21 +40,27 @@ describe('exportLoyaltyCustomers job', () => {
         }
     };
 
+    let hasNextReturn = true;
     const exportLoyaltyCustomerModel = {
-        getQueuedCustomerExportObjects: () => {
+        getCustomerExportObjectIterator: () => {
             return {
                 count: 1,
                 hasNext: () => {
-                    return true;
+                    return hasNextReturn;
                 },
                 next: () => {
                     return true;
-                }
+                },
+                getCount: () => 5
             };
         },
+        getQueuedCustomerExportObjects: () => {},
         generateCustomerExportPayload: () => {},
         updateLoyaltyInitializedFlag: () => {},
-        exportCustomerByLocale: () => {}
+        exportCustomersByLocale: () => {}
+    };
+
+    const loyaltyOrderModel = {
     };
 
     var jobContext = {
@@ -91,19 +74,27 @@ describe('exportLoyaltyCustomers job', () => {
         }
     };
 
+    let jobsConfigObject = {
+        custom: {}
+    }
+
     beforeEach(function () {
         // The exporter has a bunch of private variables that need to reset between tests.
         exportLoyaltyCustomers = proxyquire('../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/job/loyalty/exportLoyaltyCustomers.js', {
             '*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel': exportLoyaltyCustomerModel,
             '*/cartridge/models/loyalty/common/loyaltyCustomerModel': {
-                updateLoyaltyInitializedFlag: () => {}
+                updateLoyaltyInitializedFlag: () => {},
+                prepareCustomerJSON: () => customerJson
             },
             '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
             '*/cartridge/models/common/yotpoConfigurationModel': yotpoConfigurationModel,
-            '*/cartridge/scripts/utils/constants': constants
+            '*/cartridge/scripts/utils/constants': constants,
+            'dw/object/CustomObjectMgr': {
+                getCustomObject: () => jobsConfigObject
+            },
+            '*/cartridge/models/loyalty/common/loyaltyOrderModel': loyaltyOrderModel
         });
         sitePrefs = Object.assign({}, sitePrefDefaults);
-        fakeCustomerEvent = Object.assign({}, customerEventDefaults);
         customerObj = Object.assign({}, customerObjDefaults);
         loggerSpy.logMessage.reset();
     });
@@ -119,17 +110,6 @@ describe('exportLoyaltyCustomers job', () => {
             assert.throws(() => exportLoyaltyCustomers.beforeStep({}, stepExecution), '');
             sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/.*Yotpo Loyalty Customer Export is disabled/), 'warn', 'exportLoyaltyCustomers~beforeStep');
         });
-        it('Call getQueuedCustomerExportObjects and populate the package scoped Customers object', () => {
-            assert.isUndefined(exportLoyaltyCustomers.beforeStep({}, stepExecution));
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Starting Yotpo Loyalty Customer Export Step Job/), 'debug', 'exportLoyaltyCustomers~beforeStep');
-            assert.equal(exportLoyaltyCustomers.getTotalCount(), 1);
-        });
-        it('Throws an error if getQueuedCustomerExportObjects throws.', () => {
-            let getQueuedCustomerExportObjects = sinon.stub(exportLoyaltyCustomerModel, 'getQueuedCustomerExportObjects');
-            getQueuedCustomerExportObjects.throws('fakeException');
-            assert.throws(() => exportLoyaltyCustomers.beforeStep({}, stepExecution), 'fakeException');
-            getQueuedCustomerExportObjects.restore();
-        });
     });
 
     describe('read', () => {
@@ -138,15 +118,12 @@ describe('exportLoyaltyCustomers job', () => {
             assert.isTrue(exportLoyaltyCustomers.read());
         });
         it('should return null when has next is not true.', () => {
-            let getQueuedCustomerExportObjects = sinon.stub(exportLoyaltyCustomerModel, 'getQueuedCustomerExportObjects');
-            getQueuedCustomerExportObjects.returns({
-                hasNext: () => {
-                    return false;
-                }
-            });
+            let getCustomerExportObjectIterator = sinon.stub(exportLoyaltyCustomerModel, 'getQueuedCustomerExportObjects');
+            hasNextReturn = false;
             exportLoyaltyCustomers.beforeStep({}, stepExecution);
             assert.isNull(exportLoyaltyCustomers.read());
-            getQueuedCustomerExportObjects.restore();
+            getCustomerExportObjectIterator.restore();
+            hasNextReturn = true;
         });
     });
 
@@ -156,17 +133,9 @@ describe('exportLoyaltyCustomers job', () => {
             generateCustomerExportPayload.returns({
                 fake: 'object'
             });
-            let result = exportLoyaltyCustomers.process(fakeCustomerEvent);
+            let result = exportLoyaltyCustomers.process(customerObjDefaults);
             assert.equal(result.customerId, 'randomID');
             generateCustomerExportPayload.restore();
-        });
-        it('should use existing payload if present and override the locale if included.', () => {
-            fakeCustomerEvent.custom.locale = 'testing';
-            fakeCustomerEvent.custom.Payload = '{"fake":"object"}';
-            customerObj.customerLocale = 'testing';
-            customerObj.customerEventObject.custom.locale = 'testing';
-            let result = exportLoyaltyCustomers.process(fakeCustomerEvent);
-            assert.deepEqual(result, customerObj);
         });
         it('should return null if no Customer data.', () => {
             let res = exportLoyaltyCustomers.process();
@@ -176,28 +145,27 @@ describe('exportLoyaltyCustomers job', () => {
 
     describe('write', () => {
         it('Should post the objects to Yotpo.', () => {
-            let exportCustomerByLocale = sinon.stub(exportLoyaltyCustomerModel, 'exportCustomerByLocale');
-            exportCustomerByLocale.returns(true);
-            let events = [customerObj];
+            let exportCustomerByLocale = sinon.stub(exportLoyaltyCustomerModel, 'exportCustomersByLocale');
+            exportCustomerByLocale.returns(false);
+            let events = {toArray: () => [customerObj]};
             exportLoyaltyCustomers.write(events);
-            assert.equal(events[0].customerEventObject.custom.Status, 'SUCCESS');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Writing customer payload to yotpo for customer/), 'debug', 'exportCustomers~write');
             exportCustomerByLocale.restore();
         });
         it('Should mark object as failed if it does not post to yotpo.', () => {
-            let exportCustomerByLocale = sinon.stub(exportLoyaltyCustomerModel, 'exportCustomerByLocale');
+            let exportCustomerByLocale = sinon.stub(exportLoyaltyCustomerModel, 'exportCustomersByLocale');
             exportCustomerByLocale.throws('FakeError');
-            let events = [customerObj];
+            let events = {toArray: () => [customerObj]};
             exportLoyaltyCustomers.write(events);
-            assert.equal(events[0].customerEventObject.custom.Status, 'FAIL');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write customer payload to yotpo for customer/), 'error', 'exportCustomers~write');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write customer payload to yotpo for payload:  Error: FakeError/), 'error', 'exportCustomers~write');
             exportCustomerByLocale.restore();
         });
-        it('Should log and fail if event has no Customer ID.', () => {
+        it('Should log and fail if errors array is present.', () => {
+            let exportCustomerByLocale = sinon.stub(exportLoyaltyCustomerModel, 'exportCustomersByLocale');
+            exportCustomerByLocale.returns([]);
             customerObj.customerId = null;
-            let events = [customerObj];
+            let events = {toArray: () => [customerObj]};
             exportLoyaltyCustomers.write(events);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write event/), 'error', 'exportCustomers~write');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo customer import, some customers failed to load:  Error/), 'error', 'exportCustomers~write');
         });
     });
     describe('afterChunk', () => {
@@ -209,7 +177,7 @@ describe('exportLoyaltyCustomers job', () => {
             exportLoyaltyCustomers.afterChunk(false);
             sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Customer Export chunk failed/), 'error', 'exportCustomers~afterChunk');
         });
-        it('Should log number of failed Customers.', () => {
+        it('Should log processed vs not status for Customers.', () => {
             // 0 out chunkErrorCount
             exportLoyaltyCustomers.beforeChunk(false);
             exportLoyaltyCustomers.afterChunk(false);
@@ -220,7 +188,7 @@ describe('exportLoyaltyCustomers job', () => {
             // Only care about logging for the afterChunk
             loggerSpy.logMessage.reset();
             exportLoyaltyCustomers.afterChunk(false);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/3 customers skipped out of 3 processed in this chunk/), 'error', 'exportCustomers~afterChunk');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 customers skipped out of 3 processed in this chunk/), 'error', 'exportCustomers~afterChunk');
         });
     });
     describe('afterStep', () => {
@@ -230,23 +198,10 @@ describe('exportLoyaltyCustomers job', () => {
             sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 customers skipped out of 0 processed in this step /), 'debug', 'exportCustomers~afterStep');
         });
         it('Should log unsuccessful when the step was unsuccessful.', () => {
+            jobsConfigObject.custom.loyaltyCustomerExportComplete = false;
             exportLoyaltyCustomers.beforeStep({}, stepExecution);
             exportLoyaltyCustomers.afterStep(false, {}, stepExecution);
             sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Customer Export step failed/), 'error', 'exportCustomers~afterStep');
-        });
-        it('Should throw if failed Customers are more than constants.EXPORT_Customer_ERROR_COUNT_THRESHOLD.', () => {
-            // Process an Customer
-            exportLoyaltyCustomers.beforeStep({}, stepExecution);
-            let generateCustomerExportPayload = sinon.stub(exportLoyaltyCustomerModel, 'generateCustomerExportPayload');
-            generateCustomerExportPayload.returns({
-                fake: 'object'
-            });
-            // Generate 1 successful 1 failed Customer
-            exportLoyaltyCustomers.process(fakeCustomerEvent);
-            exportLoyaltyCustomers.process();
-            generateCustomerExportPayload.restore();
-            loggerSpy.logMessage.reset();
-            assert.throws(() => exportLoyaltyCustomers.afterStep(false, {}, stepExecution), /1 customers skipped out of 2 processed in this step/);
         });
     });
 });

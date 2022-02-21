@@ -79,7 +79,7 @@
                 "after-step-function": "afterStep",
                 "after-chunk-function": "afterChunk",
                 "before-chunk-function": "beforeChunk",
-                "chunk-size": 100,
+                "chunk-size": 1000,
                 "transactional": "true",
                 "parameters": {
                     "parameter": []
@@ -113,7 +113,7 @@
                 "after-step-function": "afterStep",
                 "after-chunk-function": "afterChunk",
                 "before-chunk-function": "beforeChunk",
-                "chunk-size": 100,
+                "chunk-size": 1000,
                 "transactional": "true",
                 "parameters": {
                     "parameter": []
