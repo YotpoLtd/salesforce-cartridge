@@ -14,6 +14,7 @@ dw.json*
 sitegenesisdata/
 mobilefirstdata/
 storefrontdata/
+bm_app_storefront_base/
 demo_data_sfra/
 demo_data_sfra.zip
 .DS_Store

@@ -6,6 +6,7 @@
             data-authenticated="true"
             data-email="${pdict.customerDetails.customerEmail}"
             data-id="${pdict.customerDetails.customerNo}"
+            data-token="${pdict.customerDetails.token}"
             data-tags="${pdict.customerDetails.customerGroups}" >
         </div>
     </isif>
