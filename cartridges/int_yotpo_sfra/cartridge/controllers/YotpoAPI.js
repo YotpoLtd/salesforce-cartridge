@@ -67,7 +67,7 @@ server.get('AddProductToCart', server.middleware.https, function (req, res, next
  * Used closely in tandem with the concept of "free" product and its removal if some failure occurs.
  * Basket must be present.
  * 
- * @name AddProductToCart
+ * @name RemoveProductToCart
  * @function
  * @param {category} - non-sensitive
  * @param {renders} - json

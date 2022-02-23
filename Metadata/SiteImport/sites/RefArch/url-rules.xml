@@ -10,6 +10,8 @@
         <pipeline-alias pipeline="YotpoLoyalty-GetOrderCountByState">swell/index/order-count</pipeline-alias>
         <pipeline-alias pipeline="YotpoLoyalty-GetOrders">swell/index/orders</pipeline-alias>
         <pipeline-alias pipeline="YotpoLoyalty-GetCartridgeInformation">swell/index/get-cartridge-information</pipeline-alias>
+        <pipeline-alias pipeline="YotpoAPI-AddProductToCart">swell/index/add-product-to-cart</pipeline-alias>
+        <pipeline-alias pipeline="YotpoAPI-RemoveProductFromCart">swell/index/remove-product-from-cart</pipeline-alias>
     </pipeline-aliases>
 </url-rules>
 
