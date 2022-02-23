@@ -69,7 +69,7 @@ function beforeStep(parameters, stepExecution) {
         lastCustomerId = '' + yotpoJobsConfiguration.custom.loyaltyCustomerExportLastId;
     } else {
         require('dw/system/Transaction').wrap(function () {
-            yotpoJobsConfiguration.custom['loyaltyCustomerExportLastId'] = lastCustomerId;
+            yotpoJobsConfiguration.custom.loyaltyCustomerExportLastId = lastCustomerId;
         });
     }
 
@@ -193,7 +193,7 @@ function write(events) {
     var customersByLocale = events.toArray().reduce(function callback(acc, curval) {
         var curLocale = curval.customerLocale;
         if (!acc[curLocale]) {
-            acc[curLocale] = [];
+            acc[curLocale] = []; // eslint-disable-line no-param-reassign
         }
         if (curval.customerId) {
             acc[curLocale].push(curval.customerData);
@@ -239,9 +239,9 @@ function afterChunk(success) {
         yotpoLogger.logMessage(logMsg + '\n' + errorsMsg, 'error', logLocation);
     }
 
-    if (lastCustomerId && lastCustomerId != '0') {
+    if (lastCustomerId && lastCustomerId !== '0') {
         require('dw/system/Transaction').wrap(function () {
-            yotpoJobsConfiguration.custom['loyaltyCustomerExportLastId'] = lastCustomerId;
+            yotpoJobsConfiguration.custom.loyaltyCustomerExportLastId = lastCustomerId;
         });
     }
 }
@@ -271,7 +271,7 @@ function afterStep(success, parameters, stepExecution) {
     if (success) {
         yotpoLogger.logMessage('Yotpo Customer Export step completed successfully. \n ' + logMsg, 'debug', logLocation);
         require('dw/system/Transaction').wrap(function () {
-            yotpoJobsConfiguration.custom['loyaltyCustomerExportComplete'] = true;
+            yotpoJobsConfiguration.custom.loyaltyCustomerExportComplete = true;
         });
     } else {
         yotpoLogger.logMessage('Yotpo Customer Export step failed. \n ' + logMsg, 'error', logLocation);
