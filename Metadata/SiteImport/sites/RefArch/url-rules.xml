@@ -9,6 +9,7 @@
         <pipeline-alias pipeline="YotpoLoyalty-GetOrder">swell/index/order</pipeline-alias>
         <pipeline-alias pipeline="YotpoLoyalty-GetOrderCountByState">swell/index/order-count</pipeline-alias>
         <pipeline-alias pipeline="YotpoLoyalty-GetOrders">swell/index/orders</pipeline-alias>
+        <pipeline-alias pipeline="YotpoLoyalty-GetCartridgeInformation">swell/index/get-cartridge-information</pipeline-alias>
     </pipeline-aliases>
 </url-rules>
 
