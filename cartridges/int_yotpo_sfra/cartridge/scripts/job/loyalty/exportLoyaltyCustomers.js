@@ -121,6 +121,8 @@ function read() {
         return nextCustomer;
     }
     customers = ExportLoyaltyCustomerModel.getCustomerExportObjectIterator(lastCustomerId);
+    // Skip next customer to avoid duplicate posting
+    customers.next();
     if (customers.hasNext()) {
         nextCustomer = customers.next();
         if (nextCustomer.customerNo > lastCustomerId) {

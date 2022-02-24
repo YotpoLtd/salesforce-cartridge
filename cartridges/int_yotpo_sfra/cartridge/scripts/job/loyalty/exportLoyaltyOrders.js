@@ -125,6 +125,8 @@ function read() {
         return nextOrder;
     }
     Orders = ExportLoyaltyOrderModel.getOrderExportObjectIterator(lastOrderId);
+    // Skip 1 order to avoid repeat posting the last order.  Cant do +1 on the lastOrderId before the query because the order id is not numeric.
+    Orders.next();
     if (Orders.hasNext()) {
         nextOrder = Orders.next();
         if (nextOrder.orderNo > lastOrderId) {
