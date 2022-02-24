@@ -212,13 +212,12 @@ server.get('GetCartridgeInformation', server.middleware.https, function (req, re
         status: constants.STATUS_200,
         responseJSON: {
             cartridge: {
-                version:constants.YOTPO_CARTRIDGE_VERSION
-            }}};
+                version: constants.YOTPO_CARTRIDGE_VERSION
+            } } };
 
     res.json(result);
 
     next();
-
 });
 
 module.exports = server.exports();

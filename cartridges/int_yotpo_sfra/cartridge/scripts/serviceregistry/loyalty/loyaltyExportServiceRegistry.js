@@ -9,6 +9,7 @@ var LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
 
 var loyaltyService = LocalServiceRegistry.createService('int_yotpo_sfra.https.post.loyalty.api', {
 
+    // eslint-disable-next-line no-unused-vars
     mockExec: function (svc, params) {
         return {
             123412887: 'Unknown Error',

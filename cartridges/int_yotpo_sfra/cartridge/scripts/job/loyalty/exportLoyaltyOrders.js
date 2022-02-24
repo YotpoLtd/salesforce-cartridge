@@ -70,7 +70,7 @@ function beforeStep(parameters, stepExecution) {
         lastOrderId = '' + yotpoJobsConfiguration.custom.loyaltyOrderExportLastId;
     } else {
         require('dw/system/Transaction').wrap(function () {
-            yotpoJobsConfiguration.custom['loyaltyOrderExportLastId'] = lastOrderId;
+            yotpoJobsConfiguration.custom.loyaltyOrderExportLastId = lastOrderId;
         });
     }
 
@@ -198,7 +198,7 @@ function write(events) {
     var ordersByLocale = events.toArray().reduce(function callback(acc, curval) {
         var curLocale = curval.orderLocale;
         if (!acc[curLocale]) {
-            acc[curLocale] = [];
+            acc[curLocale] = []; // eslint-disable-line no-param-reassign
         }
         if (curval.orderId) {
             acc[curLocale].push(curval.orderData);
@@ -249,9 +249,9 @@ function afterChunk(success) {
         yotpoLogger.logMessage(logMsg + '\n' + orderErrorsMsg, 'error', logLocation);
     }
 
-    if (lastOrderId && lastOrderId != '0') {
+    if (lastOrderId && lastOrderId !== '0') {
         require('dw/system/Transaction').wrap(function () {
-            yotpoJobsConfiguration.custom['loyaltyOrderExportLastId'] = lastOrderId;
+            yotpoJobsConfiguration.custom.loyaltyOrderExportLastId = lastOrderId;
         });
     }
 }
@@ -281,7 +281,7 @@ function afterStep(success, parameters, stepExecution) {
     if (success) {
         yotpoLogger.logMessage('Yotpo Order Export step completed successfully. \n ' + logMsg, 'debug', logLocation);
         require('dw/system/Transaction').wrap(function () {
-            yotpoJobsConfiguration.custom['loyaltyOrderExportComplete'] = true;
+            yotpoJobsConfiguration.custom.loyaltyOrderExportComplete = true;
         });
     } else {
         yotpoLogger.logMessage('Yotpo Order Export step failed. \n ' + logMsg, 'error', logLocation);
