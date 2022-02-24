@@ -57,7 +57,7 @@ function getLoggedInCustomerDetails(customerNo, currentLocaleID) {
     try {
         var messageDigest = new MessageDigest(MessageDigest.DIGEST_SHA_256);
         var clearTextCustomerEmailToken = result.customerEmail + loyaltyAPIKey;
-        cipheredCustomerEmailToken = Encoding.toBase64(messageDigest.digestBytes(new Bytes(clearTextCustomerEmailToken, 'UTF-8')));
+        cipheredCustomerEmailToken = Encoding.toHex(messageDigest.digestBytes(new Bytes(clearTextCustomerEmailToken, 'UTF-8')));
     } catch (ex) {
         YotpoLogger.logMessage('Exception occurred while generating the cipheredCustomerToken Locale: ' + currentLocaleID + ' exception is:' + ex, 'error', 'CommonModel-getLoggedInCustomerDetails');
     }
