@@ -1,6 +1,6 @@
 'use strict';
 /**
- * @module scripts/job/loyalty/exportLoyaltyOrders
+ * @module scripts/job/loyalty/backfillLoyaltyOrders
  *
  * https://documentation.b2c.commercecloud.salesforce.com/DOC1/index.jsp?topic=%2Fcom.demandware.dochelp%2FJobs%2FChunkOrientedScriptModules.html
  *
