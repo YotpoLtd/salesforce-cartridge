@@ -47,6 +47,39 @@
         </flow>
         <rules/>
         <triggers>
+            <run-recurring enabled="false">
+                <recurrence>
+                    <date-from>2019-08-08Z</date-from>
+                    <start-time>06:00:00.000Z</start-time>
+                    <interval>1d</interval>
+                    <day-of-week>
+                        <weekday>Saturday</weekday>
+                        <weekday>Tuesday</weekday>
+                        <weekday>Wednesday</weekday>
+                        <weekday>Sunday</weekday>
+                        <weekday>Thursday</weekday>
+                        <weekday>Monday</weekday>
+                        <weekday>Friday</weekday>
+                    </day-of-week>
+                </recurrence>
+            </run-recurring>
+        </triggers>
+    </job>
+
+    <job job-id="Yotpo Loyalty Order Backfill" priority="0">
+        <description>
+        One time export of historical order data to Yotpo for initial setup.
+        </description>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="YotpoLoyaltyOrderBackfill" type="custom.Yotpo.LoyaltyOrderBackfill" enforce-restart="false">
+                <description/>
+                <parameters/>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
             <run-once enabled="false">
                 <date>2017-06-02Z</date>
                 <time>11:57:51.000Z</time>
@@ -106,6 +139,38 @@
         <flow>
             <context site-id="RefArch"/>
             <step step-id="LoyaltyCustomerExport" type="custom.Yotpo.LoyaltyCustomerExport" enforce-restart="false">
+                <description/>
+                <parameters/>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-recurring enabled="false">
+                <recurrence>
+                    <date-from>2019-08-08Z</date-from>
+                    <start-time>06:00:00.000Z</start-time>
+                    <interval>1d</interval>
+                    <day-of-week>
+                        <weekday>Saturday</weekday>
+                        <weekday>Tuesday</weekday>
+                        <weekday>Wednesday</weekday>
+                        <weekday>Sunday</weekday>
+                        <weekday>Thursday</weekday>
+                        <weekday>Monday</weekday>
+                        <weekday>Friday</weekday>
+                    </day-of-week>
+                </recurrence>
+            </run-recurring>
+        </triggers>
+    </job>
+
+    <job job-id="Yotpo Loyalty Customer Backfill" priority="0">
+        <description> One time export of historical customer data to Yotpo for initial setup.
+        </description>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="LoyaltyCustomerBackfill" type="custom.Yotpo.LoyaltyCustomerBackfill" enforce-restart="false">
                 <description/>
                 <parameters/>
             </step>
