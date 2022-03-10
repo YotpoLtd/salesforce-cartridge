@@ -41,7 +41,10 @@
         <flow>
             <context site-id="RefArch"/>
             <step step-id="YotpoLoyaltyOrderExport" type="custom.Yotpo.LoyaltyOrderExport" enforce-restart="false">
-                <description/>
+                <description>
+                    Ongoing job that exports queued orders to Yotpo. Typically, orders are sent to Yotpo during checkout.
+                    However, if a transmission error occurs, they are temporarily queued to a Custom Object (yotpoLoyaltyOrder) and sent later via this job.
+                </description>
                 <parameters/>
             </step>
         </flow>
@@ -68,7 +71,7 @@
 
     <job job-id="Yotpo Loyalty Order Backfill" priority="0">
         <description>
-        One time export of historical order data to Yotpo for initial setup.
+        One time export of historical order data to Yotpo for initial setup. Designed for those with a large volume of existing orders on the SFCC platform that need transmission to Yotpo.
         </description>
         <parameters/>
         <flow>
@@ -139,7 +142,10 @@
         <flow>
             <context site-id="RefArch"/>
             <step step-id="LoyaltyCustomerExport" type="custom.Yotpo.LoyaltyCustomerExport" enforce-restart="false">
-                <description/>
+                <description>
+                    Ongoing job that exports queued customers to Yotpo. Typically, customers are sent to Yotpo during account creation or account update.
+                    However, if a transmission error occurs, they are temporarily queued to a Custom Object (yotpoLoyaltyCustomer) and sent later via this job.
+                </description>
                 <parameters/>
             </step>
         </flow>
@@ -165,7 +171,7 @@
     </job>
 
     <job job-id="Yotpo Loyalty Customer Backfill" priority="0">
-        <description> One time export of historical customer data to Yotpo for initial setup.
+        <description> One time export of historical customer data to Yotpo for initial setup. Designed for those with a large volume of existing customers on the SFCC platform that need transmission to Yotpo.
         </description>
         <parameters/>
         <flow>
