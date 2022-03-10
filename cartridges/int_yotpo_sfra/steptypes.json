@@ -103,7 +103,7 @@
                 "@supports-site-context": "true",
                 "@supports-organization-context": "false",
                 "@trim": true,
-                "description": "Yotpo Cartridge - backfill existing customer data to Yotpo's webservice for intial setup.",
+                "description": "Yotpo Cartridge - backfill existing customer data to Yotpo's webservice for initial setup.",
                 "module": "int_yotpo_sfra/cartridge/scripts/job/loyalty/backfillLoyaltyCustomers.js",
                 "before-step-function": "beforeStep",
                 "total-count-function": "getTotalCount",
