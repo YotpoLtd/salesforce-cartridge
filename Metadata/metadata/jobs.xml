@@ -67,7 +67,7 @@
         </triggers>
     </job>
 
-    <job job-id="Yotpo Loyalty Order Backfill" priority="0">
+    <job job-id="Backfill - Yotpo Loyalty Order Export" priority="0">
         <description>One time export of historical order data to Yotpo for initial setup. Designed for those with a large volume of existing orders on the SFCC platform that need transmission to Yotpo.
         </description>
         <parameters/>
@@ -165,7 +165,7 @@
         </triggers>
     </job>
 
-    <job job-id="Yotpo Loyalty Customer Backfill" priority="0">
+    <job job-id="Backfill - Yotpo Loyalty Customer Export" priority="0">
         <description> One time export of historical customer data to Yotpo for initial setup. Designed for those with a large volume of existing customers on the SFCC platform that need transmission to Yotpo.
         </description>
         <parameters/>
