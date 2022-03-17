@@ -109,7 +109,7 @@ function read() {
 function process(customerEventObject) {
     var ExportLoyaltyCustomerModel = require('*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var logLocation = 'exportCustomers~process';
+    var logLocation = 'exportLoyaltyCustomers~process';
 
     stepCustomersProcessed++;
     chunkCustomersProcessed++;
@@ -160,7 +160,7 @@ function process(customerEventObject) {
 function write(events) {
     var ExportLoyaltyCustomerModel = require('*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var logLocation = 'exportCustomers~write';
+    var logLocation = 'exportLoyaltyCustomers~write';
     for (var i = 0; i < events.length; i++) {
         if (events[i].customerId) {
             YotpoLogger.logMessage('Writing customer payload to yotpo for customer: ' + events[i].customerId, 'debug', logLocation);
@@ -196,7 +196,7 @@ function write(events) {
  */
 function afterChunk(success) {
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var logLocation = 'exportCustomers~afterChunk';
+    var logLocation = 'exportLoyaltyCustomers~afterChunk';
     var logMsg = '\n' + chunkErrorCount + ' customers skipped out of ' + chunkCustomersProcessed + ' processed in this chunk';
     var orderErrorsMsg = 'The following customers where excluded from export in this chunk due to data errors: \n' +
     chunkSkippedCustomers.join('\n');
@@ -225,7 +225,7 @@ function afterStep(success, parameters, stepExecution) {
 
     var jobExecution = stepExecution.getJobExecution();
     var jobContext = jobExecution.getContext();
-    var logLocation = 'exportCustomers~afterStep';
+    var logLocation = 'exportLoyaltyCustomers~afterStep';
     var logMsg = '\n' + stepErrorCount + ' customers skipped out of ' + stepCustomersProcessed + ' processed in this step \n' +
     'Total number of customers to be exported: ' + getTotalCount();
     var customersErrorsMsg = 'The following customers where excluded from export in this job execution due to data errors: \n' +
