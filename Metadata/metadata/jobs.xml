@@ -36,11 +36,44 @@
     </job>
     
     <job job-id="Yotpo Loyalty Order Export" priority="0">
-        <description/>
+        <description>Ongoing job that exports queued orders to Yotpo. Typically, orders are sent to Yotpo during checkout.However, if a transmission error occurs, they are temporarily queued to a Custom Object (yotpoLoyaltyOrder) and sent later via this job.
+        </description>
         <parameters/>
         <flow>
             <context site-id="RefArch"/>
             <step step-id="YotpoLoyaltyOrderExport" type="custom.Yotpo.LoyaltyOrderExport" enforce-restart="false">
+                <description/>
+                <parameters/>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-recurring enabled="false">
+                <recurrence>
+                    <date-from>2019-08-08Z</date-from>
+                    <start-time>06:00:00.000Z</start-time>
+                    <interval>1d</interval>
+                    <day-of-week>
+                        <weekday>Saturday</weekday>
+                        <weekday>Tuesday</weekday>
+                        <weekday>Wednesday</weekday>
+                        <weekday>Sunday</weekday>
+                        <weekday>Thursday</weekday>
+                        <weekday>Monday</weekday>
+                        <weekday>Friday</weekday>
+                    </day-of-week>
+                </recurrence>
+            </run-recurring>
+        </triggers>
+    </job>
+
+    <job job-id="Backfill - Yotpo Loyalty Order Export" priority="0">
+        <description>One time export of historical order data to Yotpo for initial setup. Designed for those with a large volume of existing orders on the SFCC platform that need transmission to Yotpo.
+        </description>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="YotpoLoyaltyOrderBackfill" type="custom.Yotpo.LoyaltyOrderBackfill" enforce-restart="false">
                 <description/>
                 <parameters/>
             </step>
@@ -100,12 +133,45 @@
         </triggers>
     </job>
 
-    <job job-id="Yotpo Loyalty Customer Export" priority="0">
-        <description/>
+    <job job-id="Yotpo Loyalty Customer Export" priority="0">        
+        <description>Ongoing job that exports queued customers to Yotpo. Typically, customers are sent to Yotpo during account creation or account update. However, if a transmission error occurs, they are temporarily queued to a Custom Object (yotpoLoyaltyCustomer) and sent later via this job.
+        </description>        
         <parameters/>
         <flow>
             <context site-id="RefArch"/>
             <step step-id="LoyaltyCustomerExport" type="custom.Yotpo.LoyaltyCustomerExport" enforce-restart="false">
+                <description/>
+                <parameters/>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-recurring enabled="false">
+                <recurrence>
+                    <date-from>2019-08-08Z</date-from>
+                    <start-time>06:00:00.000Z</start-time>
+                    <interval>1d</interval>
+                    <day-of-week>
+                        <weekday>Saturday</weekday>
+                        <weekday>Tuesday</weekday>
+                        <weekday>Wednesday</weekday>
+                        <weekday>Sunday</weekday>
+                        <weekday>Thursday</weekday>
+                        <weekday>Monday</weekday>
+                        <weekday>Friday</weekday>
+                    </day-of-week>
+                </recurrence>
+            </run-recurring>
+        </triggers>
+    </job>
+
+    <job job-id="Backfill - Yotpo Loyalty Customer Export" priority="0">
+        <description> One time export of historical customer data to Yotpo for initial setup. Designed for those with a large volume of existing customers on the SFCC platform that need transmission to Yotpo.
+        </description>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="LoyaltyCustomerBackfill" type="custom.Yotpo.LoyaltyCustomerBackfill" enforce-restart="false">
                 <description/>
                 <parameters/>
             </step>
