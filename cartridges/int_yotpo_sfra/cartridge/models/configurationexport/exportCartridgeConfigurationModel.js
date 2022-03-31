@@ -180,7 +180,7 @@ function sendConfigDataToYotpo(requestData, locale, shouldGetNewToken) {
  *
  * @returns {Object} - Contains success, authenticationError, serviceError, & unknownError flags
  */
- function parseYotpoResponse(result) {
+function parseYotpoResponse(result) {
     var constants = require('*/cartridge/scripts/utils/constants');
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportCartridgeConfigurationModel~parseYotpoResponse';
@@ -189,7 +189,7 @@ function sendConfigDataToYotpo(requestData, locale, shouldGetNewToken) {
         responseStatusCode = !empty(result.object) ? JSON.parse(result.object).status.code : result.error;
     } catch (e) {
         responseStatusCode = result.error;
-    }    
+    }
 
     var status = {
         success: false,
@@ -223,8 +223,6 @@ function sendConfigDataToYotpo(requestData, locale, shouldGetNewToken) {
 
     return status;
 }
-
-
 
 /**
  * Exports

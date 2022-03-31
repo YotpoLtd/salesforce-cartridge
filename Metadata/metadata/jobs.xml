@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jobs xmlns="http://www.demandware.com/xml/impex/jobs/2015-07-01">
+    <job job-id="Yotpo Cartridge Configuration Export" priority="0">
+        <description>Relays Yotpo Cartridge version information to Yotpo periodically.</description>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="Yotpo-ExportCartridgeConfiguration" type="ExecuteScriptModule" enforce-restart="false">
+                <description>Calls the endpoint defined within the int_yotpo_sfra.https.post.export.cartridge.config.api service.</description>
+                <parameters>
+                    <parameter name="ExecuteScriptModule.Module">int_yotpo_sfra/cartridge/scripts/job/exportCartridgeConfiguration.js</parameter>
+                    <parameter name="ExecuteScriptModule.FunctionName">exportCartridgeConfiguration</parameter>
+                    <parameter name="ExecuteScriptModule.Transactional">false</parameter>
+                </parameters>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-recurring enabled="true">
+                <recurrence>
+                    <date-from>2019-08-08Z</date-from>
+                    <start-time>06:00:00.000Z</start-time>
+                    <interval>1d</interval>
+                    <day-of-week>
+                        <weekday>Saturday</weekday>
+                        <weekday>Tuesday</weekday>
+                        <weekday>Wednesday</weekday>
+                        <weekday>Sunday</weekday>
+                        <weekday>Thursday</weekday>
+                        <weekday>Monday</weekday>
+                        <weekday>Friday</weekday>
+                    </day-of-week>
+                </recurrence>
+            </run-recurring>
+        </triggers>
+    </job>
+    
+    <job job-id="Yotpo Loyalty Order Export" priority="0">
+        <description>Ongoing job that exports queued orders to Yotpo. Typically, orders are sent to Yotpo during checkout.However, if a transmission error occurs, they are temporarily queued to a Custom Object (yotpoLoyaltyOrder) and sent later via this job.
+        </description>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="YotpoLoyaltyOrderExport" type="custom.Yotpo.LoyaltyOrderExport" enforce-restart="false">
+                <description/>
+                <parameters/>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-recurring enabled="false">
+                <recurrence>
+                    <date-from>2019-08-08Z</date-from>
+                    <start-time>06:00:00.000Z</start-time>
+                    <interval>1d</interval>
+                    <day-of-week>
+                        <weekday>Saturday</weekday>
+                        <weekday>Tuesday</weekday>
+                        <weekday>Wednesday</weekday>
+                        <weekday>Sunday</weekday>
+                        <weekday>Thursday</weekday>
+                        <weekday>Monday</weekday>
+                        <weekday>Friday</weekday>
+                    </day-of-week>
+                </recurrence>
+            </run-recurring>
+        </triggers>
+    </job>
+
+    <job job-id="Backfill - Yotpo Loyalty Order Export" priority="0">
+        <description>One time export of historical order data to Yotpo for initial setup. Designed for those with a large volume of existing orders on the SFCC platform that need transmission to Yotpo.
+        </description>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="YotpoLoyaltyOrderBackfill" type="custom.Yotpo.LoyaltyOrderBackfill" enforce-restart="false">
+                <description/>
+                <parameters/>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-once enabled="false">
+                <date>2017-06-02Z</date>
+                <time>11:57:51.000Z</time>
+            </run-once>
+        </triggers>
+    </job>
+    
+    <job job-id="Yotpo Order Export (Purchase Feed)" priority="0">
+        <description>This job exports high-level order information (name, email, products purchased, etc.) to Yotpo. Its primary purpose is to supply enough details for Yotpo to trigger "Review Your Product" emails after a preconfigured delay after purchase.Orders are sent to Yotpo in batches, grouped by locale. Additional connection details are configured in the "Manage Yotpo Configuration" Business Manager plugin. The "int_yotpo_sfra.https.post.export.purchase.api.cred" Service facilitates transmission of information.
+	</description>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="YotpoExportOrders" type="custom.Yotpo.ExportOrdersJson" enforce-restart="false">
+                <description>Sends the order information to Yotpo's endpoint.</description>
+                <parameters/>
+                <rules>
+                    <on-exit status="ERROR">
+                        <continue/>
+                    </on-exit>
+                </rules>
+            </step>
+            <step step-id="YotpoJobErrorChecking" type="custom.Yotpo.JobErrorChecking" enforce-restart="true">
+                <description>Checks previously run YotpoExportOrders step for errors.  Modifies job exit status if error exceed threshold</description>
+                <parameters/>
+                <rules>
+                    <on-exit status="ERROR">
+                        <stop-job/>
+                    </on-exit>
+                </rules>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-recurring enabled="true">
+                <recurrence>
+                    <date-from>2019-08-08Z</date-from>
+                    <start-time>06:00:00.000Z</start-time>
+                    <interval>1d</interval>
+                    <day-of-week>
+                        <weekday>Saturday</weekday>
+                        <weekday>Tuesday</weekday>
+                        <weekday>Wednesday</weekday>
+                        <weekday>Sunday</weekday>
+                        <weekday>Thursday</weekday>
+                        <weekday>Monday</weekday>
+                        <weekday>Friday</weekday>
+                    </day-of-week>
+                </recurrence>
+            </run-recurring>
+        </triggers>
+    </job>
+
+    <job job-id="Yotpo Loyalty Customer Export" priority="0">        
+        <description>Ongoing job that exports queued customers to Yotpo. Typically, customers are sent to Yotpo during account creation or account update. However, if a transmission error occurs, they are temporarily queued to a Custom Object (yotpoLoyaltyCustomer) and sent later via this job.
+        </description>        
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="LoyaltyCustomerExport" type="custom.Yotpo.LoyaltyCustomerExport" enforce-restart="false">
+                <description/>
+                <parameters/>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-recurring enabled="false">
+                <recurrence>
+                    <date-from>2019-08-08Z</date-from>
+                    <start-time>06:00:00.000Z</start-time>
+                    <interval>1d</interval>
+                    <day-of-week>
+                        <weekday>Saturday</weekday>
+                        <weekday>Tuesday</weekday>
+                        <weekday>Wednesday</weekday>
+                        <weekday>Sunday</weekday>
+                        <weekday>Thursday</weekday>
+                        <weekday>Monday</weekday>
+                        <weekday>Friday</weekday>
+                    </day-of-week>
+                </recurrence>
+            </run-recurring>
+        </triggers>
+    </job>
+
+    <job job-id="Backfill - Yotpo Loyalty Customer Export" priority="0">
+        <description> One time export of historical customer data to Yotpo for initial setup. Designed for those with a large volume of existing customers on the SFCC platform that need transmission to Yotpo.
+        </description>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="LoyaltyCustomerBackfill" type="custom.Yotpo.LoyaltyCustomerBackfill" enforce-restart="false">
+                <description/>
+                <parameters/>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-once enabled="false">
+                <date>2017-06-02Z</date>
+                <time>11:57:51.000Z</time>
+            </run-once>
+        </triggers>
+    </job>
+    
+</jobs>

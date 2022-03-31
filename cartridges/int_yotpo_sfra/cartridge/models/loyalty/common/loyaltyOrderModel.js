@@ -296,7 +296,7 @@ function prepareOrderJSON(order) {
             customerEmail = empty(order.customerEmail) ? null : YotpoUtils.escape(order.customerEmail, Constants.REGEX_FOR_YOTPO_DATA, '');
         }
 
-        if (!order.orderNo || !customerEmail || !order.currencyCode || !orderTotalPrice) {
+        if (!order.orderNo || !customerEmail || !order.currencyCode || empty(orderTotalPrice)) {
             throw Constants.EXPORT_ORDER_MISSING_MANDATORY_FIELDS_ERROR;
         }
 

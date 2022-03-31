@@ -10,10 +10,8 @@ const Status = require('dw/system/Status');
  *
  * @returns {dw/system/Status} returnStatus
  */
-function exportCartridgeConfiguration(parameters, stepExecution) {
+function exportCartridgeConfiguration(parameters, stepExecution) { // eslint-disable-line no-unused-vars
     var returnStatus = new Status(Status.ERROR);
-    var jobExecution = stepExecution.getJobExecution();
-    var jobContext = jobExecution.getContext();
     var constants = require('*/cartridge/scripts/utils/constants');
     var ExportOrderModel = require('*/cartridge/models/orderexport/exportOrderModel');
     var exportOrderModelInstance = new ExportOrderModel();
@@ -45,9 +43,9 @@ function exportCartridgeConfiguration(parameters, stepExecution) {
             isAnyErrorOccured = isAnyErrorOccured || isErrorReported;
         }
         if (isAnyErrorOccured) {
-            returnStatus = Status(Status.ERROR);
+            returnStatus = new Status(Status.ERROR);
         } else {
-            returnStatus = Status(Status.OK);
+            returnStatus = new Status(Status.OK);
         }
     } catch (e) {
         returnStatus = new Status(Status.ERROR, e.message);

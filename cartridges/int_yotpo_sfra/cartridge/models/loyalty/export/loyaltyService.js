@@ -51,6 +51,13 @@ function exportData(payload, queryParams, endpoint) {
 
     if (result.status === Result.OK) {
         YotpoLogger.logMessage('The data sumbitted successfully to Yotpo.', 'debug', logLocation);
+        if (result.mockResult) {
+            return {
+                123412887: 'Unknown Error',
+                123412889: 'Invalid email address',
+                123412890: 'Missing value, sfcc_id'
+            };
+        }
     } else {
         var error = 'Could not export data to Yotpo ' +
             '- HTTP Status Code is: ' + result.error +

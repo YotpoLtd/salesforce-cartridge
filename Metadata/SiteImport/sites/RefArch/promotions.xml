@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<promotions xmlns="http://www.demandware.com/xml/impex/promotion/2008-01-31">
+    <campaign campaign-id="Yotpo Loyalty S2F Campaign">
+        <description>Send to Friend Loyalty Discount</description>
+        <enabled-flag>true</enabled-flag>
+        <campaign-scope>
+            <applicable-online/>
+        </campaign-scope>
+    </campaign>
+
+    <promotion promotion-id="Yotpo Loyalty S2F Promotion">
+        <enabled-flag>true</enabled-flag>
+        <archived-flag>false</archived-flag>
+        <searchable-flag>false</searchable-flag>
+        <refinable-flag>false</refinable-flag>
+        <prevent-requalifying-flag>false</prevent-requalifying-flag>
+        <exclusivity>no</exclusivity>
+        <name xml:lang="x-default">Yotpo Loyalty S2F Promotion</name>
+        <callout-msg xml:lang="x-default">Send to Friend Loyalty Discount</callout-msg>
+        <details xml:lang="x-default">Send to Friend Loyalty Discount</details>
+        <order-promotion-rule>
+            <discount-only-qualifying-products>false</discount-only-qualifying-products>
+            <discounts condition-type="order-total">
+                <discount>
+                    <threshold>1.0</threshold>
+                    <percentage>10.0</percentage>
+                </discount>
+            </discounts>
+            <exclude-discounted-products>false</exclude-discounted-products>
+        </order-promotion-rule>
+    </promotion>
+
+    <promotion-campaign-assignment promotion-id="Yotpo Loyalty S2F Promotion" campaign-id="Yotpo Loyalty S2F Campaign">
+        <qualifiers match-mode="all">
+            <customer-groups/>
+            <source-codes/>
+            <coupons/>
+        </qualifiers>
+        <customer-groups match-mode="any">
+            <customer-group group-id="Unregistered"/>
+        </customer-groups>
+        <coupons>
+            <coupon coupon-id="yotpoLoyaltyS2FCoupon"/>
+        </coupons>
+    </promotion-campaign-assignment>
+</promotions>

@@ -113,7 +113,7 @@ function read() {
 function process(OrderEventObject) {
     var ExportLoyaltyOrderModel = require('*/cartridge/models/loyalty/export/exportLoyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var logLocation = 'exportOrders~process';
+    var logLocation = 'exportLoyaltyOrders~process';
 
     stepOrdersProcessed++;
     chunkOrdersProcessed++;
@@ -166,7 +166,7 @@ function process(OrderEventObject) {
 function write(events) {
     var ExportLoyaltyOrderModel = require('*/cartridge/models/loyalty/export/exportLoyaltyOrderModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var logLocation = 'exportOrders~write';
+    var logLocation = 'exportLoyaltyOrders~write';
     for (var i = 0; i < events.length; i++) {
         if (events[i].OrderId) {
             YotpoLogger.logMessage('Writing Order payload to yotpo for Order: ' + events[i].OrderId, 'debug', logLocation);
@@ -197,7 +197,7 @@ function write(events) {
  */
 function afterChunk(success) {
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var logLocation = 'exportOrders~afterChunk';
+    var logLocation = 'exportLoyaltyOrders~afterChunk';
     var logMsg = '\n' + chunkErrorCount + ' Orders skipped out of ' + chunkOrdersProcessed + ' processed in this chunk';
     var orderErrorsMsg = 'The following Orders where excluded from export in this chunk due to data errors: \n' +
     chunkSkippedOrders.join('\n');
@@ -226,7 +226,7 @@ function afterStep(success, parameters, stepExecution) {
 
     var jobExecution = stepExecution.getJobExecution();
     var jobContext = jobExecution.getContext();
-    var logLocation = 'exportOrders~afterStep';
+    var logLocation = 'exportLoyaltyOrders~afterStep';
     var logMsg = '\n' + stepErrorCount + ' Orders skipped out of ' + stepOrdersProcessed + ' processed in this step \n' +
     'Total number of Orders to be exported: ' + getTotalCount();
     var OrdersErrorsMsg = 'The following Orders where excluded from export in this job execution due to data errors: \n' +

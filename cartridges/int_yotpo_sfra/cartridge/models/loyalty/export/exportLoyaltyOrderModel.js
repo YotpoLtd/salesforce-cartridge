@@ -53,6 +53,46 @@ function exportOrder(payload, params) {
 }
 
 /**
+ * Post Order data to Yotpo API
+ * @param {*} ordersArray Payload data to post to yotpo
+ * @param {*} locale locale to lookup api key info
+ * @throws {Constants.EXPORT_LOYALTY_SERVICE_ERROR} If the post to the loyalty service was unsuccessful.
+ */
+function exportOrdersByLocale(ordersArray, locale) {
+    var LoyaltyService = require('*/cartridge/models/loyalty/export/loyaltyService');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+
+    var logLocation = 'ExportLoyaltyOrderModel~exportOrderByLocale';
+
+    var keys = YotpoConfigurationModel.getLoyaltyAPIKeys(locale);
+    if (!keys) {
+        var error = 'Failed to export loyalty Order event. Unable to load Yotpo Loyalty API Key for locale: ' + locale;
+        YotpoLogger.logMessage(error, 'error', logLocation);
+        throw new Error(error);
+    }
+
+    var queryParams = {
+        guid: keys.guid,
+        api_key: keys.key
+    };
+    var payload = { orders: ordersArray };
+    LoyaltyService.exportData(payload, queryParams, 'process_orders_batch');
+}
+
+
+/**
+ * Get an Order object iterator starting from a given order ID
+ * @param {*} lastOrderId Str Order ID to start iterator from
+ * @returns {Object} orderIterator order object iterator
+ */
+function getOrderExportObjectIterator(lastOrderId) {
+    var OrderMgr = require('dw/order/OrderMgr');
+    var orderIterator = OrderMgr.searchOrders('orderNo >= {0}', 'orderNo ASC', lastOrderId);
+    return orderIterator;
+}
+
+/**
  * This is the main function called by Loyalty Exporter.
  *
  * @param {string} OrderNo : The Order number
@@ -121,6 +161,11 @@ function getQueuedOrderExportObjects() {
 
 /* Module Exports */
 exports.generateOrderExportPayload = generateOrderExportPayload;
-exports.exportOrderByLocale = exportOrderByLocale;
+
 exports.getQueuedOrderExportObjects = getQueuedOrderExportObjects;
+exports.getOrderExportObjectIterator = getOrderExportObjectIterator;
+
+exports.exportOrderByLocale = exportOrderByLocale;
+exports.exportOrdersByLocale = exportOrdersByLocale;
+
 exports.exportOrder = exportOrder;

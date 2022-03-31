@@ -10,13 +10,16 @@
  * This function is used to get customer by its customer number
  *
  * @param {string} customerNo: The customer number to retrieve customer information
+ * @param {string} currentLocaleID: The current locale
  *
- * @return {boolean} result.customerExists : The flag to indicate if customer exists
- * @return {string} result.customerEmail : The customer email address
- * @return {string} result.customerNo : current customer no
- * @return {string} result.customerGroups : The customer Groups associate with customer
+ * @return {Object} An object with customer details. Some information is blank if the customer is not available.
+ *                  result.customerExists : The flag to indicate if customer exists
+ *                  result.customerEmail : The customer email address
+ *                  result.customerNo : current customer no
+ *                  result.customerGroups : The customer Groups associate with customer
+ *                  result.token : SHA256(customer email + yotpoAppKey)
  */
-function getLoggedInCustomerDetails(customerNo) {
+function getLoggedInCustomerDetails(customerNo, currentLocaleID) {
     var CustomerMgr = require('dw/customer/CustomerMgr');
 
     var result = {
@@ -41,6 +44,24 @@ function getLoggedInCustomerDetails(customerNo) {
     result.customerEmail = customerObj.profile.email;
     result.customerNo = customerNo;
     result.customerGroups = '[' + customerGroupArray.join(',') + ']';
+
+    // Augment customerDetails with ciphered Customer Email Token.
+    // Token equates to: SHA256(Email + YotpoLoyaltyAPIKey)
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+    var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
+    var MessageDigest = require('dw/crypto/MessageDigest');
+    var Bytes = require('dw/util/Bytes');
+    var Encoding = require('dw/crypto/Encoding');
+    var loyaltyAPIKey = YotpoConfigurationModel.getYotpoPref('yotpoLoyaltyAPIKey', currentLocaleID);
+    var cipheredCustomerEmailToken = '';
+    try {
+        var messageDigest = new MessageDigest(MessageDigest.DIGEST_SHA_256);
+        var clearTextCustomerEmailToken = result.customerEmail + loyaltyAPIKey;
+        cipheredCustomerEmailToken = Encoding.toHex(messageDigest.digestBytes(new Bytes(clearTextCustomerEmailToken, 'UTF-8')));
+    } catch (ex) {
+        YotpoLogger.logMessage('Exception occurred while generating the cipheredCustomerToken Locale: ' + currentLocaleID + ' exception is:' + ex, 'error', 'CommonModel-getLoggedInCustomerDetails');
+    }
+    result.token = cipheredCustomerEmailToken;
 
     return result;
 }
@@ -69,7 +90,7 @@ function getCurrentBasketDetails(currentLocaleID) {
         basketExists: false
     };
 
-    var currentBasket = BasketMgr.getCurrentOrNewBasket();
+    var currentBasket = BasketMgr.getCurrentBasket();
 
     if (!currentBasket) {
         return result;

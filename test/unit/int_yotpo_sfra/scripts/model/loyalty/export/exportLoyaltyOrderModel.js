@@ -92,20 +92,16 @@ describe('exportLoyaltyOrderModel', () => {
         });
     });
     describe('generateOrderExportPayload', () => {
+        it('should export the order.', () => {
+            exportLoyaltyOrderModel.exportOrdersByLocale('payload', 'default');
+            sinon.assert.calledWith(exportSpy, {orders: "payload"}, { api_key: '123', guid: 'abc' }, 'process_orders_batch');
+        });
         it('throw an error and log it does not find valid keys.', () => {
             let getLoyaltyAPIKeys = sinon.stub(yotpoConfigurationModel, 'getLoyaltyAPIKeys');
             getLoyaltyAPIKeys.returns(null);
-            assert.throws(() => exportLoyaltyOrderModel.exportOrderByLocale({}, 'default'), /Failed to export loyalty Order event. Unable to load Yotpo Loyalty API Key for locale: default/);
+            assert.throws(() => exportLoyaltyOrderModel.exportOrdersByLocale({}, 'default'), /Failed to export loyalty Order event. Unable to load Yotpo Loyalty API Key for locale: default/);
             getLoyaltyAPIKeys.restore();
         });
-        it('should export the order.', () => {
-            exportLoyaltyOrderModel.exportOrderByLocale('payload', 'default');
-            sinon.assert.calledWith(exportSpy, 'payload', { api_key: '123', guid: 'abc' }, 'orders');
-        });
     });
-    describe('getQueuedOrderExportObjects', () => {
-        it('run a query.', () => {
-            assert.equal(exportLoyaltyOrderModel.getQueuedOrderExportObjects(), true);
-        });
-    });
+
 });
