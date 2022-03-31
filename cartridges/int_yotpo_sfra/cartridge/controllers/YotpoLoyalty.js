@@ -202,4 +202,22 @@ server.get('GetCouponCode', server.middleware.https, function (req, res, next) {
     next();
 });
 
+server.get('GetCartridgeInformation', server.middleware.https, function (req, res, next) {
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+    YotpoLogger.logMessage('Received request to fetch single customer',
+        'debug', 'YotpoLoyalty~GetCartridgeInformation');
+    var constants = require('*/cartridge/scripts/utils/constants');
+
+    var result = {
+        status: constants.STATUS_200,
+        responseJSON: {
+            cartridge: {
+                version: constants.YOTPO_CARTRIDGE_VERSION
+            } } };
+
+    res.json(result);
+
+    next();
+});
+
 module.exports = server.exports();

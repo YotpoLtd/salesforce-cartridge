@@ -1,6 +1,6 @@
 'use strict';
 /**
- * @module scripts/job/loyalty/exportLoyaltyCustomers
+ * @module scripts/job/loyalty/backfillLoyaltyCustomers
  *
  * https://documentation.b2c.commercecloud.salesforce.com/DOC1/index.jsp?topic=%2Fcom.demandware.dochelp%2FJobs%2FChunkOrientedScriptModules.html
  *
@@ -19,6 +19,7 @@ var stepCustomersProcessed = 0;
 var chunkCustomersProcessed = 0;
 var stepErrorCount = 0;
 var chunkErrorCount = 0;
+var lastCustomerId = '0';
 var stepSkippedCustomers = [];
 var chunkSkippedCustomers = [];
 
@@ -32,7 +33,10 @@ function beforeStep(parameters, stepExecution) {
     var ExportLoyaltyCustomerModel = require('*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
-    var logLocation = 'exportLoyaltyCustomers~beforeStep';
+    var logLocation = 'backfillLoyaltyCustomers~beforeStep';
+    var constants = require('*/cartridge/scripts/utils/constants');
+    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
+    var yotpoJobsConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_JOBS_CONFIGURATION_OBJECT, constants.YOTPO_JOB_CONFIG_ID);
 
     // reset error flagging in job context
     var jobExecution = stepExecution.getJobExecution();
@@ -53,10 +57,26 @@ function beforeStep(parameters, stepExecution) {
         throw new Error();
     }
 
+    if ('loyaltyCustomerExportComplete' in yotpoJobsConfiguration.custom) {
+        if (yotpoJobsConfiguration.custom.loyaltyCustomerExportComplete) {
+            YotpoLogger.logMessage('Failed to start loyalty Customer Export, Yotpo Loyalty Customer Export is marked as complete in jobs configuration custom object', 'warn', logLocation);
+            jobContext.displayErrorInBm = true;
+            throw new Error();
+        }
+    }
+
+    if ('loyaltyCustomerExportLastId' in yotpoJobsConfiguration.custom) {
+        lastCustomerId = '' + yotpoJobsConfiguration.custom.loyaltyCustomerExportLastId;
+    } else {
+        require('dw/system/Transaction').wrap(function () {
+            yotpoJobsConfiguration.custom.loyaltyCustomerExportLastId = lastCustomerId;
+        });
+    }
+
     YotpoLogger.logMessage('Starting Yotpo Loyalty Customer Export Step Job', 'debug', logLocation);
 
     try {
-        customers = ExportLoyaltyCustomerModel.getQueuedCustomerExportObjects();
+        customers = ExportLoyaltyCustomerModel.getCustomerExportObjectIterator(lastCustomerId);
     } catch (e) {
         // Set error status to job context so it can be checked in the following script step to
         // surface the job error status for the chunk step in the Business Manager.
@@ -84,7 +104,7 @@ function beforeChunk() {
  * @return {number} - Total number of orders retrieved in 'beforeStep'
  */
 function getTotalCount() {
-    return customers.count;
+    return customers.getCount();
 }
 
 /**
@@ -93,8 +113,22 @@ function getTotalCount() {
  * @return {Object} - Customer Object to send to 'process' returns null when there are more objects to read
  */
 function read() {
+    var ExportLoyaltyCustomerModel = require('*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel');
+    var nextCustomer;
     if (customers.hasNext()) {
-        return customers.next();
+        nextCustomer = customers.next();
+        lastCustomerId = '' + nextCustomer.customerNo;
+        return nextCustomer;
+    }
+    customers = ExportLoyaltyCustomerModel.getCustomerExportObjectIterator(lastCustomerId);
+    // Skip next customer to avoid duplicate posting
+    customers.next();
+    if (customers.hasNext()) {
+        nextCustomer = customers.next();
+        if (nextCustomer.customerNo > lastCustomerId) {
+            lastCustomerId = '' + nextCustomer.customerNo;
+            return nextCustomer;
+        }
     }
 
     return null;
@@ -103,50 +137,47 @@ function read() {
 /**
  * Performs any calculations / formatting required
  *
- * @param {Object} customerEventObject - Customer Object to be processed
+ * @param {Object} customerObject - Customer Object to be processed
  * @return {Object} - customerData to be sent to List for 'write' returns null if customer was skipped due to data errors
  */
-function process(customerEventObject) {
-    var ExportLoyaltyCustomerModel = require('*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel');
+function process(customerObject) {
+    var LoyaltyCustomerModel = require('*/cartridge/models/loyalty/common/loyaltyCustomerModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var logLocation = 'exportLoyaltyCustomers~process';
+    var logLocation = 'backfillLoyaltyCustomers~process';
 
     stepCustomersProcessed++;
     chunkCustomersProcessed++;
     var customerData;
-    var customerId;
-    var customerLocale;
+    var customerLocale = 'default';
+
+    if (!customerObject) {
+        return null;
+    }
 
     try {
-        if ('CustomerID' in customerEventObject.custom) {
-            customerId = customerEventObject.custom.CustomerID;
-            if ('Payload' in customerEventObject.custom && customerEventObject.custom.Payload) {
-                customerData = JSON.parse(customerEventObject.custom.Payload);
-            } else {
-                customerData = ExportLoyaltyCustomerModel.generateCustomerExportPayload(customerId);
-            }
-        }
-        if ('locale' in customerEventObject.custom) {
-            customerLocale = customerEventObject.custom.locale;
-        }
+        customerData = LoyaltyCustomerModel.prepareCustomerJSON(customerObject);
     } catch (e) {
         YotpoLogger.logMessage(e, 'error', logLocation);
+    }
+
+    //  If you create a custom locale attribute on the customer object, change the name of that attribute here.  None exists nor is needed by default.
+    if ('locale' in customerObject) {
+        customerLocale = customerObject.locale;
     }
 
     if (!empty(customerData)) {
         return {
             customerLocale: customerLocale,
-            customerId: customerId,
-            customerData: customerData,
-            customerEventObject: customerEventObject
+            customerId: customerObject.customerNo,
+            customerData: customerData
         };
     }
 
     stepErrorCount++;
     chunkErrorCount++;
-    if (!empty(customerId)) {
-        stepSkippedCustomers.push(customerId);
-        chunkSkippedCustomers.push(customerId);
+    if (!empty(customerData.customerNo)) {
+        stepSkippedCustomers.push(customerData.customerNo);
+        chunkSkippedCustomers.push(customerData.customerNo);
     }
 
     return null;
@@ -160,33 +191,29 @@ function process(customerEventObject) {
 function write(events) {
     var ExportLoyaltyCustomerModel = require('*/cartridge/models/loyalty/export/exportLoyaltyCustomerModel');
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var logLocation = 'exportLoyaltyCustomers~write';
-    for (var i = 0; i < events.length; i++) {
-        if (events[i].customerId) {
-            YotpoLogger.logMessage('Writing customer payload to yotpo for customer: ' + events[i].customerId, 'debug', logLocation);
-
-            try {
-                // Throws on error rather than returning status.
-                ExportLoyaltyCustomerModel.exportCustomerByLocale(events[i].customerData, events[i].customerLocale);
-                events[i].customerEventObject.custom.Status = 'SUCCESS'; // eslint-disable-line
-                events[i].customerEventObject.custom.PayloadDeliveryDate = new Date(); // eslint-disable-line
-                // Successfully exported to Yotpo. Update profile
-                var CustomerMgr = require('dw/customer/CustomerMgr');
-                var registeredCustomer = CustomerMgr.getCustomerByCustomerNumber(events[i].customerId);
-                var LoyaltyCustomerModel = require('*/cartridge/models/loyalty/common/loyaltyCustomerModel');
-                LoyaltyCustomerModel.updateLoyaltyInitializedFlag(registeredCustomer);
-                // Blank out the status Details in case this export had previously failed.
-                events[i].customerEventObject.custom.StatusDetails = ''; // eslint-disable-line
-            } catch (errorDetails) {
-                events[i].customerEventObject.custom.Status = 'FAIL'; // eslint-disable-line
-                events[i].customerEventObject.custom.StatusDetails = 'Error Details: ' + errorDetails; // eslint-disable-line
-
-                YotpoLogger.logMessage('Failed to write customer payload to yotpo for customer: ' + events[i].customerId + ' Error: ' + errorDetails, 'error', logLocation);
-            }
-        } else {
-            YotpoLogger.logMessage('Failed to write event, customerId not found', 'error', logLocation);
+    var logLocation = 'backfillLoyaltyCustomers~write';
+    var customersByLocale = events.toArray().reduce(function callback(acc, curval) {
+        var curLocale = curval.customerLocale;
+        if (!acc[curLocale]) {
+            acc[curLocale] = []; // eslint-disable-line no-param-reassign
         }
-    }
+        if (curval.customerId) {
+            acc[curLocale].push(curval.customerData);
+            YotpoLogger.logMessage('Writing customer payload to yotpo for customer: ' + curval.customerId, 'debug', logLocation);
+        }
+        return acc;
+    }, {});
+    Object.keys(customersByLocale).forEach(function (locale) {
+        var customerDataArray = customersByLocale[locale];
+        try {
+            var errorsArray = ExportLoyaltyCustomerModel.exportCustomersByLocale(customerDataArray, locale);
+            if (errorsArray) {
+                YotpoLogger.logMessage('Yotpo customer import, some customers failed to load: ' + customerDataArray + ' Error: ' + errorsArray, 'error', logLocation);
+            }
+        } catch (errorDetails) {
+            YotpoLogger.logMessage('Failed to write customer payload to yotpo for payload: ' + customerDataArray + ' Error: ' + errorDetails, 'error', logLocation);
+        }
+    });
 }
 
 /**
@@ -196,10 +223,13 @@ function write(events) {
  */
 function afterChunk(success) {
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
-    var logLocation = 'exportLoyaltyCustomers~afterChunk';
+    var logLocation = 'backfillLoyaltyCustomers~afterChunk';
     var logMsg = '\n' + chunkErrorCount + ' customers skipped out of ' + chunkCustomersProcessed + ' processed in this chunk';
-    var orderErrorsMsg = 'The following customers where excluded from export in this chunk due to data errors: \n' +
+    var errorsMsg = 'The following customers where excluded from export in this chunk due to data errors: \n' +
     chunkSkippedCustomers.join('\n');
+    var constants = require('*/cartridge/scripts/utils/constants');
+    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
+    var yotpoJobsConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_JOBS_CONFIGURATION_OBJECT, constants.YOTPO_JOB_CONFIG_ID);
 
     if (success) {
         yotpoLogger.logMessage('Yotpo Customer Export chunk completed successfully. \n ' + logMsg, 'debug', logLocation);
@@ -208,7 +238,13 @@ function afterChunk(success) {
     }
 
     if (chunkErrorCount > 0) {
-        yotpoLogger.logMessage(logMsg + '\n' + orderErrorsMsg, 'error', logLocation);
+        yotpoLogger.logMessage(logMsg + '\n' + errorsMsg, 'error', logLocation);
+    }
+
+    if (lastCustomerId && lastCustomerId !== '0') {
+        require('dw/system/Transaction').wrap(function () {
+            yotpoJobsConfiguration.custom.loyaltyCustomerExportLastId = lastCustomerId;
+        });
     }
 }
 
@@ -223,9 +259,12 @@ function afterStep(success, parameters, stepExecution) {
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var constants = require('*/cartridge/scripts/utils/constants');
 
+    var CustomObjectMgr = require('dw/object/CustomObjectMgr');
+    var yotpoJobsConfiguration = CustomObjectMgr.getCustomObject(constants.YOTPO_JOBS_CONFIGURATION_OBJECT, constants.YOTPO_JOB_CONFIG_ID);
+
     var jobExecution = stepExecution.getJobExecution();
     var jobContext = jobExecution.getContext();
-    var logLocation = 'exportLoyaltyCustomers~afterStep';
+    var logLocation = 'backfillLoyaltyCustomers~afterStep';
     var logMsg = '\n' + stepErrorCount + ' customers skipped out of ' + stepCustomersProcessed + ' processed in this step \n' +
     'Total number of customers to be exported: ' + getTotalCount();
     var customersErrorsMsg = 'The following customers where excluded from export in this job execution due to data errors: \n' +
@@ -233,6 +272,9 @@ function afterStep(success, parameters, stepExecution) {
 
     if (success) {
         yotpoLogger.logMessage('Yotpo Customer Export step completed successfully. \n ' + logMsg, 'debug', logLocation);
+        require('dw/system/Transaction').wrap(function () {
+            yotpoJobsConfiguration.custom.loyaltyCustomerExportComplete = true;
+        });
     } else {
         yotpoLogger.logMessage('Yotpo Customer Export step failed. \n ' + logMsg, 'error', logLocation);
     }

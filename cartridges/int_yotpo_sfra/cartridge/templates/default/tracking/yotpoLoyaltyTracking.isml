@@ -6,6 +6,7 @@
             data-authenticated="true"
             data-email="${pdict.customerDetails.customerEmail}"
             data-id="${pdict.customerDetails.customerNo}"
+            data-token="${pdict.customerDetails.token}"
             data-tags="${pdict.customerDetails.customerGroups}" >
         </div>
     </isif>
@@ -18,3 +19,7 @@
         </div>
     </isif>
 </isif>
+<div style="display:none;"
+    id="cart-api-details"
+    data-api-endpoint="${dw.web.URLUtils.abs('YotpoAPI')}"> <iscomment>Note this is deliberately missing the controller's route(s) as they're known to Yotpo and will be assembled for calling.</iscomment>
+</div>

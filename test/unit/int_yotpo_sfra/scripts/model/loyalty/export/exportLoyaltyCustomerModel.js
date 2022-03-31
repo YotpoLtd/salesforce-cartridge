@@ -41,26 +41,11 @@ describe('exportLoyaltyCustomerModel', () => {
             getLoyaltyAPIKeys: () => { return { guid: 'guid', key: 'apikey' }; }
         }
     });
-
-    describe('generateCustomerExportPayload', () => {
-        it('should get a customer back.', () => {
-            LoyaltyCustomerModelStub.prepareCustomerJSON.returns(true);
-            let fakeCustomerJson = exportLoyaltyCustomerModel.generateCustomerExportPayload('cust123');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/.*Customer Number: cust123/), 'debug', 'ExportLoyaltyCustomerModel~generateCustomerExportPayload');
-            sinon.assert.calledWithMatch(LoyaltyCustomerModelStub.prepareCustomerJSON, { status: true });
-            assert.equal(fakeCustomerJson, true);
-        });
-    });
-    describe('exportCustomerByLocale', () => {
+    describe('exportCustomersByLocale', () => {
         it('should export a customer.', () => {
-            exportLoyaltyCustomerModel.exportCustomerByLocale('fakepayload', 'default');
-            sinon.assert.calledWithMatch(serviceSpy.exportData, 'fakepayload', { api_key: 'apikey', guid: 'guid' }, 'customers');
+            exportLoyaltyCustomerModel.exportCustomersByLocale('fakepayload', 'default');
+            sinon.assert.calledWithMatch(serviceSpy.exportData, { customers: "fakepayload" }, { api_key: 'apikey', guid: 'guid' }, 'customers');
         });
     });
 
-    describe('getQueuedCustomerExportObjects', () => {
-        it('run a query.', () => {
-            assert.equal(exportLoyaltyCustomerModel.getQueuedCustomerExportObjects(), true);
-        });
-    });
 });

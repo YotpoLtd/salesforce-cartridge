@@ -9,14 +9,23 @@ var LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
 
 var loyaltyService = LocalServiceRegistry.createService('int_yotpo_sfra.https.post.loyalty.api', {
 
+    // eslint-disable-next-line no-unused-vars
+    mockExec: function (svc, params) {
+        return {
+            123412887: 'Unknown Error',
+            123412889: 'Invalid email address',
+            123412890: 'Missing value, sfcc_id'
+        };
+    },
+
     createRequest: function (svc, args) {
         svc.addHeader('Content-Type', 'application/json; charset=utf-8');
 
         return args;
     },
 
-    parseResponse: function (svc, client) {
-        return client.text;
+    parseResponse: function (svc, rawResponse) {
+        return rawResponse;
     },
 
     // Hide sensitive data in server request and response logs
