@@ -641,7 +641,7 @@ function prepareOrderData(order, dateTimes) {
             constants.EXPORT_ORDER_MISSING_MANDATORY_FIELDS_ERROR + ': ' + errorMsgs.join(', '));
     }
 
-    yotpoLogger.logMessage('Mandatory data present continuing with export of order' + orderNo + '\n' +
+    yotpoLogger.logMessage('Mandatory data present continuing with export of order ' + orderNo + '\n' +
         ' Last Execution Time: ' + dateTimes.orderFeedJobLastExecutionTime + '\n' +
         ' Current Execution Time: ' + dateTimes.currentDateTime, 'debug', logLocation);
 
@@ -846,7 +846,7 @@ function exportOrdersByLocale(configAndRequestsByLocale) {
         if (!empty(orderRequestData.orders)) {
             model.sendOrdersToYotpo(orderRequestData, localeAppKey, locale, true);
         } else {
-            yotpoLogger.logMessage('Purchase feed export skipped for Locale ID: ' + locale + 'because there were no orders to process for that locale', 'debug', logLocation);
+            yotpoLogger.logMessage('Purchase feed export skipped for Locale ID: ' + locale + ' because there were no orders to process for that locale', 'debug', logLocation);
         }
     });
 }
@@ -873,7 +873,7 @@ function addOrderDataToRequests(ordersData, configAndRequestsByLocale) {
 }
 
 /**
- * It updates the Yotop Configuration object. It updates the last execution time of order process job with currentDateTime.
+ * It updates the Yotpo Configuration object. It updates the last execution time of order process job with currentDateTime.
  *
  * @param {Date} currentDateTime - The current date time.
  *
