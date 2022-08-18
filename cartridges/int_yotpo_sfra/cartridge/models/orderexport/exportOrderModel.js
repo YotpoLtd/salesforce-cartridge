@@ -127,10 +127,11 @@ function validateLocaleConfigData(yotpoConfigurations, yotpoJobConfiguration) {
  * @param {Date} orderFeedJobLastExecutionTime - Date and time when the order feed job last executed
  * @param {Date} currentDateTime - Current Date and time
  * @param {Object} localesToProcess - List of locales to export orders for
+ * @param {string} sortRule - Optional, specifies how to sort the search results. Defaults to 'orderNo ASC'
  *
  * @returns {Iterator} ordersIterator - The order list to be exported
  */
-function searchOrders(orderFeedJobLastExecutionTime, currentDateTime, localesToProcess) {
+function searchOrders(orderFeedJobLastExecutionTime, currentDateTime, localesToProcess, sortRule) {
     var Order = require('dw/order/Order');
     var OrderMgr = require('dw/order/OrderMgr');
 
@@ -148,7 +149,7 @@ function searchOrders(orderFeedJobLastExecutionTime, currentDateTime, localesToP
     }
     queryString += ')';
 
-    var sortString = 'orderNo ASC';
+    var sortString = sortRule || 'orderNo ASC';
 
     var queryArgs = [
         queryString,
