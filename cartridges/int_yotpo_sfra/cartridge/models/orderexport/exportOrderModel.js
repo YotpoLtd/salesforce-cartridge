@@ -127,10 +127,11 @@ function validateLocaleConfigData(yotpoConfigurations, yotpoJobConfiguration) {
  * @param {Date} orderFeedJobLastExecutionTime - Date and time when the order feed job last executed
  * @param {Date} currentDateTime - Current Date and time
  * @param {Object} localesToProcess - List of locales to export orders for
+ * @param {string} sortRule - Optional, specifies how to sort the search results. Defaults to 'orderNo ASC'
  *
  * @returns {Iterator} ordersIterator - The order list to be exported
  */
-function searchOrders(orderFeedJobLastExecutionTime, currentDateTime, localesToProcess) {
+function searchOrders(orderFeedJobLastExecutionTime, currentDateTime, localesToProcess, sortRule) {
     var Order = require('dw/order/Order');
     var OrderMgr = require('dw/order/OrderMgr');
 
@@ -148,7 +149,7 @@ function searchOrders(orderFeedJobLastExecutionTime, currentDateTime, localesToP
     }
     queryString += ')';
 
-    var sortString = 'orderNo ASC';
+    var sortString = sortRule || 'orderNo ASC';
 
     var queryArgs = [
         queryString,
@@ -641,7 +642,7 @@ function prepareOrderData(order, dateTimes) {
             constants.EXPORT_ORDER_MISSING_MANDATORY_FIELDS_ERROR + ': ' + errorMsgs.join(', '));
     }
 
-    yotpoLogger.logMessage('Mandatory data present continuing with export of order' + orderNo + '\n' +
+    yotpoLogger.logMessage('Mandatory data present continuing with export of order ' + orderNo + '\n' +
         ' Last Execution Time: ' + dateTimes.orderFeedJobLastExecutionTime + '\n' +
         ' Current Execution Time: ' + dateTimes.currentDateTime, 'debug', logLocation);
 
@@ -846,7 +847,7 @@ function exportOrdersByLocale(configAndRequestsByLocale) {
         if (!empty(orderRequestData.orders)) {
             model.sendOrdersToYotpo(orderRequestData, localeAppKey, locale, true);
         } else {
-            yotpoLogger.logMessage('Purchase feed export skipped for Locale ID: ' + locale + 'because there were no orders to process for that locale', 'debug', logLocation);
+            yotpoLogger.logMessage('Purchase feed export skipped for Locale ID: ' + locale + ' because there were no orders to process for that locale', 'debug', logLocation);
         }
     });
 }
@@ -873,7 +874,7 @@ function addOrderDataToRequests(ordersData, configAndRequestsByLocale) {
 }
 
 /**
- * It updates the Yotop Configuration object. It updates the last execution time of order process job with currentDateTime.
+ * It updates the Yotpo Configuration object. It updates the last execution time of order process job with currentDateTime.
  *
  * @param {Date} currentDateTime - The current date time.
  *

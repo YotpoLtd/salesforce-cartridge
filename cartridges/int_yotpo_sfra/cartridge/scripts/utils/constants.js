@@ -21,7 +21,7 @@ exports.YOTPO_CONFIGURATION_OBJECT = 'yotpoConfiguration';
 exports.YOTPO_JOBS_CONFIGURATION_OBJECT = 'yotpoJobsConfiguration';
 exports.DATE_FORMAT_FOR_YOTPO_DATA = 'yyyy-MM-dd';
 exports.PLATFORM_FOR_YOTPO_DATA = 'commerce_cloud';
-exports.YOTPO_CARTRIDGE_VERSION = '21.2.1';
+exports.YOTPO_CARTRIDGE_VERSION = '21.3.0';
 exports.REGEX_BASE_FOR_YOTPO_DATA = '^0-9a-zA-Z';
 exports.REGEX_FOR_YOTPO_DATA_SAFE_SPECIAL_CHARS = ':,\\.\\?\\!\\|\\+\\_\\-=\\$\\*#%& ';
 exports.REGEX_FOR_YOTPO_PRODUCT_ID_DATA_SAFE_SPECIAL_CHARS = '\\_\\- ';

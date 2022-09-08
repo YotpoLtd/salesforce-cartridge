@@ -23,6 +23,8 @@ var stepErrorCount = 0;
 var chunkErrorCount = 0;
 var stepSkippedOrders = [];
 var chunkSkippedOrders = [];
+var originalLastExecutionDateTime;
+var latestOrderDateTime;
 
 /**
  * Performs search
@@ -53,12 +55,14 @@ function beforeStep(parameters, stepExecution) {
     var localesToProcess;
     try {
         localesToProcess = exportOrderModelInstance.validateLocaleConfigData(yotpoConfigurations, yotpoJobConfiguration);
+        originalLastExecutionDateTime = yotpoJobConfiguration.orderFeedJobLastExecutionTime;
 
         // Get all non-exported orders
         orders = exportOrderModelInstance.searchOrders(
             yotpoJobConfiguration.orderFeedJobLastExecutionTime,
             yotpoJobConfiguration.currentDateTime,
-            localesToProcess
+            localesToProcess,
+            'creationDate ASC'
         );
     } catch (e) {
         // Set error status to job context so it can be checked in the following script step to
@@ -118,6 +122,7 @@ function process(order) {
 
     stepOrdersProcessed++;
     chunkOrdersProcessed++;
+    latestOrderDateTime = order.creationDate;
 
     var orderLocale = order.customerLocaleID;
 
@@ -182,7 +187,16 @@ function afterChunk(success) {
         yotpoLogger.logMessage('Yotpo Order Export chunk completed successfully. \n ' + logMsg, 'debug', logLocation);
         var ExportOrderModel = require('*/cartridge/models/orderexport/exportOrderModel');
         var exportOrderModelInstance = new ExportOrderModel();
-        exportOrderModelInstance.updateJobExecutionTime(yotpoJobConfiguration.currentDateTime);
+
+        var isSameTime = originalLastExecutionDateTime.valueOf() === latestOrderDateTime.valueOf();
+        if (isSameTime) {
+            yotpoLogger.logMessage('New job execution time is identical to previous value; shifting ahead one minute to prevent endless loop', 'error', logLocation);
+            var newTimeVal = latestOrderDateTime.valueOf() + 60000;
+            var newDateTime = new Date(newTimeVal);
+            exportOrderModelInstance.updateJobExecutionTime(newDateTime);
+        } else {
+            exportOrderModelInstance.updateJobExecutionTime(latestOrderDateTime);
+        }
     } else {
         yotpoLogger.logMessage('Yotpo Order Export chunk failed. \n ' + logMsg, 'error', logLocation);
     }
