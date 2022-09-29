@@ -153,7 +153,7 @@ function getOrderDiscounts(order) {
         couponCodes.push(couponLineItem.couponCode);
     }
 
-    discounts.orderDiscount = YotpoUtils.convertPriceIntoCents(orderDiscount);
+    discounts.orderDiscount = YotpoUtils.convertPriceIntoCents(orderDiscount, order.getCurrencyCode());
     discounts.couponCodes = couponCodes;
     discounts.giftCertificates = giftCertificates;
 
@@ -187,6 +187,7 @@ function prepareOrderLineItemsJSON(order) {
     var productAdjustedTax;
     var productTax;
     var productTaxBasis;
+    var currencyCode = order.getCurrencyCode();
 
     var prodLineItemIt = order.getAllProductLineItems().iterator();
     while (prodLineItemIt.hasNext()) {
@@ -200,8 +201,8 @@ function prepareOrderLineItemsJSON(order) {
 
         productID = YotpoUtils.escape(product.ID, Constants.PRODUCT_REGEX_FOR_YOTPO_DATA, '-');
         productName = empty(product.name) ? ' ' : YotpoUtils.escape(product.name, Constants.REGEX_FOR_YOTPO_DATA, '');
-        productPrice = YotpoUtils.convertPriceIntoCents(productLineItem.getGrossPrice().getValueOrNull());
-        productBasePrice = YotpoUtils.convertPriceIntoCents(productLineItem.getBasePrice().getValueOrNull());
+        productPrice = YotpoUtils.convertPriceIntoCents(productLineItem.getGrossPrice().getValueOrNull(), currencyCode);
+        productBasePrice = YotpoUtils.convertPriceIntoCents(productLineItem.getBasePrice().getValueOrNull(), currencyCode);
         productCategory = YotpoUtils.getCategoryPath(product);
         if (productLineItem.custom) {
             if ('swellRedemptionId' in productLineItem.custom) {
@@ -211,9 +212,9 @@ function prepareOrderLineItemsJSON(order) {
                 swellPointsUsed = productLineItem.custom.swellPointsUsed;
             }
         }
-        productAdjustedTax = YotpoUtils.convertPriceIntoCents(productLineItem.getAdjustedTax().getValueOrNull());
-        productTax = YotpoUtils.convertPriceIntoCents(productLineItem.getTax().getValueOrNull());
-        productTaxBasis = YotpoUtils.convertPriceIntoCents(productLineItem.getTaxBasis().getValueOrNull());
+        productAdjustedTax = YotpoUtils.convertPriceIntoCents(productLineItem.getAdjustedTax().getValueOrNull(), currencyCode);
+        productTax = YotpoUtils.convertPriceIntoCents(productLineItem.getTax().getValueOrNull(), currencyCode);
+        productTaxBasis = YotpoUtils.convertPriceIntoCents(productLineItem.getTaxBasis().getValueOrNull(), currencyCode);
 
         if (product.productSet) {
             productType = 'productSet';
@@ -282,10 +283,11 @@ function prepareOrderJSON(order) {
         throw Constants.YOTPO_ORDER_MISSING_ERROR;
     }
     var orderJSON;
+    var orderCurrencyCode = order.getCurrencyCode();
 
     try {
         var orderCreationDate = order.creationDate.toISOString();
-        var orderTotalPrice = YotpoUtils.convertPriceIntoCents(order.totalGrossPrice.value);
+        var orderTotalPrice = YotpoUtils.convertPriceIntoCents(order.totalGrossPrice.value, orderCurrencyCode);
 
         var customerProfile = order.customer.profile;
         var customerEmail = null;
@@ -369,23 +371,23 @@ function prepareOrderJSON(order) {
             orderPriceAjustments.push(priceAjustment);
         }
 
-        var adjustedMerchandizeTotalTax = YotpoUtils.convertPriceIntoCents(order.getAdjustedMerchandizeTotalTax().getValueOrNull());
-        var adjustedShippingTotalTax = YotpoUtils.convertPriceIntoCents(order.getAdjustedShippingTotalTax().getValueOrNull());
-        var merchandizeTotalTax = YotpoUtils.convertPriceIntoCents(order.getMerchandizeTotalTax().getValueOrNull());
-        var shippingTotal = YotpoUtils.convertPriceIntoCents(order.getShippingTotalPrice().getValueOrNull());
-        var shippingTotalTax = YotpoUtils.convertPriceIntoCents(order.getShippingTotalTax().getValueOrNull());
+        var adjustedMerchandizeTotalTax = YotpoUtils.convertPriceIntoCents(order.getAdjustedMerchandizeTotalTax().getValueOrNull(), orderCurrencyCode);
+        var adjustedShippingTotalTax = YotpoUtils.convertPriceIntoCents(order.getAdjustedShippingTotalTax().getValueOrNull(), orderCurrencyCode);
+        var merchandizeTotalTax = YotpoUtils.convertPriceIntoCents(order.getMerchandizeTotalTax().getValueOrNull(), orderCurrencyCode);
+        var shippingTotal = YotpoUtils.convertPriceIntoCents(order.getShippingTotalPrice().getValueOrNull(), orderCurrencyCode);
+        var shippingTotalTax = YotpoUtils.convertPriceIntoCents(order.getShippingTotalTax().getValueOrNull(), orderCurrencyCode);
         var shippingStatus = order.getShippingStatus().getDisplayValue();
         var paymentStatus = order.getPaymentStatus().getDisplayValue();
-        var giftCertificateTotalTax = YotpoUtils.convertPriceIntoCents(order.getGiftCertificateTotalTax().getValueOrNull());
-        var taxTotal = YotpoUtils.convertPriceIntoCents(order.getTotalTax().getValueOrNull());
+        var giftCertificateTotalTax = YotpoUtils.convertPriceIntoCents(order.getGiftCertificateTotalTax().getValueOrNull(), orderCurrencyCode);
+        var taxTotal = YotpoUtils.convertPriceIntoCents(order.getTotalTax().getValueOrNull(), orderCurrencyCode);
         var productSubTotal = 0;
         var productTotal = 0;
 
         var orderProductsLineItemsIt = order.getAllProductLineItems().iterator();
         while (orderProductsLineItemsIt.hasNext()) {
             var productLineItem = orderProductsLineItemsIt.next();
-            productSubTotal += YotpoUtils.convertPriceIntoCents(productLineItem.getBasePrice().getValueOrNull());
-            productTotal += YotpoUtils.convertPriceIntoCents(productLineItem.getGrossPrice().getValueOrNull());
+            productSubTotal += YotpoUtils.convertPriceIntoCents(productLineItem.getBasePrice().getValueOrNull(), orderCurrencyCode);
+            productTotal += YotpoUtils.convertPriceIntoCents(productLineItem.getGrossPrice().getValueOrNull(), orderCurrencyCode);
         }
 
         orderJSON = {

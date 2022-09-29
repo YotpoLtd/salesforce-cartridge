@@ -252,16 +252,25 @@ function appendParamsToUrl(url, params) {
 }
 
 /**
- * This function is used to convert the price into cents
+ * This function is used to convert the price into cents (or whatever the smallest subunit of the specified currency is)
  *
- * @param {number} price : The price which needs to be convert.
+ * @param {number} price : The price which needs to be converted.
+ * @param {string} currencyCode : The currency code for the given price.
  *
- * @return {number} priceCents : The converted price into cents.
+ * @return {number} priceCents : The converted price in cents.
  */
-function convertPriceIntoCents(price) {
+function convertPriceIntoCents(price, currencyCode) {
+    var Currency = require('dw/util/Currency');
     var priceCents = 0;
     if (price !== null) {
-        priceCents = price * 100;
+        var currency = Currency.getCurrency(currencyCode);
+        if (currency !== null) {
+            var currencyFractionDigits = Currency.getCurrency(currencyCode).getDefaultFractionDigits();
+            priceCents = price * (Math.pow(10, currencyFractionDigits));
+        } else {
+            // default to assuming 2 fraction digits if currency is unknown
+            priceCents = price * 100;
+        }
     }
     return priceCents;
 }
