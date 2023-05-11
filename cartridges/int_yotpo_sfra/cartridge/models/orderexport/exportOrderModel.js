@@ -663,13 +663,17 @@ function prepareOrderData(order, dateTimes) {
 
     // Skipping order if there are no products
     if (!empty(products)) {
-        orderData = yotpoUtils.extendObject(customerData,
-            {
-                order_id: orderNo,
-                order_date: yotpoUtils.formatDateTime(order.creationDate),
-                currency_iso: order.currencyCode,
-                products: products
-            });
+        // do not include order data if no products are returned
+        var emptyObject = (typeof products === 'object' && Object.keys(products).length === 0);
+        if (!emptyObject) {
+            orderData = yotpoUtils.extendObject(customerData,
+                {
+                    order_id: orderNo,
+                    order_date: yotpoUtils.formatDateTime(order.creationDate),
+                    currency_iso: order.currencyCode,
+                    products: products
+                });
+        }
     }
 
     return orderData;
