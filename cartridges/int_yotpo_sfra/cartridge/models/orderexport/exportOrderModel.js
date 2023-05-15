@@ -662,18 +662,15 @@ function prepareOrderData(order, dateTimes) {
     }
 
     // Skipping order if there are no products
-    if (!empty(products)) {
-        // do not include order data if no products are returned
-        var emptyObject = (typeof products === 'object' && Object.keys(products).length === 0);
-        if (!emptyObject) {
-            orderData = yotpoUtils.extendObject(customerData,
-                {
-                    order_id: orderNo,
-                    order_date: yotpoUtils.formatDateTime(order.creationDate),
-                    currency_iso: order.currencyCode,
-                    products: products
-                });
-        }
+    var emptyObject = (typeof products === 'object' && Object.keys(products).length === 0);
+    if (!empty(products) && !emptyObject) {
+        orderData = yotpoUtils.extendObject(customerData,
+            {
+                order_id: orderNo,
+                order_date: yotpoUtils.formatDateTime(order.creationDate),
+                currency_iso: order.currencyCode,
+                products: products
+            });
     }
 
     return orderData;
