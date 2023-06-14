@@ -662,7 +662,8 @@ function prepareOrderData(order, dateTimes) {
     }
 
     // Skipping order if there are no products
-    if (!empty(products)) {
+    var emptyObject = (typeof products === 'object' && Object.keys(products).length === 0);
+    if (!empty(products) && !emptyObject) {
         orderData = yotpoUtils.extendObject(customerData,
             {
                 order_id: orderNo,
