@@ -189,7 +189,8 @@ function afterChunk(success) {
         var exportOrderModelInstance = new ExportOrderModel();
 
         if (empty(latestOrderDateTime)) {
-            yotpoLogger.logMessage('No orders to process. Ending job to avoid errors');
+            // exiting job here to prevent the comparison below from blowing up if latestOrderDateTime is undefined
+            yotpoLogger.logMessage('No orders to process. Exiting job.');
             return;
         }
 
