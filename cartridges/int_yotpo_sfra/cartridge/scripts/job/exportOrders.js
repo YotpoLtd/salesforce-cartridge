@@ -188,6 +188,12 @@ function afterChunk(success) {
         var ExportOrderModel = require('*/cartridge/models/orderexport/exportOrderModel');
         var exportOrderModelInstance = new ExportOrderModel();
 
+        if (empty(latestOrderDateTime)) {
+            // exiting job here to prevent the comparison below from blowing up if latestOrderDateTime is undefined
+            yotpoLogger.logMessage('No orders to process. Exiting job.');
+            return;
+        }
+
         var isSameTime = originalLastExecutionDateTime.valueOf() === latestOrderDateTime.valueOf();
         if (isSameTime) {
             yotpoLogger.logMessage('New job execution time is identical to previous value; shifting ahead one minute to prevent endless loop', 'error', logLocation);
