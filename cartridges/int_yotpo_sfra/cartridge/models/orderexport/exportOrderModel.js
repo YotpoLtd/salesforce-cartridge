@@ -671,6 +671,8 @@ function prepareOrderData(order, dateTimes) {
                 currency_iso: order.currencyCode,
                 products: products
             });
+    } else {
+        throw new Error('Skipping order ' + orderNo + ' in the export due to empty products array. No products or gift cards in order.');
     }
 
     return orderData;
