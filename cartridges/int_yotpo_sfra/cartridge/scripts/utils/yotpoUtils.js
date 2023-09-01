@@ -178,7 +178,8 @@ function cleanDataForExport(text, type, replacement, safeChars) {
         defaultedText = escape(defaultedText, regEx, defaultedReplacement);
     }
 
-    return defaultedText;
+    // trim off extra spaces in case there was a space in the text but everything else got replaced, leaving only a space
+    return defaultedText.trim();
 }
 
 /**
