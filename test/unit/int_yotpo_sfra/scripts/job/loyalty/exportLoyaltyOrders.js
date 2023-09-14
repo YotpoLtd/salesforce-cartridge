@@ -220,7 +220,7 @@ describe('exportLoyaltyOrders job', () => {
             constants.EXPORT_ORDER_ERROR_COUNT_THRESHOLD = 100;
             exportLoyaltyOrders.afterStep(false, {}, stepExecution);
             sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/1 Orders skipped out of 2 processed in this step /), 'error', 'exportLoyaltyOrders~afterStep');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/The following Orders where excluded from export in this job execution due to data errors:/), 'error', 'exportLoyaltyOrders~afterStep');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/The following Orders were excluded from export in this job execution due to data errors:/), 'error', 'exportLoyaltyOrders~afterStep');
             constants.EXPORT_ORDER_ERROR_COUNT_THRESHOLD = 0.3;
         });
     });

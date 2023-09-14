@@ -267,8 +267,18 @@ describe('yotpoUtils', () => {
     });
 
     describe('cleanDataForExport', () => {
-        const baseText = 'abcdefghijklmnopqrstuvwxyz0123456789:,.?!|+_-=$*#%& ';
+        const baseText = ' abcdefghijklmnopqrstuvwxyz0123456789:,.?!|+_-=$*#%& ';
         const badChars = '@^(){}[]\\/<>~`';
+
+        it('should return "" when text is only empty space', () => {
+            const result = yotpoUtils.cleanDataForExport('   ', 'product');
+            assert.equal(result, '');
+        });
+
+        it('should return trimmed value when text has leading or trailing spaces', () => {
+            const result = yotpoUtils.cleanDataForExport(' a  ', 'product');
+            assert.equal(result, 'a');
+        });
 
         it('should return "" when text is empty', () => {
             const result = yotpoUtils.cleanDataForExport('', 'product');
@@ -277,7 +287,7 @@ describe('yotpoUtils', () => {
 
         it('should return ' + baseText, () => {
             const result = yotpoUtils.cleanDataForExport(baseText + badChars, 'product');
-            assert.equal(result, baseText);
+            assert.equal(result, baseText.trim());
         });
 
         it('should return abcdefghijklmnopqrstuvwxyz0123456789-_--', () => {
@@ -287,7 +297,7 @@ describe('yotpoUtils', () => {
 
         it('should return ' + baseText, () => {
             const result = yotpoUtils.cleanDataForExport(baseText + badChars, 'order');
-            assert.equal(result, baseText);
+            assert.equal(result, baseText.trim());
         });
 
         it('should return ' + baseText, () => {

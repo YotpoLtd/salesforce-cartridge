@@ -180,7 +180,7 @@ function afterChunk(success) {
     var yotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
     var logLocation = 'exportOrders~afterChunk';
     var logMsg = '\n' + chunkErrorCount + ' orders skipped out of ' + chunkOrdersProcessed + ' processed in this chunk';
-    var orderErrorsMsg = 'The following orders where excluded from export in this chunk due to data errors: \n' +
+    var orderErrorsMsg = 'The following orders were excluded from export in this chunk due to data errors: \n' +
     chunkSkippedOrders.join('\n');
 
     if (success) {
@@ -228,7 +228,7 @@ function afterStep(success, parameters, stepExecution) {
     var logLocation = 'exportOrders~afterStep';
     var logMsg = '\n' + stepErrorCount + ' orders skipped out of ' + stepOrdersProcessed + ' processed in this step \n' +
     'Total number of orders to be exported: ' + getTotalCount();
-    var orderErrorsMsg = 'The following orders where excluded from export in this job execution due to data errors: \n' +
+    var orderErrorsMsg = 'The following orders were excluded from export in this job execution due to data errors: \n' +
         stepSkippedOrders.join('\n');
 
     if (success) {
