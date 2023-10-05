@@ -179,7 +179,7 @@ function cleanDataForExport(text, type, replacement, safeChars) {
     }
 
     // trim off extra spaces in case there was a space in the text but everything else got replaced, leaving only a space
-    return defaultedText.trim();
+    return defaultedText;//.trim(); ADD THIS BACK, REMOVED FOR TESTING
 }
 
 /**

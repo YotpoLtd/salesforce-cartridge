@@ -819,9 +819,21 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
                     throw new Error(authErrorMsg);
                 }
             } else if (responseStatus.unknownError) {
+                // Changing how we're doing this. No longer throwing an error, but instead using a counter on orders
                 // Some other error occurred we should terminate here
-                throw new Error(constants.EXPORT_ORDER_SERVICE_ERROR + ': An unknown error occurred while attempting to communicate with the Yotpo service');
+                // throw new Error(constants.EXPORT_ORDER_SERVICE_ERROR + ': An unknown error occurred while attempting to communicate with the Yotpo service');
+
+                // Go through orders that were sent
+                // Mark ones successfully sent as SENT (custom.yotpoPurchaseFeedSentStatus=SENT)
+                // when order that caused the error is found...
+                // increment order custom.yotpoPurchaseFeedSendAttemptCount
+                // set order custom.yotpoPurchaseFeedLastSendAttemptDate as current date
+                // if job returned a 400 error code, mark order custom.yotpoPurchaseFeedSentStatus=FAIL
+                // if counter is past threshold, mark order custom.yotpoPurchaseFeedSentStatus=FAIL
             }
+        } else {
+            // success
+            // mark all sent orders custom.yotpoPurchaseFeedSendStatus=SENT
         }
     } catch (e) {
         yotpoLogger.logMessage('Error occurred while trying to upload feed - ' + e, 'error', logLocation);
