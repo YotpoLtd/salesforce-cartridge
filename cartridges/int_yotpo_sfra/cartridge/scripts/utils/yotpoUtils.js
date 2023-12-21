@@ -15,7 +15,9 @@
  * @returns {string} escapedText
  */
 function escape(text, regex, replacement) {
-    if (!text) {
+    // undefined regex causes slightly different behavior of .replace() between compatibility modes
+    // so make sure we have regex instead of just assuming that .replace() will just return the text
+    if (!text || !regex) {
         return text;
     }
 
