@@ -1,7 +1,7 @@
 {
     "name": "link_yotpo",
     "packageName": "int_yotpo_sfra",
-    "version": "21.5.1",
+    "version": "21.5.2",
     "description": "Yotpo ratings and reviews integration for SFCC Storefront Reference Architecture",
     "author": "CQL Inc.",
     "main": "index.js",
