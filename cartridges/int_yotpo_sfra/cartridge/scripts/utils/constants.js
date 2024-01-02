@@ -23,6 +23,8 @@ exports.DATE_FORMAT_FOR_YOTPO_DATA = 'yyyy-MM-dd';
 exports.PLATFORM_FOR_YOTPO_DATA = 'commerce_cloud';
 exports.YOTPO_CARTRIDGE_VERSION = '21.5.1';
 exports.REGEX_BASE_FOR_YOTPO_DATA = '^0-9a-zA-Z';
+exports.PRODUCT_REGEX_FOR_YOTPO_DATA = '[^0-9a-zA-Z\\_\\-]+';
+exports.REGEX_FOR_YOTPO_DATA = '[^0-9a-zA-Z\\s\\_\\-]+'; // allowing whitespace in this one
 exports.REGEX_FOR_YOTPO_DATA_SAFE_SPECIAL_CHARS = ':,\\.\\?\\!\\|\\+\\_\\-=\\$\\*#%& ';
 exports.REGEX_FOR_YOTPO_PRODUCT_ID_DATA_SAFE_SPECIAL_CHARS = '\\_\\- ';
 // RFC 5322 Official Standard regex
