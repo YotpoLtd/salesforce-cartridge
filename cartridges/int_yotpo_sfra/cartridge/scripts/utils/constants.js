@@ -30,6 +30,8 @@ exports.REGEX_FOR_YOTPO_PRODUCT_ID_DATA_SAFE_SPECIAL_CHARS = '\\_\\- ';
 // The email validation regex that the Yotpo API is using (PCRE2 flavor): /\A\s*([#-\\p{L}\\d+._" : "^@\\s]{1,64})@((?:[-\p{L}\d]+\.)+\p{L}{2,})\s*\z/i
 // The below email regex is that regex converted to work with JavaScript
 // The regex that the API uses may not be RFC-compliant, but it seems like it covers the majority of good/bad email cases correctly.
+// Previously an RFC-spec regex was used, but it allowed some emails through that the Yotpo API rejected, so this was updated to match the
+// regex used by the Yotpo API as close as possible.
 // Note that this regex will filter out potentially valid email addresses if they use certain special unicode characters.
 exports.EMAIL_VALIDATION_REGEX_FOR_YOTPO_DATA = /^\s*([#-\u002D\u002E\u003A-\u0040a-zA-Z0-9_" /\[\\^\{\}]{1,64})@((?:[-a-zA-Z0-9\u00AA\u00B5\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u0100]+\.)+[a-zA-Z\u00AA\u00B5\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u0100]{2,})\s*$/i;  // eslint-disable-line
 exports.EMAIL_REGEX_FOR_YOTPO_DATA = ' ';
