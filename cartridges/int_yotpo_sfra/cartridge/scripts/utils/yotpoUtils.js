@@ -98,7 +98,7 @@ function getCurrentLocaleSFRA(currentLocaleID) {
 }
 
 /**
- * Validates given email address based on RFC 5322 Official Standard regex
+ * Validates given email address based on regex used by the Yotpo API (see constants.js)
  * @param {string} emailAddress email address to validate
  * @returns {boolean} true if email is valid based on regex
  */
