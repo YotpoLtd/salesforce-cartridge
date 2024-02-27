@@ -33,7 +33,7 @@ function getRatingsOrReviewsData(currentLocale, productId) {
         return {
             isReviewsEnabled: yotpoConfig.isReviewsEnabled,
             isRatingsEnabled: yotpoConfig.isRatingsEnabled,
-            yotpoAppKey: yotpoConfig.yotpoAppKey,
+            yotpoAppKey: yotpoConfig.appKey,
             domainAddress: yotpoConfig.domainAddress,
             productID: yotpoUtils.escape(currentProduct.ID, '([\/])', '-'),
             productName: currentProduct.name,
