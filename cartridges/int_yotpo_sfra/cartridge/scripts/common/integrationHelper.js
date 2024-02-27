@@ -76,7 +76,7 @@ function getConversionTrackingData(order, currentLocale) {
         }
 
         var Site = require('dw/system/Site');
-        var yotpoAppKey = yotpoConfig.yotpoAppKey;
+        var yotpoAppKey = yotpoConfig.appKey;
         var conversionTrackingURL = Site.getCurrent().preferences.custom.yotpoConversionTrackingPixelURL;
         conversionTrkURL = conversionTrackingURL + '?order_amount=' + orderTotalValue +
             '&order_id=' + order.orderNo + '&order_currency=' + order.currencyCode + '&app_key=' + yotpoAppKey;
