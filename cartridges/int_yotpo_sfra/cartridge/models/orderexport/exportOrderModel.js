@@ -695,7 +695,8 @@ function parseYotpoResponse(result) {
         success: false,
         authenticationError: false,
         serviceError: false,
-        unknownError: false
+        unknownError: false,
+        dataError: false
     };
 
     switch (String(responseStatusCode)) {
@@ -715,6 +716,11 @@ function parseYotpoResponse(result) {
             ' Error Text is: ' + result.errorMessage.error, 'error', logLocation);
             status.serviceError = true;
             break;
+        case constants.STATUS_400 :
+            yotpoLogger.logMessage('The request to export order failed because of bad data. ' +
+            ' Error code: ' + result.error + '\n' +
+            ' Error Text is: ' + result.errorMessage.error, 'error', logLocation);
+            status.dataError = true;
         default :
             yotpoLogger.logMessage('The request to export order failed for an unknown reason. Error: ' + result.error + '\n' +
             ' Error Text is: ' + result.errorMessage, 'error', logLocation);
@@ -818,22 +824,32 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
                     yotpoLogger.logMessage(authErrorMsg, 'error', logLocation);
                     throw new Error(authErrorMsg);
                 }
-            } else if (responseStatus.unknownError) {
-                // Changing how we're doing this. No longer throwing an error, but instead using a counter on orders
-                // Some other error occurred we should terminate here
-                // throw new Error(constants.EXPORT_ORDER_SERVICE_ERROR + ': An unknown error occurred while attempting to communicate with the Yotpo service');
+            } else if (responseStatus.dataError) {
+                var OrderMgr = require('dw/order/OrderMgr');
+                var errorData = JSON.parse(result.errorMessage).errors;
+                // get IDs of orders with bad data
+                var badDataOrderIDs = [];
+                for (var i = 0; i < errorData.length; i++) {
+                    badDataOrderIDs.push(errorData[i].order_id);
+                }
 
-                // Go through orders that were sent
-                // Mark ones successfully sent as SENT (custom.yotpoPurchaseFeedSentStatus=SENT)
-                // when order that caused the error is found...
-                // increment order custom.yotpoPurchaseFeedSendAttemptCount
-                // set order custom.yotpoPurchaseFeedLastSendAttemptDate as current date
-                // if job returned a 400 error code, mark order custom.yotpoPurchaseFeedSentStatus=FAIL
-                // if counter is past threshold, mark order custom.yotpoPurchaseFeedSentStatus=FAIL
+                // filter out bad orders from the original orders array
+                var filteredOrders = [];
+                for (var i = 0; i < requestData.orders.length; i++) {
+                    // if order did NOT have bad data
+                    if (badDataOrderIDs.indexOf(requestData.orders[i].order_id) === -1) {
+                        filteredOrders.push(requestData.orders[i])
+                    }
+                }
+                // put array with bad orders removed back into original orders array
+                requestData.orders = filteredOrders;
+                // call the function again without the bad orders
+                yotpoLogger.logMessage('Retrying Order Feed submission skipping orders with bad data \n' +
+                    'Orders with bad data: ' + badDataOrderIDs, 'error', logLocation);
+                this.sendOrdersToYotpo(requestData, yotpoAppKey, locale, false);
+            } else if (responseStatus.unknownError) {
+                throw new Error(constants.EXPORT_ORDER_SERVICE_ERROR + ': An unknown error occurred while attempting to communicate with the Yotpo service');
             }
-        } else {
-            // success
-            // mark all sent orders custom.yotpoPurchaseFeedSendStatus=SENT
         }
     } catch (e) {
         yotpoLogger.logMessage('Error occurred while trying to upload feed - ' + e, 'error', logLocation);
