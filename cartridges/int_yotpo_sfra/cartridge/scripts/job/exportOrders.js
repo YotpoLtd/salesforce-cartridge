@@ -57,9 +57,6 @@ function beforeStep(parameters, stepExecution) {
         localesToProcess = exportOrderModelInstance.validateLocaleConfigData(yotpoConfigurations, yotpoJobConfiguration);
         originalLastExecutionDateTime = yotpoJobConfiguration.orderFeedJobLastExecutionTime;
 
-        // possibly update what orders are queries here
-        // get orders that have custom.yotpoPurchasFeedSendStatus=NULL
-        // and that order.custom.yotpoPurchaseFeedLastSendAttemptDate is BLANK/NULL/EMPTY OR older than 1 hour (or some other arbitrary time frame)
         // Get all non-exported orders
         orders = exportOrderModelInstance.searchOrders(
             yotpoJobConfiguration.orderFeedJobLastExecutionTime,
@@ -131,7 +128,6 @@ function process(order) {
 
     var orderData;
     try {
-        // possibly update what orders are queries here
         orderData = exportOrderModelInstance.prepareOrderData(order, {
             orderFeedJobLastExecutionTime: yotpoJobConfiguration.orderFeedJobLastExecutionTime,
             currentDateTime: yotpoJobConfiguration.currentDateTime
