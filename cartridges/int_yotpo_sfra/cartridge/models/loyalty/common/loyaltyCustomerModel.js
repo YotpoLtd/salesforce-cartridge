@@ -13,7 +13,9 @@ function prepareCustomerJSON(profile) {
     var customerJSON;
 
     try {
-        var customerEmail = YotpoUtils.escape(profile.email, Constants.REGEX_FOR_YOTPO_DATA, '');
+        // Removing the escape for now as this regex removes special chars. Potentially in the future we could implement a more accurate regex
+        // var customerEmail = YotpoUtils.escape(profile.email, Constants.REGEX_FOR_YOTPO_DATA, '');
+        var customerEmail = profile.email;
 
         if (!customerEmail) {
             throw new Error(Constants.EXPORT_CUSTOMER_MISSING_MANDATORY_FIELDS_ERROR);
