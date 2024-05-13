@@ -293,9 +293,13 @@ function prepareOrderJSON(order) {
         var customerEmail = null;
 
         if (!empty(customerProfile)) {
-            customerEmail = empty(customerProfile.email) ? null : YotpoUtils.escape(customerProfile.email, Constants.REGEX_FOR_YOTPO_DATA, '');
+            // Removing the escape for now as this regex removes special chars. Potentially in the future we could implement a more accurate regex
+            //customerEmail = empty(customerProfile.email) ? null : YotpoUtils.escape(customerProfile.email, Constants.REGEX_FOR_YOTPO_DATA, '');
+            customerEmail = empty(customerProfile.email) ? null : customerProfile.email;
         } else {
-            customerEmail = empty(order.customerEmail) ? null : YotpoUtils.escape(order.customerEmail, Constants.REGEX_FOR_YOTPO_DATA, '');
+            // Removing the escape for now as this regex removes special chars. Potentially in the future we could implement a more accurate regex
+            // customerEmail = empty(order.customerEmail) ? null : YotpoUtils.escape(order.customerEmail, Constants.REGEX_FOR_YOTPO_DATA, '');
+            customerEmail = empty(order.customerEmail) ? null : order.customerEmail;
         }
 
         if (!order.orderNo || !customerEmail || !order.currencyCode || empty(orderTotalPrice)) {
@@ -355,7 +359,9 @@ function prepareOrderJSON(order) {
             customerJSON.id = customerProfile.customerNo;
             customerJSON.first_name = YotpoUtils.escape(customerProfile.firstName, Constants.REGEX_FOR_YOTPO_DATA, '');
             customerJSON.last_name = YotpoUtils.escape(customerProfile.lastName, Constants.REGEX_FOR_YOTPO_DATA, '');
-            customerJSON.email = YotpoUtils.escape(customerProfile.email, Constants.REGEX_FOR_YOTPO_DATA, '');
+            // Removing the escape for now as this regex removes special chars. Potentially in the future we could implement a more accurate regex
+            // customerJSON.email = YotpoUtils.escape(customerProfile.email, Constants.REGEX_FOR_YOTPO_DATA, '');
+            customerJSON.email = customerProfile.email;
         }
 
         var orderPriceAjustments = new Array();
