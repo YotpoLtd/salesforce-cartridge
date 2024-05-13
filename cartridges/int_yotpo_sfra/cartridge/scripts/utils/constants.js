@@ -37,6 +37,8 @@ exports.EMAIL_VALIDATION_REGEX_FOR_YOTPO_DATA = /^\s*([#-\u002D\u002E\u003A-\u00
 exports.EMAIL_REGEX_FOR_YOTPO_DATA = ' ';
 exports.SERVICE_MAX_TIMEOUTS = 5;
 exports.PRODUCT_ID_TOKEN = 'PRODUCT_ID__';
+// use this regex to remove above prefix, as passing the global flag into .replace() is deprecated on newer compatibility modes
+exports.PRODUCT_ID_PREFIX_REGEX = /PRODUCT_ID__/g;
 // Used to calculate % threshold of skipped orders. Once reached the
 // job is flagged with an ERROR status that is displayed in the BM
 exports.EXPORT_ORDER_ERROR_COUNT_THRESHOLD = 0.03;
