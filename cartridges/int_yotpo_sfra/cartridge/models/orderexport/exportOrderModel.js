@@ -827,6 +827,10 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
             } else if (responseStatus.dataError) {
                 var OrderMgr = require('dw/order/OrderMgr');
                 var errorData = JSON.parse(result.errorMessage).errors;
+                if (!errorData || errorData.length === 0) {
+                    // this case seems extremely unlikely. Putting this here on the off chance to prevent infinite recursion
+                    throw new Error(constants.EXPORT_ORDER_SERVICE_ERROR + ': Yotpo API returned a data error, but did not indicate which orders included bad data. Aborting as there is not enough information to remove bad orders.');
+                }
                 // get IDs of orders with bad data
                 var badDataOrderIDs = [];
                 for (var i = 0; i < errorData.length; i++) {
@@ -841,7 +845,11 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
                         filteredOrders.push(requestData.orders[i])
                     }
                 }
-                // put array with bad orders removed back into original orders array
+                // check if filteredOrders is empty, if it is then stop and don't send again
+                if (filteredOrders.length === 0) {
+                    throw new Error(constsnts.EXPORT_ORDER_SERVICE_ERROR + ': After removing orders indicated as bad data by Yotpo API, no orders remain to send to Yotpo. Aborting.');
+                }
+                // overwrite original orders array with the new array that does not contain orders with bad data
                 requestData.orders = filteredOrders;
                 // call the function again without the bad orders
                 yotpoLogger.logMessage('Retrying Order Feed submission skipping orders with bad data \n' +
