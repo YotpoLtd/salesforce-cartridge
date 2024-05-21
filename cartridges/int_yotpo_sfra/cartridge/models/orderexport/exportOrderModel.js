@@ -784,7 +784,7 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
         exportOrderServiceRegistry.yotpoExportOrdersSvc.setURL(yotpoURL);
 
         // Removing the prefix that was added earlier to workaround SFCC not allowing object keys to start with '0.'
-        var requestJson = JSON.stringify(requestData).replace(constants.PRODUCT_ID_TOKEN, '', 'g');
+        var requestJson = JSON.stringify(requestData).replace(constants.PRODUCT_ID_PREFIX_REGEX, '');
         var result = exportOrderServiceRegistry.yotpoExportOrdersSvc.call(requestJson);
         var responseStatus = this.parseYotpoResponse(result);
         authenticationError = responseStatus.authenticationError;

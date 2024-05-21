@@ -15,7 +15,9 @@
  * @returns {string} escapedText
  */
 function escape(text, regex, replacement) {
-    if (!text) {
+    // undefined regex causes slightly different behavior of .replace() between compatibility modes
+    // so make sure we have regex instead of just assuming that .replace() will just return the text
+    if (!text || !regex) {
         return text;
     }
 
@@ -96,7 +98,7 @@ function getCurrentLocaleSFRA(currentLocaleID) {
 }
 
 /**
- * Validates given email address based on RFC 5322 Official Standard regex
+ * Validates given email address based on regex used by the Yotpo API (see constants.js)
  * @param {string} emailAddress email address to validate
  * @returns {boolean} true if email is valid based on regex
  */
