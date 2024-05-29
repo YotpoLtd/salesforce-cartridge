@@ -41,7 +41,9 @@ function getRatingsOrReviewsData(currentLocale, productId) {
             productModel: empty(currentProduct.brand) ? '' : currentProduct.brand,
             productURL: productURL,
             imageURL: imageURL,
-            productCategory: yotpoUtils.getCategoryPath(currentProduct)
+            productCategory: yotpoUtils.getCategoryPath(currentProduct),
+            price: currentProduct.priceModel.minPrice.decimalValue,
+            currency: currentProduct.priceModel.minPrice.currencyCode
         };
     }
 
