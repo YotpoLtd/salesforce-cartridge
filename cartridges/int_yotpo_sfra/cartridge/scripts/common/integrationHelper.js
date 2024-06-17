@@ -30,6 +30,11 @@ function getRatingsOrReviewsData(currentLocale, productId) {
         var yotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils.js');
         var imageURL = yotpoUtils.getProductImageUrl(currentProduct);
 
+        // retrieving minPrice for a master product can be an expensive operation, as it has to look through all the variant prices
+        // minPrice will always have a relevant price. If there is a sale price, it will hold the sale price,
+        // if there is only a list price, it will hold the list price. Special pricing situations like tiered pricing are not considered.
+        var currentProductPrice = currentProduct.priceModel.minPrice;
+
         return {
             isReviewsEnabled: yotpoConfig.isReviewsEnabled,
             isRatingsEnabled: yotpoConfig.isRatingsEnabled,
@@ -42,8 +47,8 @@ function getRatingsOrReviewsData(currentLocale, productId) {
             productURL: productURL,
             imageURL: imageURL,
             productCategory: yotpoUtils.getCategoryPath(currentProduct),
-            price: currentProduct.priceModel.minPrice.decimalValue,
-            currency: currentProduct.priceModel.minPrice.currencyCode
+            price: currentProductPrice.decimalValue,
+            currency: currentProductPrice.currencyCode
         };
     }
 
