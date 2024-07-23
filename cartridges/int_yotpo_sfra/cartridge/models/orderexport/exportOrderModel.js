@@ -14,7 +14,7 @@
 function getExportOrderConfig() {
     var Site = require('dw/system/Site');
     return {
-        productInformationFromMaster: Site.getCurrent().getPreferences().custom.yotpoProductInformationFromMaster,
+        yotpoProductInformationFromMaster: Site.getCurrent().getPreferences().custom.yotpoProductInformationFromMaster,
         exportGroupIdInOrder: Site.getCurrent().getPreferences().custom.yotpoExportGroupIdInOrder
     };
 }
@@ -504,7 +504,7 @@ function prepareOrderProductsData(order) {
                 throw new Error(constants.EXPORT_ORDER_MISSING_PRODUCT_ERROR + ' Product ID: ' + productLineItem.productID);
             }
 
-            if (exportOrderConfig.productInformationFromMaster && currentProduct.variant) {
+            if (exportOrderConfig.yotpoProductInformationFromMaster && currentProduct.variant) {
                 currentProduct = currentProduct.getVariationModel().master;
             }
 
@@ -592,7 +592,7 @@ function prepareOrderData(order, dateTimes) {
 
     yotpoLogger.logMessage(logHeader +
     'Date format for the Yotpo data: ' + constants.DATE_FORMAT_FOR_YOTPO_DATA + '\n' +
-    'Site preference productInformationFromMaster: ' + exportOrderConfig.productInformationFromMaster + '\n' +
+    'Site preference yotpoProductInformationFromMaster: ' + exportOrderConfig.yotpoProductInformationFromMaster + '\n' +
     'Site preference exportGroupIdInOrder: ' + exportOrderConfig.exportGroupIdInOrder + '\n' +
     'Order Locale ID: ' + order.customerLocaleID + '\n' +
     logFooter, 'debug', logLocation);

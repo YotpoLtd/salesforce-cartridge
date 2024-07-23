@@ -81,7 +81,7 @@ function setYotpoConfigOverrides(locale) {
         enableRatings: currSite.getCustomPreferenceValue('enableRatings') || false,
         isRatingsEnabled: currSite.getCustomPreferenceValue('enableRatings') || false,
 
-        productInformationFromMaster: currSite.getCustomPreferenceValue('productInformationFromMaster') || false,
+        yotpoProductInformationFromMaster: currSite.getCustomPreferenceValue('yotpoProductInformationFromMaster') || false,
 
         yotpoLoyaltyEnabled: currSite.getCustomPreferenceValue('yotpoLoyaltyEnabled') || false,
         isLoyaltyEnabled: currSite.getCustomPreferenceValue('yotpoLoyaltyEnabled') || false,
@@ -134,8 +134,8 @@ function setYotpoConfigOverrides(locale) {
             if ('enablePurchaseFeed' in localeConfigObject.custom) {
                 yotpoConfig.enablePurchaseFeed = localeConfigObject.custom.enablePurchaseFeed;
             }
-            if ('productInformationFromMaster' in localeConfigObject.custom) {
-                yotpoConfig.productInformationFromMaster = localeConfigObject.custom.productInformationFromMaster;
+            if ('yotpoProductInformationFromMaster' in localeConfigObject.custom) {
+                yotpoConfig.yotpoProductInformationFromMaster = localeConfigObject.custom.yotpoProductInformationFromMaster;
             }
             if ('yotpoLoyaltyEnabled' in localeConfigObject.custom) {
                 yotpoConfig.yotpoLoyaltyEnabled = yotpoConfig.isLoyaltyEnabled = localeConfigObject.custom.yotpoLoyaltyEnabled;
