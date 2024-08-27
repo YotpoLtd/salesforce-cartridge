@@ -1,4 +1,17 @@
 <isset name="currLocale" value="${request.locale}" scope="page" />
+<script>
+    // Re-initialize widgets on AJAX call
+    var ajaxListener = new Object();
+    ajaxListener.tempOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(a,b) {
+        this.addEventListener('load', function() {
+            setTimeout(() => {
+                yotpo.initWidgets();
+            }, 1)
+        });
+        ajaxListener.tempOpen.apply(this, arguments);
+    }
+</script>
 <isscript>
     var YotpoConfigurationModel = require('*/cartridge/models/common/yotpoConfigurationModel');
 </isscript>
