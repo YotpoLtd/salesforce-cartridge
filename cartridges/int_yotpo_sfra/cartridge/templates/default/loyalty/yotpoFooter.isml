@@ -1,13 +1,17 @@
 <isset name="currLocale" value="${request.locale}" scope="page" />
 <script>
-    // Re-initialize widgets on AJAX call
+    // Re-initialize widgets on PLP search refinement AJAX call
     var ajaxListener = new Object();
     ajaxListener.tempOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function(a,b) {
-        this.addEventListener('load', function() {
-            setTimeout(() => {
-                yotpo.initWidgets();
-            }, 1)
+        this.addEventListener('load', function(c) {
+            // this event listener will hit every time an ajax request is made, so filter out
+            // requests so we only re-init the widgets when the request is for PLP search refinements
+            if (c.currentTarget.responseURL.includes('Search-ShowAjax')) {
+                setTimeout(() => {
+                    yotpo.initWidgets();
+                }, 1)
+            }
         });
         ajaxListener.tempOpen.apply(this, arguments);
     }
