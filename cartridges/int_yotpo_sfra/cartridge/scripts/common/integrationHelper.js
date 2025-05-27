@@ -15,10 +15,10 @@ function getRatingsOrReviewsData(currentLocale, productId) {
     if (isCartridgeEnabled && (yotpoConfig.isReviewsEnabled || yotpoConfig.isRatingsEnabled)) {
         var ProductMgr = require('dw/catalog/ProductMgr');
         var currentProduct = ProductMgr.getProduct(productId);
-        var productInformationFromMaster = yotpoConfig.productInformationFromMaster;
+        var yotpoProductInformationFromMaster = yotpoConfig.yotpoProductInformationFromMaster;
 
         if (currentProduct.variant) {
-            if (productInformationFromMaster) {
+            if (yotpoProductInformationFromMaster) {
                 currentProduct = currentProduct.getVariationModel().master;
             }
         }
