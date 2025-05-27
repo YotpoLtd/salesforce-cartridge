@@ -321,7 +321,9 @@ function prepareCustomerData(order) {
         customerEmail = empty(order.customerEmail) ? '' : order.customerEmail;
     }
 
-    customerData.customer_name = yotpoUtils.cleanDataForExport(customerName, 'order');
+    // Yotpo API allows pretty much all characters for a customer name. The only stipulation is that it is non-blank and less than 255 chars
+    // The parser in the API will also strip html tags and code in <script> tags
+    customerData.customer_name = customerName;
     customerData.email = yotpoUtils.cleanDataForExport(customerEmail, 'email');
 
     return customerData;
