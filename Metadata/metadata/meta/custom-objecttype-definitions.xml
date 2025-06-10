@@ -78,6 +78,14 @@
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
+            <attribute-definition attribute-id="yotpoProductInformationFromMaster">
+                <display-name xml:lang="x-default">Yotpo Product Information From Master</display-name>
+                <description xml:lang="x-default">This yotpo config is used to make production information configurable whether the information will be exported from master or from variants.</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>true</default-value>
+            </attribute-definition>
         </attribute-definitions>
         <group-definitions>
             <attribute-group group-id="yotpoConfigurationAttributes">
@@ -90,6 +98,7 @@
                 <attribute attribute-id="enableReviews"/>
                 <attribute attribute-id="enableRatings"/>
                 <attribute attribute-id="enablePurchaseFeed"/>
+                <attribute attribute-id="yotpoProductInformationFromMaster"/>
             </attribute-group>
             <attribute-group group-id="YotpoLoyalty">
                 <display-name xml:lang="x-default">Yotpo Loyalty</display-name>

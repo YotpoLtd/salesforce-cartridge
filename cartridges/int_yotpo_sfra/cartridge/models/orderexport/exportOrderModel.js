@@ -14,7 +14,7 @@
 function getExportOrderConfig() {
     var Site = require('dw/system/Site');
     return {
-        productInformationFromMaster: Site.getCurrent().getPreferences().custom.yotpoProductInformationFromMaster,
+        yotpoProductInformationFromMaster: Site.getCurrent().getPreferences().custom.yotpoProductInformationFromMaster,
         exportGroupIdInOrder: Site.getCurrent().getPreferences().custom.yotpoExportGroupIdInOrder
     };
 }
@@ -321,7 +321,9 @@ function prepareCustomerData(order) {
         customerEmail = empty(order.customerEmail) ? '' : order.customerEmail;
     }
 
-    customerData.customer_name = yotpoUtils.cleanDataForExport(customerName, 'order');
+    // Yotpo API allows pretty much all characters for a customer name. The only stipulation is that it is non-blank and less than 255 chars
+    // The parser in the API will also strip html tags and code in <script> tags
+    customerData.customer_name = customerName;
     customerData.email = yotpoUtils.cleanDataForExport(customerEmail, 'email');
 
     return customerData;
@@ -504,7 +506,7 @@ function prepareOrderProductsData(order) {
                 throw new Error(constants.EXPORT_ORDER_MISSING_PRODUCT_ERROR + ' Product ID: ' + productLineItem.productID);
             }
 
-            if (exportOrderConfig.productInformationFromMaster && currentProduct.variant) {
+            if (exportOrderConfig.yotpoProductInformationFromMaster && currentProduct.variant) {
                 currentProduct = currentProduct.getVariationModel().master;
             }
 
@@ -592,7 +594,7 @@ function prepareOrderData(order, dateTimes) {
 
     yotpoLogger.logMessage(logHeader +
     'Date format for the Yotpo data: ' + constants.DATE_FORMAT_FOR_YOTPO_DATA + '\n' +
-    'Site preference productInformationFromMaster: ' + exportOrderConfig.productInformationFromMaster + '\n' +
+    'Site preference yotpoProductInformationFromMaster: ' + exportOrderConfig.yotpoProductInformationFromMaster + '\n' +
     'Site preference exportGroupIdInOrder: ' + exportOrderConfig.exportGroupIdInOrder + '\n' +
     'Order Locale ID: ' + order.customerLocaleID + '\n' +
     logFooter, 'debug', logLocation);
