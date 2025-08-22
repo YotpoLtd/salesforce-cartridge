@@ -381,5 +381,16 @@ describe('yotpoUtils', () => {
             const result = yotpoUtils.getCategoryPath(product);
             assert.equal(result, 'Parent Product Primary Category Name');
         });
+
+        it('should return empty string when product has no primary category', () => {
+            const product = getProductMock();
+
+            product.isVariant = () => false;
+            product.getPrimaryCategory = () => null;
+            product.categories = [];
+
+            const result = yotpoUtils.getCategoryPath(product);
+            assert.equal(result, '');
+        });
     });
 });
