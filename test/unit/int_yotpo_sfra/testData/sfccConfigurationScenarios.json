@@ -51,7 +51,7 @@
     "baseYotpoRequestParams": {
         "validate_data": true,
         "platform": "commerce_cloud",
-        "plugin_version": "21.5.1",
+        "plugin_version": "21.6.0",
         "utoken": "utokenAuthCode",
         "orders": []
     },

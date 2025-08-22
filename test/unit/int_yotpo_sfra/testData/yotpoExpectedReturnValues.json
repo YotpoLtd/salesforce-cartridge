@@ -1,10 +1,10 @@
 {
     "orderExportEnabled": {
-        "productInformationFromMaster": true,
+        "yotpoProductInformationFromMaster": true,
         "exportGroupIdInOrder": true
     },
     "orderExportDisabled": {
-        "productInformationFromMaster": false,
+        "yotpoProductInformationFromMaster": false,
         "exportGroupIdInOrder": false
     },
     "productData": {
@@ -40,24 +40,28 @@
         "success": true,
         "authenticationError": false,
         "serviceError": false,
-        "unknownError": false
+        "unknownError": false,
+        "dataError": false
     },
     "authErrorServiceStatus": {
         "success": false,
         "authenticationError": true,
         "serviceError": false,
-        "unknownError": false
+        "unknownError": false,
+        "dataError": false
     },
     "serviceErrorServiceStatus": {
         "success": false,
         "authenticationError": false,
         "serviceError": true,
-        "unknownError": false
+        "unknownError": false,
+        "dataError": false
     },
     "unknownErrorServiceStatus": {
         "success": false,
         "authenticationError": false,
         "serviceError": false,
-        "unknownError": true
+        "unknownError": true,
+        "dataError": false
     }
 }
