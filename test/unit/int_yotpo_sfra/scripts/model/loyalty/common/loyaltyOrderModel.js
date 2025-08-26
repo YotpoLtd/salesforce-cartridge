@@ -322,7 +322,7 @@ describe('loyaltyOrderModel', () => {
                         'adjusted_tax_cents': 200,
                         'base_price_cents': 2999,
                         'collections': 'Fake Category Name',
-                        'id': '-f-a-k-e-P-r-o-d-u-c-t-I-d-',
+                        'id': 'fakeProductId',
                         'name': 'fake product name',
                         'price_adjustments': [
                             {

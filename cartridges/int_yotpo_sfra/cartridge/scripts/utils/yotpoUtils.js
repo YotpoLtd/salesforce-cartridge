@@ -52,7 +52,7 @@ function getCategoryPath(product, separator) {
     var cat = theCategory;
     var path = [];
 
-    while (cat.parent != null) {
+    while (!empty(cat) && (cat.parent != null)) {
         if (cat.online) {
             path[0] = cat.getDisplayName();
         }
