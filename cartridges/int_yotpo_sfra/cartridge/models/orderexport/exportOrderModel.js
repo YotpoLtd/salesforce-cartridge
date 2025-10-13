@@ -862,7 +862,7 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
             }
         }
     } catch (e) {
-        yotpoLogger.logMessage('Error occurred while trying to upload feed - ' + e, 'error', logLocation);
+        yotpoLogger.logMessage('Error occurred while trying to upload feed - App Key: ' + yotpoAppKey + ' Locale: ' + locale + ' Error: ' + e, 'error', logLocation);
         throw e;
     }
 
