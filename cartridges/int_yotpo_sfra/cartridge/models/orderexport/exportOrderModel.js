@@ -723,6 +723,7 @@ function parseYotpoResponse(result) {
             ' Error code: ' + result.error + '\n' +
             ' Error Text is: ' + result.errorMessage.error, 'error', logLocation);
             status.dataError = true;
+            break;
         default :
             yotpoLogger.logMessage('The request to export order failed for an unknown reason. Error: ' + result.error + '\n' +
             ' Error Text is: ' + result.errorMessage, 'error', logLocation);
@@ -827,7 +828,6 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
                     throw new Error(authErrorMsg);
                 }
             } else if (responseStatus.dataError) {
-                var OrderMgr = require('dw/order/OrderMgr');
                 var errorData = JSON.parse(result.errorMessage).errors;
                 if (!errorData || errorData.length === 0) {
                     // this case seems extremely unlikely. Putting this here on the off chance to prevent infinite recursion
@@ -835,8 +835,8 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
                 }
                 // get IDs of orders with bad data
                 var badDataOrderIDs = [];
-                for (var i = 0; i < errorData.length; i++) {
-                    badDataOrderIDs.push(errorData[i].order_id);
+                for (var j = 0; j < errorData.length; j++) {
+                    badDataOrderIDs.push(errorData[j].order_id);
                 }
 
                 // filter out bad orders from the original orders array
@@ -844,14 +844,15 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
                 for (var i = 0; i < requestData.orders.length; i++) {
                     // if order did NOT have bad data
                     if (badDataOrderIDs.indexOf(requestData.orders[i].order_id) === -1) {
-                        filteredOrders.push(requestData.orders[i])
+                        filteredOrders.push(requestData.orders[i]);
                     }
                 }
                 // check if filteredOrders is empty, if it is then stop and don't send again
                 if (filteredOrders.length === 0) {
-                    throw new Error(constsnts.EXPORT_ORDER_SERVICE_ERROR + ': After removing orders indicated as bad data by Yotpo API, no orders remain to send to Yotpo. Aborting.');
+                    throw new Error(constants.EXPORT_ORDER_SERVICE_ERROR + ': After removing orders indicated as bad data by Yotpo API, no orders remain to send to Yotpo. Aborting.');
                 }
                 // overwrite original orders array with the new array that does not contain orders with bad data
+                // eslint-disable-next-line no-param-reassign
                 requestData.orders = filteredOrders;
                 // call the function again without the bad orders
                 yotpoLogger.logMessage('Retrying Order Feed submission skipping orders with bad data \n' +
