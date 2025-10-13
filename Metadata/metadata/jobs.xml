@@ -116,6 +116,7 @@
             <on-exit status="ERROR" enabled="true">
                 <send-mail>
                     <from>notifications@yotpo.com</from>
+                    <to> </to>
                     <bcc>sfcc-alerts@yotpo.com</bcc>
                 </send-mail>
             </on-exit>
