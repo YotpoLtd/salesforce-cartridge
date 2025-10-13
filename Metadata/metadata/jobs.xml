@@ -46,7 +46,15 @@
                 <parameters/>
             </step>
         </flow>
-        <rules/>
+        <rules>
+            <on-exit status="ERROR" enabled="true">
+                <send-mail>
+                    <from>notifications@yotpo.com</from>
+                    <to> </to>
+                    <bcc>sfcc-alerts@yotpo.com</bcc>
+                </send-mail>
+            </on-exit>
+        </rules>
         <triggers>
             <run-recurring enabled="false">
                 <recurrence>
