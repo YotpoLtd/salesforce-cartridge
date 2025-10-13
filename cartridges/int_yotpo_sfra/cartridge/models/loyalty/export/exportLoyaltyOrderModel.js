@@ -48,7 +48,7 @@ function exportOrder(payload, params) {
         guid: loyaltyGuid,
         api_key: loyaltyAPIKey
     };
-    var success = LoyaltyService.exportData(payload, queryParams, 'orders');
+    var success = LoyaltyService.exportData(payload, queryParams, 'orders', localeID);
     return success;
 }
 
@@ -77,7 +77,7 @@ function exportOrdersByLocale(ordersArray, locale) {
         api_key: keys.key
     };
     var payload = { orders: ordersArray };
-    LoyaltyService.exportData(payload, queryParams, 'process_orders_batch');
+    LoyaltyService.exportData(payload, queryParams, 'process_orders_batch', locale);
 }
 
 
@@ -140,7 +140,7 @@ function exportOrderByLocale(payload, locale) {
         guid: keys.guid,
         api_key: keys.key
     };
-    LoyaltyService.exportData(payload, queryParams, 'orders');
+    LoyaltyService.exportData(payload, queryParams, 'orders', locale);
 }
 
 /**
