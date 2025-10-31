@@ -181,7 +181,7 @@ describe('exportLoyaltyCustomers job', () => {
             let events = [customerObj];
             exportLoyaltyCustomers.write(events);
             assert.equal(events[0].customerEventObject.custom.Status, 'SUCCESS');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Writing customer payload to yotpo for customer/), 'debug', 'exportCustomers~write');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Writing customer payload to yotpo for customer/), 'debug', 'exportLoyaltyCustomers~write');
             exportCustomerByLocale.restore();
         });
         it('Should mark object as failed if it does not post to yotpo.', () => {
@@ -190,49 +190,49 @@ describe('exportLoyaltyCustomers job', () => {
             let events = [customerObj];
             exportLoyaltyCustomers.write(events);
             assert.equal(events[0].customerEventObject.custom.Status, 'FAIL');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write customer payload to yotpo for customer/), 'error', 'exportCustomers~write');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write customer payload to yotpo for customer/), 'error', 'exportLoyaltyCustomers~write');
             exportCustomerByLocale.restore();
         });
         it('Should log and fail if event has no Customer ID.', () => {
             customerObj.customerId = null;
             let events = [customerObj];
             exportLoyaltyCustomers.write(events);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write event/), 'error', 'exportCustomers~write');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write event/), 'error', 'exportLoyaltyCustomers~write');
         });
     });
     describe('afterChunk', () => {
         it('Should log successful when the chunk was successful.', () => {
             exportLoyaltyCustomers.afterChunk(true);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Customer Export chunk completed successfully/), 'debug', 'exportCustomers~afterChunk');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Customer Export chunk completed successfully/), 'debug', 'exportLoyaltyCustomers~afterChunk');
         });
         it('Should log unsuccessful when the chunk was unsuccessful.', () => {
             exportLoyaltyCustomers.afterChunk(false);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Customer Export chunk failed/), 'error', 'exportCustomers~afterChunk');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Customer Export chunk failed/), 'error', 'exportLoyaltyCustomers~afterChunk');
         });
         it('Should log number of failed Customers.', () => {
             // 0 out chunkErrorCount
             exportLoyaltyCustomers.beforeChunk(false);
             exportLoyaltyCustomers.afterChunk(false);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 customers skipped out of 0 processed in this chunk/), 'error', 'exportCustomers~afterChunk');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 customers skipped out of 0 processed in this chunk/), 'error', 'exportLoyaltyCustomers~afterChunk');
             exportLoyaltyCustomers.process();
             exportLoyaltyCustomers.process();
             exportLoyaltyCustomers.process();
             // Only care about logging for the afterChunk
             loggerSpy.logMessage.reset();
             exportLoyaltyCustomers.afterChunk(false);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/3 customers skipped out of 3 processed in this chunk/), 'error', 'exportCustomers~afterChunk');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/3 customers skipped out of 3 processed in this chunk/), 'error', 'exportLoyaltyCustomers~afterChunk');
         });
     });
     describe('afterStep', () => {
         it('Should log successful when the step was successful.', () => {
             exportLoyaltyCustomers.beforeStep({}, stepExecution);
             exportLoyaltyCustomers.afterStep(true, {}, stepExecution);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 customers skipped out of 0 processed in this step /), 'debug', 'exportCustomers~afterStep');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 customers skipped out of 0 processed in this step /), 'debug', 'exportLoyaltyCustomers~afterStep');
         });
         it('Should log unsuccessful when the step was unsuccessful.', () => {
             exportLoyaltyCustomers.beforeStep({}, stepExecution);
             exportLoyaltyCustomers.afterStep(false, {}, stepExecution);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Customer Export step failed/), 'error', 'exportCustomers~afterStep');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Customer Export step failed/), 'error', 'exportLoyaltyCustomers~afterStep');
         });
         it('Should throw if failed Customers are more than constants.EXPORT_Customer_ERROR_COUNT_THRESHOLD.', () => {
             // Process an Customer

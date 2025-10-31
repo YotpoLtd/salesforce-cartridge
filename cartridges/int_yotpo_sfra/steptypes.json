@@ -98,6 +98,40 @@
                 }
             },
             {
+                "@type-id": "custom.Yotpo.LoyaltyCustomerBackfill",
+                "@supports-parallel-execution": "false",
+                "@supports-site-context": "true",
+                "@supports-organization-context": "false",
+                "@trim": true,
+                "description": "Yotpo Cartridge - backfill existing customer data to Yotpo's webservice for initial setup.",
+                "module": "int_yotpo_sfra/cartridge/scripts/job/loyalty/backfillLoyaltyCustomers.js",
+                "before-step-function": "beforeStep",
+                "total-count-function": "getTotalCount",
+                "read-function": "read",
+                "process-function": "process",
+                "write-function": "write",
+                "after-step-function": "afterStep",
+                "after-chunk-function": "afterChunk",
+                "before-chunk-function": "beforeChunk",
+                "chunk-size": 1000,
+                "transactional": "true",
+                "parameters": {
+                    "parameter": []
+                },
+                "status-codes": {
+                    "status": [
+                        {
+                            "@code": "ERROR",
+                            "description": "Used when the step failed with an error."
+                        },
+                        {
+                            "@code": "OK",
+                            "description": "Used when the step finished successfully."
+                        }
+                    ]
+                }
+            },
+            {
                 "@type-id": "custom.Yotpo.LoyaltyOrderExport",
                 "@supports-parallel-execution": "false",
                 "@supports-site-context": "true",
@@ -114,6 +148,40 @@
                 "after-chunk-function": "afterChunk",
                 "before-chunk-function": "beforeChunk",
                 "chunk-size": 100,
+                "transactional": "true",
+                "parameters": {
+                    "parameter": []
+                },
+                "status-codes": {
+                    "status": [
+                        {
+                            "@code": "ERROR",
+                            "description": "Used when the step failed with an error."
+                        },
+                        {
+                            "@code": "OK",
+                            "description": "Used when the step finished successfully."
+                        }
+                    ]
+                }
+            },
+            {
+                "@type-id": "custom.Yotpo.LoyaltyOrderBackfill",
+                "@supports-parallel-execution": "false",
+                "@supports-site-context": "true",
+                "@supports-organization-context": "false",
+                "@trim": true,
+                "description": "Yotpo Cartridge - send historical order loyalty data to Yotpo's webservice.",
+                "module": "int_yotpo_sfra/cartridge/scripts/job/loyalty/backfillLoyaltyOrders.js",
+                "before-step-function": "beforeStep",
+                "total-count-function": "getTotalCount",
+                "read-function": "read",
+                "process-function": "process",
+                "write-function": "write",
+                "after-step-function": "afterStep",
+                "after-chunk-function": "afterChunk",
+                "before-chunk-function": "beforeChunk",
+                "chunk-size": 1000,
                 "transactional": "true",
                 "parameters": {
                     "parameter": []

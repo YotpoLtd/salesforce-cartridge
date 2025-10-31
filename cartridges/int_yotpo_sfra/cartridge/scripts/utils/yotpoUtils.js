@@ -15,7 +15,9 @@
  * @returns {string} escapedText
  */
 function escape(text, regex, replacement) {
-    if (!text) {
+    // undefined regex causes slightly different behavior of .replace() between compatibility modes
+    // so make sure we have regex instead of just assuming that .replace() will just return the text
+    if (!text || !regex) {
         return text;
     }
 
@@ -50,7 +52,7 @@ function getCategoryPath(product, separator) {
     var cat = theCategory;
     var path = [];
 
-    while (cat.parent != null) {
+    while (!empty(cat) && (cat.parent != null)) {
         if (cat.online) {
             path[0] = cat.getDisplayName();
         }
@@ -96,7 +98,7 @@ function getCurrentLocaleSFRA(currentLocaleID) {
 }
 
 /**
- * Validates given email address based on RFC 5322 Official Standard regex
+ * Validates given email address based on regex used by the Yotpo API (see constants.js)
  * @param {string} emailAddress email address to validate
  * @returns {boolean} true if email is valid based on regex
  */
@@ -178,7 +180,8 @@ function cleanDataForExport(text, type, replacement, safeChars) {
         defaultedText = escape(defaultedText, regEx, defaultedReplacement);
     }
 
-    return defaultedText;
+    // trim off extra spaces in case there was a space in the text but everything else got replaced, leaving only a space
+    return defaultedText.trim();
 }
 
 /**
@@ -252,16 +255,25 @@ function appendParamsToUrl(url, params) {
 }
 
 /**
- * This function is used to convert the price into cents
+ * This function is used to convert the price into cents (or whatever the smallest subunit of the specified currency is)
  *
- * @param {number} price : The price which needs to be convert.
+ * @param {number} price : The price which needs to be converted.
+ * @param {string} currencyCode : The currency code for the given price.
  *
- * @return {number} priceCents : The converted price into cents.
+ * @return {number} priceCents : The converted price in cents.
  */
-function convertPriceIntoCents(price) {
+function convertPriceIntoCents(price, currencyCode) {
+    var Currency = require('dw/util/Currency');
     var priceCents = 0;
     if (price !== null) {
-        priceCents = price * 100;
+        var currency = Currency.getCurrency(currencyCode);
+        if (currency !== null) {
+            var currencyFractionDigits = Currency.getCurrency(currencyCode).getDefaultFractionDigits();
+            priceCents = price * (Math.pow(10, currencyFractionDigits));
+        } else {
+            // default to assuming 2 fraction digits if currency is unknown
+            priceCents = price * 100;
+        }
     }
     return priceCents;
 }

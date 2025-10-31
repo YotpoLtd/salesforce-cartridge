@@ -14,7 +14,7 @@
 function getExportOrderConfig() {
     var Site = require('dw/system/Site');
     return {
-        productInformationFromMaster: Site.getCurrent().getPreferences().custom.yotpoProductInformationFromMaster,
+        yotpoProductInformationFromMaster: Site.getCurrent().getPreferences().custom.yotpoProductInformationFromMaster,
         exportGroupIdInOrder: Site.getCurrent().getPreferences().custom.yotpoExportGroupIdInOrder
     };
 }
@@ -127,10 +127,11 @@ function validateLocaleConfigData(yotpoConfigurations, yotpoJobConfiguration) {
  * @param {Date} orderFeedJobLastExecutionTime - Date and time when the order feed job last executed
  * @param {Date} currentDateTime - Current Date and time
  * @param {Object} localesToProcess - List of locales to export orders for
+ * @param {string} sortRule - Optional, specifies how to sort the search results. Defaults to 'orderNo ASC'
  *
  * @returns {Iterator} ordersIterator - The order list to be exported
  */
-function searchOrders(orderFeedJobLastExecutionTime, currentDateTime, localesToProcess) {
+function searchOrders(orderFeedJobLastExecutionTime, currentDateTime, localesToProcess, sortRule) {
     var Order = require('dw/order/Order');
     var OrderMgr = require('dw/order/OrderMgr');
 
@@ -148,7 +149,7 @@ function searchOrders(orderFeedJobLastExecutionTime, currentDateTime, localesToP
     }
     queryString += ')';
 
-    var sortString = 'orderNo ASC';
+    var sortString = sortRule || 'orderNo ASC';
 
     var queryArgs = [
         queryString,
@@ -176,6 +177,7 @@ function prepareRequestParamsData(utokenAuthCode) {
     return {
         validate_data: true,
         platform: constants.PLATFORM_FOR_YOTPO_DATA,
+        plugin_version: constants.YOTPO_CARTRIDGE_VERSION,
         utoken: utokenAuthCode,
         orders: []
     };
@@ -319,7 +321,9 @@ function prepareCustomerData(order) {
         customerEmail = empty(order.customerEmail) ? '' : order.customerEmail;
     }
 
-    customerData.customer_name = yotpoUtils.cleanDataForExport(customerName, 'order');
+    // Yotpo API allows pretty much all characters for a customer name. The only stipulation is that it is non-blank and less than 255 chars
+    // The parser in the API will also strip html tags and code in <script> tags
+    customerData.customer_name = customerName;
     customerData.email = yotpoUtils.cleanDataForExport(customerEmail, 'email');
 
     return customerData;
@@ -502,7 +506,7 @@ function prepareOrderProductsData(order) {
                 throw new Error(constants.EXPORT_ORDER_MISSING_PRODUCT_ERROR + ' Product ID: ' + productLineItem.productID);
             }
 
-            if (exportOrderConfig.productInformationFromMaster && currentProduct.variant) {
+            if (exportOrderConfig.yotpoProductInformationFromMaster && currentProduct.variant) {
                 currentProduct = currentProduct.getVariationModel().master;
             }
 
@@ -590,7 +594,7 @@ function prepareOrderData(order, dateTimes) {
 
     yotpoLogger.logMessage(logHeader +
     'Date format for the Yotpo data: ' + constants.DATE_FORMAT_FOR_YOTPO_DATA + '\n' +
-    'Site preference productInformationFromMaster: ' + exportOrderConfig.productInformationFromMaster + '\n' +
+    'Site preference yotpoProductInformationFromMaster: ' + exportOrderConfig.yotpoProductInformationFromMaster + '\n' +
     'Site preference exportGroupIdInOrder: ' + exportOrderConfig.exportGroupIdInOrder + '\n' +
     'Order Locale ID: ' + order.customerLocaleID + '\n' +
     logFooter, 'debug', logLocation);
@@ -640,7 +644,7 @@ function prepareOrderData(order, dateTimes) {
             constants.EXPORT_ORDER_MISSING_MANDATORY_FIELDS_ERROR + ': ' + errorMsgs.join(', '));
     }
 
-    yotpoLogger.logMessage('Mandatory data present continuing with export of order' + orderNo + '\n' +
+    yotpoLogger.logMessage('Mandatory data present continuing with export of order ' + orderNo + '\n' +
         ' Last Execution Time: ' + dateTimes.orderFeedJobLastExecutionTime + '\n' +
         ' Current Execution Time: ' + dateTimes.currentDateTime, 'debug', logLocation);
 
@@ -660,7 +664,8 @@ function prepareOrderData(order, dateTimes) {
     }
 
     // Skipping order if there are no products
-    if (!empty(products)) {
+    var emptyObject = (typeof products === 'object' && Object.keys(products).length === 0);
+    if (!empty(products) && !emptyObject) {
         orderData = yotpoUtils.extendObject(customerData,
             {
                 order_id: orderNo,
@@ -668,6 +673,8 @@ function prepareOrderData(order, dateTimes) {
                 currency_iso: order.currencyCode,
                 products: products
             });
+    } else {
+        throw new Error('Skipping order ' + orderNo + ' in the export due to empty products array. No products or gift cards in order.');
     }
 
     return orderData;
@@ -690,7 +697,8 @@ function parseYotpoResponse(result) {
         success: false,
         authenticationError: false,
         serviceError: false,
-        unknownError: false
+        unknownError: false,
+        dataError: false
     };
 
     switch (String(responseStatusCode)) {
@@ -710,6 +718,11 @@ function parseYotpoResponse(result) {
             ' Error Text is: ' + result.errorMessage.error, 'error', logLocation);
             status.serviceError = true;
             break;
+        case constants.STATUS_400 :
+            yotpoLogger.logMessage('The request to export order failed because of bad data. ' +
+            ' Error code: ' + result.error + '\n' +
+            ' Error Text is: ' + result.errorMessage.error, 'error', logLocation);
+            status.dataError = true;
         default :
             yotpoLogger.logMessage('The request to export order failed for an unknown reason. Error: ' + result.error + '\n' +
             ' Error Text is: ' + result.errorMessage, 'error', logLocation);
@@ -773,7 +786,7 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
         exportOrderServiceRegistry.yotpoExportOrdersSvc.setURL(yotpoURL);
 
         // Removing the prefix that was added earlier to workaround SFCC not allowing object keys to start with '0.'
-        var requestJson = JSON.stringify(requestData).replace(constants.PRODUCT_ID_TOKEN, '', 'g');
+        var requestJson = JSON.stringify(requestData).replace(constants.PRODUCT_ID_PREFIX_REGEX, '');
         var result = exportOrderServiceRegistry.yotpoExportOrdersSvc.call(requestJson);
         var responseStatus = this.parseYotpoResponse(result);
         authenticationError = responseStatus.authenticationError;
@@ -813,8 +826,38 @@ function sendOrdersToYotpo(requestData, yotpoAppKey, locale, shouldGetNewToken) 
                     yotpoLogger.logMessage(authErrorMsg, 'error', logLocation);
                     throw new Error(authErrorMsg);
                 }
+            } else if (responseStatus.dataError) {
+                var OrderMgr = require('dw/order/OrderMgr');
+                var errorData = JSON.parse(result.errorMessage).errors;
+                if (!errorData || errorData.length === 0) {
+                    // this case seems extremely unlikely. Putting this here on the off chance to prevent infinite recursion
+                    throw new Error(constants.EXPORT_ORDER_SERVICE_ERROR + ': Yotpo API returned a data error, but did not indicate which orders included bad data. Aborting as there is not enough information to remove bad orders.');
+                }
+                // get IDs of orders with bad data
+                var badDataOrderIDs = [];
+                for (var i = 0; i < errorData.length; i++) {
+                    badDataOrderIDs.push(errorData[i].order_id);
+                }
+
+                // filter out bad orders from the original orders array
+                var filteredOrders = [];
+                for (var i = 0; i < requestData.orders.length; i++) {
+                    // if order did NOT have bad data
+                    if (badDataOrderIDs.indexOf(requestData.orders[i].order_id) === -1) {
+                        filteredOrders.push(requestData.orders[i])
+                    }
+                }
+                // check if filteredOrders is empty, if it is then stop and don't send again
+                if (filteredOrders.length === 0) {
+                    throw new Error(constsnts.EXPORT_ORDER_SERVICE_ERROR + ': After removing orders indicated as bad data by Yotpo API, no orders remain to send to Yotpo. Aborting.');
+                }
+                // overwrite original orders array with the new array that does not contain orders with bad data
+                requestData.orders = filteredOrders;
+                // call the function again without the bad orders
+                yotpoLogger.logMessage('Retrying Order Feed submission skipping orders with bad data \n' +
+                    'Orders with bad data: ' + badDataOrderIDs, 'error', logLocation);
+                this.sendOrdersToYotpo(requestData, yotpoAppKey, locale, false);
             } else if (responseStatus.unknownError) {
-                // Some other error occurred we should terminate here
                 throw new Error(constants.EXPORT_ORDER_SERVICE_ERROR + ': An unknown error occurred while attempting to communicate with the Yotpo service');
             }
         }
@@ -845,7 +888,7 @@ function exportOrdersByLocale(configAndRequestsByLocale) {
         if (!empty(orderRequestData.orders)) {
             model.sendOrdersToYotpo(orderRequestData, localeAppKey, locale, true);
         } else {
-            yotpoLogger.logMessage('Purchase feed export skipped for Locale ID: ' + locale + 'because there were no orders to process for that locale', 'debug', logLocation);
+            yotpoLogger.logMessage('Purchase feed export skipped for Locale ID: ' + locale + ' because there were no orders to process for that locale', 'debug', logLocation);
         }
     });
 }
@@ -872,7 +915,7 @@ function addOrderDataToRequests(ordersData, configAndRequestsByLocale) {
 }
 
 /**
- * It updates the Yotop Configuration object. It updates the last execution time of order process job with currentDateTime.
+ * It updates the Yotpo Configuration object. It updates the last execution time of order process job with currentDateTime.
  *
  * @param {Date} currentDateTime - The current date time.
  *

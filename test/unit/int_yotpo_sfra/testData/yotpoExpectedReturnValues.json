@@ -1,16 +1,16 @@
 {
     "orderExportEnabled": {
-        "productInformationFromMaster": true,
+        "yotpoProductInformationFromMaster": true,
         "exportGroupIdInOrder": true
     },
     "orderExportDisabled": {
-        "productInformationFromMaster": false,
+        "yotpoProductInformationFromMaster": false,
         "exportGroupIdInOrder": false
     },
     "productData": {
         "PRODUCT_ID__productID": {
             "name": "Product Name",
-            "imageURL": "imageUrl",
+            "image": "imageUrl",
             "coupon_used": false,
             "description": "Product Short Description",
             "price": "100.11",
@@ -25,7 +25,7 @@
     "optionalProductData": {
         "coupon_used": false,
         "description": "Product Short Description",
-        "imageURL": "imageUrl",
+        "image": "imageUrl",
         "price": "100.11",
         "vendor": "brand"
     },
@@ -40,24 +40,28 @@
         "success": true,
         "authenticationError": false,
         "serviceError": false,
-        "unknownError": false
+        "unknownError": false,
+        "dataError": false
     },
     "authErrorServiceStatus": {
         "success": false,
         "authenticationError": true,
         "serviceError": false,
-        "unknownError": false
+        "unknownError": false,
+        "dataError": false
     },
     "serviceErrorServiceStatus": {
         "success": false,
         "authenticationError": false,
         "serviceError": true,
-        "unknownError": false
+        "unknownError": false,
+        "dataError": false
     },
     "unknownErrorServiceStatus": {
         "success": false,
         "authenticationError": false,
         "serviceError": false,
-        "unknownError": true
+        "unknownError": true,
+        "dataError": false
     }
 }

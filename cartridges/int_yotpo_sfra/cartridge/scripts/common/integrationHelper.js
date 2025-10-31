@@ -15,10 +15,10 @@ function getRatingsOrReviewsData(currentLocale, productId) {
     if (isCartridgeEnabled && (yotpoConfig.isReviewsEnabled || yotpoConfig.isRatingsEnabled)) {
         var ProductMgr = require('dw/catalog/ProductMgr');
         var currentProduct = ProductMgr.getProduct(productId);
-        var productInformationFromMaster = yotpoConfig.productInformationFromMaster;
+        var yotpoProductInformationFromMaster = yotpoConfig.yotpoProductInformationFromMaster;
 
         if (currentProduct.variant) {
-            if (productInformationFromMaster) {
+            if (yotpoProductInformationFromMaster) {
                 currentProduct = currentProduct.getVariationModel().master;
             }
         }
@@ -30,10 +30,15 @@ function getRatingsOrReviewsData(currentLocale, productId) {
         var yotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils.js');
         var imageURL = yotpoUtils.getProductImageUrl(currentProduct);
 
+        // retrieving minPrice for a master product can be an expensive operation, as it has to look through all the variant prices
+        // minPrice will always have a relevant price. If there is a sale price, it will hold the sale price,
+        // if there is only a list price, it will hold the list price. Special pricing situations like tiered pricing are not considered.
+        var currentProductPrice = currentProduct.priceModel.minPrice;
+
         return {
             isReviewsEnabled: yotpoConfig.isReviewsEnabled,
             isRatingsEnabled: yotpoConfig.isRatingsEnabled,
-            yotpoAppKey: yotpoConfig.yotpoAppKey,
+            yotpoAppKey: yotpoConfig.appKey,
             domainAddress: yotpoConfig.domainAddress,
             productID: yotpoUtils.escape(currentProduct.ID, '([\/])', '-'),
             productName: currentProduct.name,
@@ -41,7 +46,9 @@ function getRatingsOrReviewsData(currentLocale, productId) {
             productModel: empty(currentProduct.brand) ? '' : currentProduct.brand,
             productURL: productURL,
             imageURL: imageURL,
-            productCategory: yotpoUtils.getCategoryPath(currentProduct)
+            productCategory: yotpoUtils.getCategoryPath(currentProduct),
+            price: currentProductPrice.decimalValue,
+            currency: currentProductPrice.currencyCode
         };
     }
 
@@ -77,7 +84,7 @@ function getConversionTrackingData(order, currentLocale) {
 
         var Site = require('dw/system/Site');
         // allow legacy pref name
-        yotpoAppKey = yotpoConfig.yotpoAppKey || yotpoConfig.appKey;
+        yotpoAppKey = yotpoConfig.appKey || yotpoConfig.appKey;
         var conversionTrackingURL = Site.getCurrent().preferences.custom.yotpoConversionTrackingPixelURL;
         conversionTrkURL = conversionTrackingURL + '?order_amount=' + orderTotalValue +
             '&order_id=' + order.orderNo + '&order_currency=' + order.currencyCode + '&app_key=' + yotpoAppKey;

@@ -12,7 +12,9 @@
         data-url="${pdict.yotpoWidgetData.productURL}"
         data-image-url="${pdict.yotpoWidgetData.imageURL}"
         data-description="${pdict.yotpoWidgetData.productDesc}"
-        data-bread-crumbs="${pdict.yotpoWidgetData.productCategory}">
+        data-bread-crumbs="${pdict.yotpoWidgetData.productCategory}"
+        data-currency="${pdict.yotpoWidgetData.currency}"
+        data-price="${pdict.yotpoWidgetData.price}">
     </div>
     <!--- //////////////////// --->
 </isif>

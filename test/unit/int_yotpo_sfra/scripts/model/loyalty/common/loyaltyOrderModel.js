@@ -29,12 +29,22 @@ describe('loyaltyOrderModel', () => {
             };
         }
     };
+    let fakeCurrency = {
+        currencyCode: 'USD',
+        getCurrency: () => {
+            return fakeCurrency;
+        },
+        getDefaultFractionDigits: () => {
+            return 2;
+        }
+    }
 
     const yotpoUtils = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/scripts/utils/yotpoUtils', {
         'dw/system/Logger': loggerSpy,
         'dw/util/StringUtils': sinon.stub(),
         '*/cartridge/scripts/utils/constants': constants,
-        '*/cartridge/scripts/utils/yotpoLogger': loggerSpy
+        '*/cartridge/scripts/utils/yotpoLogger': loggerSpy,
+        'dw/util/Currency': fakeCurrency
     });
 
     const loyaltyOrderModel = proxyquire('../../../../../../../cartridges/int_yotpo_sfra/cartridge/models/loyalty/common/loyaltyOrderModel.js', {
@@ -259,6 +269,9 @@ describe('loyaltyOrderModel', () => {
                         };
                     }
                 };
+            },
+            getCurrencyCode: () => {
+                return 'USD';
             }
         };
         it('Should Throw an error if the order is missing', () => {
@@ -309,7 +322,7 @@ describe('loyaltyOrderModel', () => {
                         'adjusted_tax_cents': 200,
                         'base_price_cents': 2999,
                         'collections': 'Fake Category Name',
-                        'id': '-f-a-k-e-P-r-o-d-u-c-t-I-d-',
+                        'id': 'fakeProductId',
                         'name': 'fake product name',
                         'price_adjustments': [
                             {

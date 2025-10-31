@@ -30,7 +30,7 @@ server.get('IncludeLoyaltyTracking', function (req, res, next) {
     };
 
     if (req.currentCustomer.profile) {
-        customerDetails = CommonModel.getLoggedInCustomerDetails(req.currentCustomer.profile.customerNo);
+        customerDetails = CommonModel.getLoggedInCustomerDetails(req.currentCustomer.profile.customerNo, currentLocaleID);
     }
     basketDetails = CommonModel.getCurrentBasketDetails(currentLocaleID);
 

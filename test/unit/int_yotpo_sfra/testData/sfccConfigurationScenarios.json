@@ -50,7 +50,8 @@
     },
     "baseYotpoRequestParams": {
         "validate_data": true,
-        "platform": "general",
+        "platform": "commerce_cloud",
+        "plugin_version": "21.6.2",
         "utoken": "utokenAuthCode",
         "orders": []
     },

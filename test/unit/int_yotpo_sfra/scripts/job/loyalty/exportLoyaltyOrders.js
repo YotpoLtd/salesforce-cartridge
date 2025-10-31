@@ -155,7 +155,7 @@ describe('exportLoyaltyOrders job', () => {
             let events = [orderObj];
             exportLoyaltyOrders.write(events);
             assert.equal(events[0].OrderEventObject.custom.Status, 'SUCCESS');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Writing Order payload to yotpo for Order/), 'debug', 'exportOrders~write');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Writing Order payload to yotpo for Order/), 'debug', 'exportLoyaltyOrders~write');
             exportOrderByLocale.restore();
         });
         it('Should mark object as failed if it does not post to yotpo.', () => {
@@ -164,48 +164,48 @@ describe('exportLoyaltyOrders job', () => {
             let events = [orderObj];
             exportLoyaltyOrders.write(events);
             assert.equal(events[0].OrderEventObject.custom.Status, 'FAIL');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write Order payload to yotpo for Order/), 'error', 'exportOrders~write');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write Order payload to yotpo for Order/), 'error', 'exportLoyaltyOrders~write');
             exportOrderByLocale.restore();
         });
         it('Should log and fail if event has no order ID.', () => {
             orderObj.OrderId = null;
             let events = [orderObj];
             exportLoyaltyOrders.write(events);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write event, OrderId not found/), 'error', 'exportOrders~write');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Failed to write event, OrderId not found/), 'error', 'exportLoyaltyOrders~write');
         });
     });
     describe('afterChunk', () => {
         it('Should log successful when the chunk was successful.', () => {
             exportLoyaltyOrders.afterChunk(true);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Order Export chunk completed successfully/), 'debug', 'exportOrders~afterChunk');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Order Export chunk completed successfully/), 'debug', 'exportLoyaltyOrders~afterChunk');
         });
         it('Should log unsuccessful when the chunk was unsuccessful.', () => {
             exportLoyaltyOrders.afterChunk(false);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Order Export chunk failed/), 'error', 'exportOrders~afterChunk');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Order Export chunk failed/), 'error', 'exportLoyaltyOrders~afterChunk');
         });
         it('Should log number of failed orders.', () => {
             // 0 out chunkErrorCount
             exportLoyaltyOrders.beforeChunk(false);
             exportLoyaltyOrders.afterChunk(false);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 Orders skipped out of 0 processed in this chunk/), 'error', 'exportOrders~afterChunk');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 Orders skipped out of 0 processed in this chunk/), 'error', 'exportLoyaltyOrders~afterChunk');
             exportLoyaltyOrders.process();
             exportLoyaltyOrders.process();
             exportLoyaltyOrders.process();
             // Only care about logging for the afterChunk
             loggerSpy.logMessage.reset();
             exportLoyaltyOrders.afterChunk(false);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/3 Orders skipped out of 3 processed in this chunk/), 'error', 'exportOrders~afterChunk');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/3 Orders skipped out of 3 processed in this chunk/), 'error', 'exportLoyaltyOrders~afterChunk');
         });
     });
     describe('afterStep', () => {
         it('Should log successful when the step was successful.', () => {
             exportLoyaltyOrders.afterStep(true, {}, stepExecution);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Order Export step completed successfully/), 'debug', 'exportOrders~afterStep');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 Orders skipped out of 0 processed in this step /), 'debug', 'exportOrders~afterStep');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Order Export step completed successfully/), 'debug', 'exportLoyaltyOrders~afterStep');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/0 Orders skipped out of 0 processed in this step /), 'debug', 'exportLoyaltyOrders~afterStep');
         });
         it('Should log unsuccessful when the step was unsuccessful.', () => {
             exportLoyaltyOrders.afterStep(false, {}, stepExecution);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Order Export step failed/), 'error', 'exportOrders~afterStep');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/Yotpo Order Export step failed/), 'error', 'exportLoyaltyOrders~afterStep');
         });
         it('Should log unsuccessful order counts.', () => {
             // Process an order
@@ -219,21 +219,9 @@ describe('exportLoyaltyOrders job', () => {
             loggerSpy.logMessage.reset();
             constants.EXPORT_ORDER_ERROR_COUNT_THRESHOLD = 100;
             exportLoyaltyOrders.afterStep(false, {}, stepExecution);
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/1 Orders skipped out of 2 processed in this step /), 'error', 'exportOrders~afterStep');
-            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/The following Orders where excluded from export in this job execution due to data errors:/), 'error', 'exportOrders~afterStep');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/1 Orders skipped out of 2 processed in this step /), 'error', 'exportLoyaltyOrders~afterStep');
+            sinon.assert.calledWithMatch(loggerSpy.logMessage, sinon.match(/The following Orders were excluded from export in this job execution due to data errors:/), 'error', 'exportLoyaltyOrders~afterStep');
             constants.EXPORT_ORDER_ERROR_COUNT_THRESHOLD = 0.3;
-        });
-        it('Should throw if failed orders are more than constants.EXPORT_ORDER_ERROR_COUNT_THRESHOLD.', () => {
-            // Process an order
-            exportLoyaltyOrders.beforeStep({}, stepExecution);
-            let generateOrderExportPayload = sinon.stub(exportLoyaltyOrderModel, 'generateOrderExportPayload');
-            generateOrderExportPayload.returns({ fake: 'object' });
-            // Generate 1 successful 1 failed order
-            exportLoyaltyOrders.process(fakeOrderEvent);
-            exportLoyaltyOrders.process();
-            generateOrderExportPayload.restore();
-            loggerSpy.logMessage.reset();
-            assert.throws(() => exportLoyaltyOrders.afterStep(false, {}, stepExecution), /1 Orders skipped out of 2 processed in this step/);
         });
     });
 });
