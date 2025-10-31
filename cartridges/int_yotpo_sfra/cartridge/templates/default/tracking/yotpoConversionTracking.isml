@@ -15,9 +15,9 @@
         </script>
         <script>
             yotpoTrackConversionData = {
-                orderId: <isprint value="${pdict.order.orderNumber}"/>,
-                orderAmount: <isprint value="${pdict.yotpoConversionTrackingData.orderTotalValue}"/>,
-                orderCurrency: <isprint value="${pdict.yotpoConversionTrackingData.orderCurrency}"/>
+                orderId: "<isprint value="${pdict.order.orderNumber}"/>",
+                orderAmount: "<isprint value="${pdict.yotpoConversionTrackingData.orderTotalValue}"/>",
+                orderCurrency: "<isprint value="${pdict.yotpoConversionTrackingData.orderCurrency}"/>""
             }
         </script>
         <noscript>

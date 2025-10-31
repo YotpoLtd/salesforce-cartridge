@@ -72,6 +72,7 @@ function getConversionTrackingData(order, currentLocale) {
     var conversionTrkURL = '';
     var yotpoAppKey = '';
     var orderTotalValue = 0;
+    var orderCurrency = '';
 
     if (isCartridgeEnabled && (yotpoConfig.isReviewsEnabled || yotpoConfig.isRatingsEnabled)) {
         if (!empty(order)) {
@@ -80,6 +81,7 @@ function getConversionTrackingData(order, currentLocale) {
             } else {
                 orderTotalValue = order.getAdjustedMerchandizeTotalPrice(true).add(order.giftCertificateTotalPrice.value);
             }
+            orderCurrency = order.currencyCode;
         }
 
         var Site = require('dw/system/Site');
@@ -95,7 +97,7 @@ function getConversionTrackingData(order, currentLocale) {
         conversionTrackingURL: conversionTrkURL,
         appKey: yotpoAppKey,
         orderTotalValue: orderTotalValue,
-        orderCurrency: order.currencyCode
+        orderCurrency: orderCurrency
     };
 }
 /**
