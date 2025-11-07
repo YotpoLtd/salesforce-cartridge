@@ -31,7 +31,7 @@ function exportCustomersByLocale(customerArray, locale) {
         api_key: keys.key
     };
     var payload = { customers: customerArray };
-    LoyaltyService.exportData(payload, queryParams, 'process_customers_batch');
+    LoyaltyService.exportData(payload, queryParams, 'process_customers_batch', locale);
 }
 
 /**
@@ -94,7 +94,7 @@ function exportCustomerByLocale(payload, locale) {
         guid: keys.guid,
         api_key: keys.key
     };
-    LoyaltyService.exportData(payload, queryParams, 'customers');
+    LoyaltyService.exportData(payload, queryParams, 'customers', locale);
 }
 
 /**
