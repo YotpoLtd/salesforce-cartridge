@@ -70,20 +70,23 @@ function getConversionTrackingData(order, currentLocale) {
     var yotpoConfig = YotpoConfigurationModel.getYotpoConfig(currentLocale);
     var isCartridgeEnabled = YotpoConfigurationModel.isCartridgeEnabled();
     var conversionTrkURL = '';
+    var yotpoAppKey = '';
+    var orderTotalValue = 0;
+    var orderCurrency = '';
 
     if (isCartridgeEnabled && (yotpoConfig.isReviewsEnabled || yotpoConfig.isRatingsEnabled)) {
-        var orderTotalValue;
-
         if (!empty(order)) {
             if (order.totalGrossPrice.available) {
                 orderTotalValue = order.totalGrossPrice.value;
             } else {
                 orderTotalValue = order.getAdjustedMerchandizeTotalPrice(true).add(order.giftCertificateTotalPrice.value);
             }
+            orderCurrency = order.currencyCode;
         }
 
         var Site = require('dw/system/Site');
-        var yotpoAppKey = yotpoConfig.appKey;
+        // allow legacy pref name
+        yotpoAppKey = yotpoConfig.yotpoAppKey ? yotpoConfig.yotpoAppKey : yotpoConfig.appKey;
         var conversionTrackingURL = Site.getCurrent().preferences.custom.yotpoConversionTrackingPixelURL;
         conversionTrkURL = conversionTrackingURL + '?order_amount=' + orderTotalValue +
             '&order_id=' + order.orderNo + '&order_currency=' + order.currencyCode + '&app_key=' + yotpoAppKey;
@@ -91,7 +94,10 @@ function getConversionTrackingData(order, currentLocale) {
 
     return {
         isCartridgeEnabled: isCartridgeEnabled,
-        conversionTrackingURL: conversionTrkURL
+        conversionTrackingURL: conversionTrkURL,
+        appKey: yotpoAppKey,
+        orderTotalValue: orderTotalValue,
+        orderCurrency: orderCurrency
     };
 }
 /**

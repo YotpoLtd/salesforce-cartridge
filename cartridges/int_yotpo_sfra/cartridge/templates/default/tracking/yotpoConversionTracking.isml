@@ -4,6 +4,24 @@
 </iscomment>
 <isif condition="${!empty(pdict.yotpoConversionTrackingData) && pdict.yotpoConversionTrackingData.isCartridgeEnabled}">
     <isif condition="${!empty(pdict.yotpoConversionTrackingData.conversionTrackingURL)}">
-        <img id="yotpo-conversion" src="${pdict.yotpoConversionTrackingData.conversionTrackingURL}" width="1" height="1">
+        <script>
+            (function e(){
+                var e=document.createElement("script");
+                e.type="text/javascript",e.async=true,e.src="//staticw2.yotpo.com/<isprint value="${pdict.yotpoConversionTrackingData.appKey}"/>/widget.js";
+                var t=document.getElementsByTagName("script")[0];
+                t.parentNode.insertBefore(e,t)
+                }
+            )();
+        </script>
+        <script>
+            yotpoTrackConversionData = {
+                orderId: "<isprint value="${pdict.order.orderNumber}"/>",
+                orderAmount: "<isprint value="${pdict.yotpoConversionTrackingData.orderTotalValue}"/>",
+                orderCurrency: "<isprint value="${pdict.yotpoConversionTrackingData.orderCurrency}"/>"
+            }
+        </script>
+        <noscript>
+            <img id="yotpo-conversion" alt="" src="${pdict.yotpoConversionTrackingData.conversionTrackingURL}" width="1" height="1" />
+        </noscript>
     </isif>
 </isif>
