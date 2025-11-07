@@ -83,7 +83,7 @@ describe('integrationHelper', () => {
 
             const trackingUrl = integrationHelper.getConversionTrackingData(order, locale).conversionTrackingURL;
 
-            assert.equal(trackingUrl, 'conversionUrl?order_amount=123.1&order_id=0001234&order_currency=USD&app_key=undefined');
+            assert.equal(trackingUrl, 'conversionUrl?order_amount=123.1&order_id=0001234&order_currency=USD&app_key=1234');
 
             stub.restore();
         });
