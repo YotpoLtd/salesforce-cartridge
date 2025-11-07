@@ -86,7 +86,7 @@ function getConversionTrackingData(order, currentLocale) {
 
         var Site = require('dw/system/Site');
         // allow legacy pref name
-        yotpoAppKey = yotpoConfig.appKey || yotpoConfig.appKey;
+        yotpoAppKey = yotpoConfig.yotpoAppKey || yotpoConfig.appKey;
         var conversionTrackingURL = Site.getCurrent().preferences.custom.yotpoConversionTrackingPixelURL;
         conversionTrkURL = conversionTrackingURL + '?order_amount=' + orderTotalValue +
             '&order_id=' + order.orderNo + '&order_currency=' + order.currencyCode + '&app_key=' + yotpoAppKey;
