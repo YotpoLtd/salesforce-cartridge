@@ -13,10 +13,11 @@
  * @param {Object} payload : The data in JSON format to be exported to Yotpo.
  * @param {Object} queryParams : The query string parameters appended to endpoint.
  * @param {string} endpoint : The endpoint to send data to.
+ * @param {string} locale : locale of the order
  *
  * @returns {boolean} status: The flag to indicate the export status
  */
-function exportData(payload, queryParams, endpoint) {
+function exportData(payload, queryParams, endpoint, locale) {
     var Result = require('dw/svc/Result');
     var LoyaltyExportServiceRegistry = require('*/cartridge/scripts/serviceregistry/loyalty/loyaltyExportServiceRegistry');
     var Constants = require('*/cartridge/scripts/utils/constants');
@@ -45,7 +46,7 @@ function exportData(payload, queryParams, endpoint) {
         loyaltyService.addHeader('Content-Length', requestJSON.length);
         result = loyaltyService.call(requestJSON);
     } catch (e) {
-        YotpoLogger.logMessage('Error occured while trying to export data - ' + e, 'error', logLocation);
+        YotpoLogger.logMessage('Error occured while trying to export data - Locale: ' + locale + ' - ' + e, 'error', logLocation);
         throw Constants.EXPORT_LOYALTY_SERVICE_ERROR;
     }
 
@@ -62,7 +63,8 @@ function exportData(payload, queryParams, endpoint) {
         var error = 'Could not export data to Yotpo ' +
             '- HTTP Status Code is: ' + result.error +
             '\n Error Text is: ' + result.errorMessage +
-            '\n Yotpo Loyalty Endpoint is: ' + serviceEndpoint;
+            '\n Yotpo Loyalty Endpoint is: ' + serviceEndpoint +
+            '\n Locale is: ' + locale;
         YotpoLogger.logMessage(error, 'error', logLocation);
         throw new Error(Constants.EXPORT_LOYALTY_SERVICE_ERROR + ' ' + error);
     }
