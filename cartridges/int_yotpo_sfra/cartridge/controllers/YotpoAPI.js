@@ -124,4 +124,36 @@ server.get('RemoveProductFromCart', server.middleware.https, function (req, res,
     next();
 });
 
+/**
+ * GetCurrentBasket : Returns the current basket ID and token from the session.
+ * Used by the frontend to refresh stale basket information when Commerce Cloud
+ * creates a new basket.
+ *
+ * @name GetCurrentBasket
+ * @function
+ * @param {category} - non-sensitive
+ * @param {renders} - json
+ * @param {serverfunction} - get
+ */
+server.get('GetCurrentBasket', server.middleware.https, function (req, res, next) {
+    var CommonModel = require('*/cartridge/models/common/commonModel');
+    var yotpoUtils = require('*/cartridge/scripts/utils/yotpoUtils.js');
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+    YotpoLogger.logMessage('Received request to get current basket',
+        'debug', 'YotpoAPI~GetCurrentBasket');
+
+    var viewData = res.getViewData();
+    var currentLocaleID = yotpoUtils.getCurrentLocaleSFRA(viewData.locale);
+
+    var basketDetails = CommonModel.getCurrentBasketDetails(currentLocaleID);
+
+    res.setStatusCode(200);
+    res.json({
+        basket_id: basketDetails.basketID || null,
+        basket_token: basketDetails.basketTokken || null,
+        basket_exists: basketDetails.basketExists
+    });
+    next();
+});
+
 module.exports = server.exports();
