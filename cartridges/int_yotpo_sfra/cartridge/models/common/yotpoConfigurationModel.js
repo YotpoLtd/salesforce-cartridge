@@ -174,7 +174,7 @@ function setYotpoConfigOverrides(locale) {
  * @returns {Object} a JSON object of the yotpo configurations.
  */
 function getYotpoConfig(locale) {
-    if (!session || !session.privacy || !session.privacy.yotpoConfig) {
+    if (!session || !session.privacy || !session.privacy.yotpoConfigOverrides) {
         return setYotpoConfigOverrides(locale);
     }
     return JSON.parse(session.privacy.yotpoConfigOverrides);
