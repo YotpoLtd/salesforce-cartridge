@@ -8,6 +8,8 @@ server.extend(module.superModule);
  */
 server.append('PlaceOrder', function (req, res, next) {
     var viewData = res.getViewData();
+    var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
+    var logLocation = 'CheckoutServices~PlaceOrder';
 
     // Add order to loyaltyOrderCO on PlaceOrder but
     // do not attempt to send order data to yotpo loyalty until order is actually confirmed,
@@ -22,8 +24,13 @@ server.append('PlaceOrder', function (req, res, next) {
                 locale: viewData.locale
             });
         } catch (ex) {
-            // Errors creating CO are already being captured in loyaltyOrderCO
+            YotpoLogger.logMessage('Yotpo Loyalty CO was not created for order: ' + orderNo +
+                    ', Exception is: ' + ex, 'error', logLocation);
         }
+    } else {
+        YotpoLogger.logMessage('Yotpo Loyalty CO was not created because the PlaceOrder response had no orderID ' +
+                'in viewData. This can happen for payment methods (e.g. redirect / hosted checkout flows) that ' +
+                'finalize the order outside this controller.', 'error', logLocation);
     }
 
     return next();
