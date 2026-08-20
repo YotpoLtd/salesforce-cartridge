@@ -25,13 +25,14 @@ function createLoyaltyOrderCO(params) {
     var YotpoLogger = require('*/cartridge/scripts/utils/yotpoLogger');
 
     var localeID = params.locale;
+    var orderNo = params.orderNo;
     var logLocation = 'loyaltyOrderCO~createLoyaltyOrderCO';
 
     YotpoLogger.logMessage('\n------ Yotpo Export Order To Yotpo Loyalty  --------' +
             '\n Current Site ID: ' + Site.getCurrent().getName() +
             '\n Date format for the Yotpo data: ' + Constants.DATE_FORMAT_FOR_YOTPO_DATA +
             '\n Current Locale: ' + localeID +
-            '\n Order Number: ' + params.orderNo +
+            '\n Order Number: ' + orderNo +
             '\n Order State: ' + params.orderState, 'debug', logLocation);
 
     var isCartridgeEnabled = YotpoConfigurationModel.isCartridgeEnabled();
@@ -40,17 +41,26 @@ function createLoyaltyOrderCO(params) {
     var isValid = !empty(YotpoConfigurationModel.getLoyaltyAPIKeys(localeID));
 
     if (!isLoyaltyEnabled || !isLoyaltyOrderFeedEnabled || !isValid) {
+        YotpoLogger.logMessage('Yotpo Loyalty CO not created for order: ' + orderNo + ', Locale: ' + localeID +
+                ' - loyalty config invalid or disabled (isLoyaltyEnabled: ' + isLoyaltyEnabled +
+                ', isLoyaltyOrderFeedEnabled: ' + isLoyaltyOrderFeedEnabled +
+                ', hasValidAPIKeys: ' + isValid + ')', 'error', logLocation);
         throw Constants.YOTPO_CONFIGURATION_LOAD_ERROR;
     }
 
-    var orderNo = params.orderNo;
     var order = OrderMgr.getOrder(orderNo);
-    order = LoyaltyOrderModel.saveUserInfoInOrder(order);
-
-    var payloadOrderJSON = LoyaltyOrderModel.prepareOrderJSON(order);
-    var payload = JSON.stringify(payloadOrderJSON);
+    if (!order) {
+        YotpoLogger.logMessage('Yotpo Loyalty CO not created for order: ' + orderNo +
+                ' - OrderMgr.getOrder(orderNo) returned no order.', 'error', logLocation);
+        throw Constants.YOTPO_ORDER_MISSING_ERROR;
+    }
 
     try {
+        order = LoyaltyOrderModel.saveUserInfoInOrder(order);
+
+        var payloadOrderJSON = LoyaltyOrderModel.prepareOrderJSON(order);
+        var payload = JSON.stringify(payloadOrderJSON);
+
         Transaction.wrap(function () {
             var newLoyaltyCO = CustomObjectMgr.createCustomObject('yotpoLoyaltyOrder', dw.util.UUIDUtils.createUUID());
             newLoyaltyCO.custom.OrderID = orderNo;

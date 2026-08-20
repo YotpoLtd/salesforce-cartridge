@@ -111,6 +111,7 @@ describe('yotpoConfigurationModel', () => {
 
     beforeEach(function () {
         sitePrefs = Object.assign({}, sitePrefDefaults);
+        session.privacy.yotpoConfigOverrides = null;
     });
 
     // Reset spies & stubs
